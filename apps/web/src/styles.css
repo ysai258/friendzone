@@ -1,0 +1,103 @@
+@import 'tailwindcss';
+
+/*
+ * One dark theme, tuned for a phone held in a noisy room: high contrast, large
+ * touch targets, and colour used to mean something rather than to decorate.
+ */
+@theme {
+  --font-sans: 'Outfit', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  --color-ink-950: #08070d;
+  --color-ink-900: #0b0a12;
+  --color-ink-850: #12101c;
+  --color-ink-800: #191627;
+  --color-ink-700: #241f38;
+  --color-ink-600: #342c4f;
+  --color-ink-500: #4a4070;
+
+  --color-chalk: #f4f2ff;
+  --color-muted: #a49dc4;
+
+  --color-pop-violet: #8b5cf6;
+  --color-pop-rose: #fb7185;
+  --color-pop-emerald: #34d399;
+  --color-pop-amber: #fbbf24;
+  --color-pop-sky: #38bdf8;
+}
+
+@layer base {
+  html {
+    background: var(--color-ink-950);
+    color-scheme: dark;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100dvh;
+    background:
+      radial-gradient(1100px 700px at 12% -10%, color-mix(in oklab, var(--color-pop-violet) 22%, transparent), transparent 60%),
+      radial-gradient(900px 600px at 95% 0%, color-mix(in oklab, var(--color-pop-sky) 14%, transparent), transparent 55%),
+      var(--color-ink-950);
+    color: var(--color-chalk);
+    font-family: var(--font-sans);
+    /* Safe areas, because this is played on phones with notches. */
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  }
+
+  /* Never let a stray element create a horizontal scrollbar on a phone. */
+  #root {
+    overflow-x: clip;
+  }
+
+  button, input {
+    font: inherit;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-pop-sky);
+    outline-offset: 2px;
+    border-radius: 0.5rem;
+  }
+}
+
+@layer utilities {
+  .card {
+    background: color-mix(in oklab, var(--color-ink-850) 88%, transparent);
+    border: 1px solid color-mix(in oklab, var(--color-ink-600) 60%, transparent);
+    border-radius: 1.25rem;
+    backdrop-filter: blur(12px);
+  }
+
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* Respect a person's stated preference. Everything below is decoration. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@keyframes fz-pop {
+  0% { transform: scale(0.85); opacity: 0; }
+  60% { transform: scale(1.04); }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes fz-rise {
+  from { transform: translateY(10px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+@keyframes fz-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
+}
+
+.animate-pop { animation: fz-pop 260ms cubic-bezier(0.2, 0.9, 0.3, 1.2) both; }
+.animate-rise { animation: fz-rise 300ms ease-out both; }
+.animate-soft-pulse { animation: fz-pulse 1.6s ease-in-out infinite; }
