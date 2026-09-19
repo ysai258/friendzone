@@ -1,0 +1,32 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: friendzone-postgres
+    environment:
+      POSTGRES_USER: friendzone
+      POSTGRES_PASSWORD: friendzone
+      POSTGRES_DB: friendzone
+    # 5433/6380 on the host so a local Postgres/Redis can keep their usual ports.
+    ports: ["55432:5432"]
+    volumes: ["friendzone-pgdata:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U friendzone -d friendzone"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+    container_name: friendzone-redis
+    command: ["redis-server", "--appendonly", "yes", "--save", ""]
+    ports: ["6380:6379"]
+    volumes: ["friendzone-redisdata:/data"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  friendzone-pgdata:
+  friendzone-redisdata:

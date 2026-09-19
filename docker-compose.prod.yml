@@ -1,0 +1,78 @@
+# A complete deployment, for a single box or as a reference for a platform.
+#
+#   SESSION_SECRET=$(node -e "console.log(require('crypto').randomBytes(32).toString('base64url'))") \
+#   docker compose -f docker-compose.prod.yml up -d --build
+#
+# Scale the game servers horizontally; they hold no state:
+#   docker compose -f docker-compose.prod.yml up -d --scale server=3
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-friendzone}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-friendzone}
+    volumes: ["pgdata:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-friendzone}"]
+      interval: 5s
+      retries: 20
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    # Append-only, no snapshots: a restart replays the log, and rooms that do
+    # not survive simply expire rather than being half-restored.
+    command: ["redis-server", "--appendonly", "yes", "--save", "", "--maxmemory-policy", "noeviction"]
+    volumes: ["redisdata:/data"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      retries: 20
+    restart: unless-stopped
+
+  server:
+    build: { context: ., target: server }
+    environment:
+      NODE_ENV: production
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      PORT: 8080
+      SESSION_SECRET: ${SESSION_SECRET:?set SESSION_SECRET}
+      DATABASE_URL: postgres://${POSTGRES_USER:-friendzone}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-friendzone}
+      REDIS_URL: redis://redis:6379
+      CORS_ORIGINS: ${PUBLIC_ORIGIN:?set PUBLIC_ORIGIN}
+      PUBLIC_WEB_ORIGIN: ${PUBLIC_ORIGIN}
+      ADMIN_TOKEN: ${ADMIN_TOKEN:-}
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
+    # Give the drain sequence room to finish before the container is killed.
+    stop_grace_period: 30s
+    restart: unless-stopped
+
+  worker:
+    build: { context: ., target: worker }
+    environment:
+      NODE_ENV: production
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      SESSION_SECRET: ${SESSION_SECRET}
+      DATABASE_URL: postgres://${POSTGRES_USER:-friendzone}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-friendzone}
+      REDIS_URL: redis://redis:6379
+      CORS_ORIGINS: ${PUBLIC_ORIGIN}
+      PUBLIC_WEB_ORIGIN: ${PUBLIC_ORIGIN}
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
+    stop_grace_period: 60s
+    restart: unless-stopped
+
+  web:
+    build: { context: ., target: web }
+    ports: ["80:80"]
+    depends_on: [server]
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  redisdata:

@@ -1,0 +1,54 @@
+{
+  "name": "friendzone",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Real-time multiplayer party games. Open a link, type a name, play.",
+  "engines": {
+    "node": ">=22"
+  },
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "dev:server": "npm run dev -w @friendzone/server",
+    "dev:web": "npm run dev -w @friendzone/web",
+    "build": "npm run build -w @friendzone/server && npm run build -w @friendzone/web",
+    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p apps/web/tsconfig.json && tsc --noEmit -p tests/e2e/tsconfig.json",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "test": "vitest run --project unit --project integration",
+    "test:unit": "vitest run --project unit",
+    "test:integration": "vitest run --project integration",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "coverage": "vitest run --project unit --coverage",
+    "migrate": "tsx --env-file-if-exists=.env scripts/db/migrate.ts",
+    "seed": "tsx --env-file-if-exists=.env scripts/seed/seed.ts",
+    "dataset:sample": "tsx --env-file-if-exists=.env scripts/dataset/pipeline.ts --source=sample",
+    "dataset:fetch": "tsx --env-file-if-exists=.env scripts/dataset/pipeline.ts --source=wikimedia",
+    "loadtest": "tsx --env-file-if-exists=.env scripts/load/loadtest.ts",
+    "infra:up": "docker compose up -d",
+    "infra:down": "docker compose down",
+    "infra:reset": "docker compose down -v && docker compose up -d",
+    "worker": "npm run worker -w @friendzone/server"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.63.0",
+    "@types/node": "^26.6.1",
+    "@types/ws": "^8.18.1",
+    "@vitest/coverage-v8": "^5.0.1",
+    "eslint": "^10.10.0",
+    "globals": "^17.12.0",
+    "p-limit": "^7.3.3",
+    "sharp": "^0.35.4",
+    "tsx": "^4.23.13",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.70.0",
+    "vitest": "^5.0.1",
+    "ws": "^8.21.3"
+  }
+}

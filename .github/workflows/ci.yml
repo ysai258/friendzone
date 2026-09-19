@@ -1,0 +1,78 @@
+name: CI
+
+on:
+  push: { branches: [main] }
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: friendzone
+          POSTGRES_PASSWORD: friendzone
+          POSTGRES_DB: friendzone
+        ports: ["55432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U friendzone"
+          --health-interval 5s --health-timeout 5s --health-retries 20
+      redis:
+        image: redis:7-alpine
+        ports: ["6380:6379"]
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s --health-timeout 5s --health-retries 20
+
+    env:
+      DATABASE_URL: postgres://friendzone:friendzone@localhost:55432/friendzone
+      REDIS_URL: redis://localhost:6380
+      SESSION_SECRET: ci-secret-long-enough-to-pass-validation
+      CORS_ORIGINS: http://localhost:5174
+      PUBLIC_WEB_ORIGIN: http://localhost:5174
+      LOG_LEVEL: silent
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Unit tests
+        run: npm run test:unit
+
+      # Placeholder art rather than a network fetch: CI should not depend on
+      # Wikimedia being reachable, and the mechanics are identical either way.
+      - name: Build content
+        run: npm run dataset:sample && npm run seed
+
+      - name: Integration tests
+        run: npm run test:integration
+
+      - name: Production builds
+        run: npm run build
+
+      - name: Install browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: End-to-end tests
+        run: npm run test:e2e -- --project=phone
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
