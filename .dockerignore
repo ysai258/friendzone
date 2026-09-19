@@ -1,0 +1,28 @@
+# The build installs its own dependencies; copying the host's would overwrite
+# them with whatever this machine happens to have, and ship them in the image.
+node_modules
+**/node_modules
+
+# Build output, regenerated inside the image.
+dist
+**/dist
+.tsbuild
+
+# Generated content. The image builds its own, so a stale local copy cannot
+# leak into a release.
+apps/web/public/content
+data/out
+data/cache
+
+# Nothing here belongs in a container.
+.git
+.github
+.env
+.env.*
+!.env.example
+load-results
+test-results
+playwright-report
+coverage
+qa
+*.log

@@ -68,9 +68,22 @@ CMD ["node", "dist/index.js"]
 
 # ---------------------------------------------------------------------------
 FROM runtime-base AS worker
-# Sharp is native and stayed out of the bundle; only the worker needs it.
+# Sharp is native, so it stayed out of the bundle, and only the worker needs it.
+#
+# It has to be moved to a production dependency first. The root manifest lists
+# it under devDependencies — it is a build-time tool for the content pipeline —
+# and with an entry in both sections npm resolves the conflict in favour of the
+# dev one, then --omit=dev skips it entirely:
+#
+#   npm warn idealTree Removing dependencies.sharp in favor of devDependencies.sharp
+#
+# So the dev entry is deleted rather than shadowed. Without this the worker
+# installs nothing and crash-loops on its first import.
 USER root
-RUN npm i --omit=dev sharp@^0.35.4 && npm cache clean --force
+RUN npm pkg delete devDependencies.sharp \
+ && npm pkg set dependencies.sharp="^0.35.4" \
+ && npm install --omit=dev --no-audit --no-fund sharp \
+ && npm cache clean --force
 USER node
 HEALTHCHECK NONE
 CMD ["node", "dist/worker.js"]

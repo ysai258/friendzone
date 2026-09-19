@@ -11,6 +11,13 @@
 # and `web` targets instead and put the web container in front; see
 # docs/deployment.md.
 
+# An explicit project name, because Compose otherwise derives it from the
+# directory — which both this file and docker-compose.yml share. Without it,
+# bringing this stack up in a checkout that is also running the dev stack
+# adopts those containers and recreates them with production settings,
+# orphaning their volumes.
+name: friendzone-prod
+
 services:
   postgres:
     image: postgres:17-alpine
