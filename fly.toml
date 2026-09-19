@@ -1,0 +1,56 @@
+# Fly.io deployment for FriendZone.
+#
+#   fly auth login
+#   ./scripts/deploy-fly.sh
+#
+# One machine serving the app, the API and the WebSocket on a single origin,
+# with Postgres and Redis attached. See docs/deployment.md for the reasoning.
+
+app = "friendzone"
+primary_region = "sin"          # Singapore; closest Fly region to India
+
+[build]
+  # The default Dockerfile target is `allinone`, which is what this runs.
+  dockerfile = "Dockerfile"
+
+[env]
+  NODE_ENV = "production"
+  PORT = "8080"
+  LOG_LEVEL = "info"
+  # Content is loaded on first boot if the database is empty.
+  SEED_ON_BOOT = "true"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  # A party game is unplayable if the first person to open the link waits for a
+  # cold start, and a sleeping machine drops every WebSocket in every live room.
+  auto_stop_machines = false
+  auto_start_machines = true
+  min_machines_running = 1
+  processes = ["app"]
+
+  [http_service.concurrency]
+    # Connections, not requests: these are long-lived sockets. The measured
+    # ceiling on one small machine is far higher; this leaves headroom before
+    # Fly starts another.
+    type = "connections"
+    hard_limit = 2000
+    soft_limit = 1500
+
+# Liveness only. A check that touched the database would cycle healthy machines
+# during a database blip, which is the opposite of what a health check is for.
+[[http_service.checks]]
+  interval = "15s"
+  timeout = "3s"
+  grace_period = "30s"
+  method = "GET"
+  path = "/health"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"
+
+# The socket must outlive the server's 15-second heartbeat.
+[experimental]
+  allowed_public_ports = []
