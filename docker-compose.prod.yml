@@ -1,10 +1,15 @@
-# A complete deployment, for a single box or as a reference for a platform.
+# The whole product on one box.
 #
-#   SESSION_SECRET=$(node -e "console.log(require('crypto').randomBytes(32).toString('base64url'))") \
+#   export SESSION_SECRET=$(node -e "console.log(require('crypto').randomBytes(32).toString('base64url'))")
+#   export POSTGRES_PASSWORD=$(openssl rand -base64 24)
 #   docker compose -f docker-compose.prod.yml up -d --build
 #
-# Scale the game servers horizontally; they hold no state:
-#   docker compose -f docker-compose.prod.yml up -d --scale server=3
+# Then open http://localhost:8080 — or put a TLS proxy in front and share that.
+#
+# `app` serves the web app, the API and the WebSocket on one origin, so there is
+# no proxy to configure and no CORS. For a larger deployment, build the `server`
+# and `web` targets instead and put the web container in front; see
+# docs/deployment.md.
 
 services:
   postgres:
@@ -32,22 +37,30 @@ services:
       retries: 20
     restart: unless-stopped
 
-  server:
-    build: { context: ., target: server }
+  app:
+    build:
+      context: .
+      target: allinone
+      args:
+        # Set this to a contact address to build with real photographs from
+        # Wikimedia Commons. Left empty, the build generates placeholder art,
+        # which plays identically.
+        WIKIMEDIA_USER_AGENT: ${WIKIMEDIA_USER_AGENT:-}
+    ports: ["${PORT:-8080}:8080"]
     environment:
       NODE_ENV: production
       LOG_LEVEL: ${LOG_LEVEL:-info}
-      PORT: 8080
       SESSION_SECRET: ${SESSION_SECRET:?set SESSION_SECRET}
       DATABASE_URL: postgres://${POSTGRES_USER:-friendzone}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-friendzone}
       REDIS_URL: redis://redis:6379
-      CORS_ORIGINS: ${PUBLIC_ORIGIN:?set PUBLIC_ORIGIN}
-      PUBLIC_WEB_ORIGIN: ${PUBLIC_ORIGIN}
+      # Same origin as the app, so this only matters if you later split them.
+      CORS_ORIGINS: ${PUBLIC_ORIGIN:-http://localhost:8080}
+      PUBLIC_WEB_ORIGIN: ${PUBLIC_ORIGIN:-http://localhost:8080}
       ADMIN_TOKEN: ${ADMIN_TOKEN:-}
     depends_on:
       postgres: { condition: service_healthy }
       redis: { condition: service_healthy }
-    # Give the drain sequence room to finish before the container is killed.
+    # Room for the drain sequence to finish before the container is killed.
     stop_grace_period: 30s
     restart: unless-stopped
 
@@ -59,18 +72,13 @@ services:
       SESSION_SECRET: ${SESSION_SECRET}
       DATABASE_URL: postgres://${POSTGRES_USER:-friendzone}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-friendzone}
       REDIS_URL: redis://redis:6379
-      CORS_ORIGINS: ${PUBLIC_ORIGIN}
-      PUBLIC_WEB_ORIGIN: ${PUBLIC_ORIGIN}
+      CORS_ORIGINS: ${PUBLIC_ORIGIN:-http://localhost:8080}
+      PUBLIC_WEB_ORIGIN: ${PUBLIC_ORIGIN:-http://localhost:8080}
     depends_on:
       postgres: { condition: service_healthy }
       redis: { condition: service_healthy }
+    # It may be mid-derivation; let it finish.
     stop_grace_period: 60s
-    restart: unless-stopped
-
-  web:
-    build: { context: ., target: web }
-    ports: ["80:80"]
-    depends_on: [server]
     restart: unless-stopped
 
 volumes:

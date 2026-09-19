@@ -19,7 +19,16 @@ function readStatusCode(error: unknown): number | null {
   return typeof value === 'number' ? value : null
 }
 
-export function registerErrorHandler(app: FastifyInstance, logger: Logger): void {
+/** Paths that belong to the server rather than to the client-side router. */
+const SERVER_PREFIXES = ['/api', '/ws', '/health', '/ready', '/metrics', '/admin']
+
+export function registerErrorHandler(
+  app: FastifyInstance,
+  logger: Logger,
+  /** True when this process is also serving the built web app, in which case an
+   *  unmatched GET is a client-side route rather than a mistake. */
+  options: { spaFallback: boolean } = { spaFallback: false },
+): void {
   app.setErrorHandler((error, request, reply) => {
     const requestId = request.id
 
@@ -51,9 +60,17 @@ export function registerErrorHandler(app: FastifyInstance, logger: Logger): void
     return reply.code(httpStatusFor('INTERNAL')).send({ error: toWireError(error) })
   })
 
-  app.setNotFoundHandler((request, reply) =>
-    reply.code(404).send({ error: { code: 'ROOM_NOT_FOUND', message: `No route for ${request.method} ${request.url}.` } }),
-  )
+  app.setNotFoundHandler((request, reply) => {
+    const isServerPath = SERVER_PREFIXES.some((prefix) => request.url.startsWith(prefix))
+    // Anything else that a browser asked for is a route like /r/AB7KQ, and the
+    // app itself resolves it. Without this a shared link would 404 on reload.
+    if (options.spaFallback && !isServerPath && request.method === 'GET') {
+      return reply.type('text/html').sendFile('index.html')
+    }
+    return reply
+      .code(404)
+      .send({ error: { code: 'ROOM_NOT_FOUND', message: `No route for ${request.method} ${request.url}.` } })
+  })
 
   app.addHook('onRequest', (request, _reply, done) => {
     // Correlation id for every line this request produces.

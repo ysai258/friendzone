@@ -1,5 +1,8 @@
+import { existsSync } from 'node:fs'
+import { join, resolve } from 'node:path'
 import Fastify, { LogController, type FastifyBaseLogger, type FastifyInstance } from 'fastify'
 import websocket from '@fastify/websocket'
+import fastifyStatic from '@fastify/static'
 import cors from '@fastify/cors'
 import helmet from '@fastify/helmet'
 import { AppError, isValidRoomCode, normalizeRoomCode, parseClientJson } from '@friendzone/shared'
@@ -7,7 +10,7 @@ import { gameRegistry } from '@friendzone/game-engine'
 import { loadConfig, type Config } from './config.ts'
 import { createLogger, type Logger } from './logger.ts'
 import { createMetrics } from './metrics.ts'
-import { createPool } from './db/pool.ts'
+import { createPool, type Pool } from './db/pool.ts'
 import { runMigrations } from './db/migrate.ts'
 import { RoomArchive } from './db/archive.ts'
 import { createRedis } from './redis/client.ts'
@@ -24,6 +27,8 @@ import { registerErrorHandler } from './errors.ts'
 import { registerRoomRoutes } from './routes/rooms.ts'
 import { registerHealthRoutes } from './routes/health.ts'
 import { registerAdminRoutes } from './routes/admin.ts'
+import { contentCounts, seedContent } from './content/seed.ts'
+import { resolveDataDir } from './content/data-dir.ts'
 import type { AppServices } from './services.ts'
 
 export const VERSION = '1.0.0'
@@ -53,6 +58,8 @@ export async function buildApp(options: BuildOptions = {}): Promise<BuiltApp> {
 
   const pool = createPool(config, logger)
   if (options.migrate !== false) await runMigrations(pool, logger)
+
+  if (config.SEED_ON_BOOT) await seedIfEmpty(pool, config, logger)
 
   const redis = await createRedis(config, logger)
   const scripts = defineScripts(redis.command)
@@ -120,10 +127,36 @@ export async function buildApp(options: BuildOptions = {}): Promise<BuiltApp> {
     requestIdHeader: 'x-request-id',
   })
 
+  // Whether this process will also serve the web app decides the whole content
+  // security policy, so it is settled before helmet rather than after.
+  const webRoot = config.WEB_DIST.length === 0 ? null : resolve(config.WEB_DIST)
+  const willServeWeb = webRoot !== null && existsSync(join(webRoot, 'index.html'))
+
   await app.register(helmet, {
-    // The API serves JSON and a WebSocket upgrade; the web app is a separate
-    // origin with its own policy, so there is no HTML here to frame or embed.
-    contentSecurityPolicy: { directives: { defaultSrc: ["'none'"], frameAncestors: ["'none'"] } },
+    contentSecurityPolicy: {
+      // Serving only JSON and a socket upgrade: nothing may load, nothing may
+      // frame it. Serving the app too: it needs to load its own bundle, talk to
+      // its own origin over HTTP and WebSocket, and show its own images. Both
+      // policies deny everything else, including any third-party script.
+      directives: willServeWeb
+        ? {
+            defaultSrc: ["'self'"],
+            scriptSrc: ["'self'"],
+            // Tailwind ships a stylesheet, but the app also sets inline styles
+            // for timer widths, which cannot be hashed ahead of time.
+            styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
+            fontSrc: ["'self'", 'https://fonts.gstatic.com', 'data:'],
+            imgSrc: ["'self'", 'data:', 'blob:'],
+            // Same origin over both schemes: the socket is same-origin by
+            // construction in this deployment shape.
+            connectSrc: ["'self'", 'ws:', 'wss:'],
+            objectSrc: ["'none'"],
+            baseUri: ["'self'"],
+            formAction: ["'self'"],
+            frameAncestors: ["'none'"],
+          }
+        : { defaultSrc: ["'none'"], frameAncestors: ["'none'"] },
+    },
     crossOriginResourcePolicy: { policy: 'cross-origin' },
   })
 
@@ -154,7 +187,15 @@ export async function buildApp(options: BuildOptions = {}): Promise<BuiltApp> {
     }
   })
 
-  registerErrorHandler(app, logger)
+  // Static files are registered before the error handler, because whether an
+  // unmatched GET is a 404 or the app shell depends on whether we serve one.
+  // willServeWeb already implies a non-null root; TypeScript cannot see that
+  // through the boolean, so the root is re-read here rather than asserted.
+  if (webRoot !== null) {
+    if (willServeWeb) await registerWebApp(app, webRoot, logger)
+    else logger.warn({ webRoot }, 'WEB_DIST holds no index.html; serving the API only')
+  }
+  registerErrorHandler(app, logger, { spaFallback: willServeWeb })
 
   gateway = new Gateway({
     service,
@@ -205,6 +246,52 @@ export async function buildApp(options: BuildOptions = {}): Promise<BuiltApp> {
   }
 
   return { app, services, shutdown }
+}
+
+/**
+ * Serve the built web app from this process.
+ *
+ * Optional, and off unless WEB_DIST points somewhere. With it, the whole
+ * product is one container on one origin: no reverse proxy to configure, no
+ * CORS, and a WebSocket that is same-origin by construction. Without it, this
+ * is an API and the web app is static files behind a CDN.
+ */
+async function registerWebApp(app: FastifyInstance, root: string, logger: Logger): Promise<void> {
+  await app.register(fastifyStatic, {
+    root,
+    // Hashed asset names can be cached hard; the shell must not be, or a
+    // deploy leaves people running the previous bundle.
+    maxAge: '1y',
+    setHeaders: (response, path) => {
+      if (path.endsWith('index.html')) void response.header('cache-control', 'no-cache')
+    },
+  })
+
+  logger.info({ root }, 'serving the web app from this process')
+}
+
+/**
+ * Load content if there is none.
+ *
+ * For hosts that run one service and offer no release step. Deliberately
+ * opt-in and deliberately conditional: an existing library is never touched,
+ * and a failure is logged rather than fatal, because a server with no
+ * questions can still run a lobby and say so.
+ */
+async function seedIfEmpty(pool: Pool, config: Config, logger: Logger): Promise<void> {
+  try {
+    const counts = await contentCounts(pool)
+    const total = Object.values(counts).reduce((a, b) => a + b, 0)
+    if (total > 0) {
+      logger.info({ counts }, 'content already loaded; skipping boot seed')
+      return
+    }
+    logger.info('no content found; seeding')
+    const results = await seedContent(pool, { dataDir: resolveDataDir(config.DATA_DIR) })
+    logger.info({ loaded: results.map((r) => `${r.kind}:${r.loaded}`) }, 'content seeded')
+  } catch (error) {
+    logger.error({ err: error }, 'boot seed failed; start the server with content already loaded')
+  }
 }
 
 /**

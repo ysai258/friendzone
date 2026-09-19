@@ -1,57 +1,88 @@
 # Deployment
 
-## Shape
+## Two shapes
+
+**One container.** The server serves the web app, the API and the WebSocket on
+a single origin. No reverse proxy to configure, no CORS, and a same-origin
+socket by construction. This is the right shape for anything up to a few
+thousand concurrent players, and it is where to start.
+
+```mermaid
+graph LR
+  U[Players] --> P[TLS proxy / platform router]
+  P --> A[friendzone allinone<br/>web + API + WebSocket]
+  A --> R[(Redis)]
+  A --> DB[(PostgreSQL)]
+  W[worker<br/>cleanup · image derivation] --> R
+  W --> DB
+```
+
+**Split, for scale.** The web app becomes static files behind nginx, which
+proxies `/api` and `/ws` to a pool of game servers — so the browser still
+sees one origin. Game servers hold no state, so scaling is "run more of them"
+and the load balancer needs no stickiness: a player reconnecting to a different
+instance resumes the same round.
 
 ```mermaid
 graph TB
-  U[Players] --> CDN[CDN / reverse proxy<br/>TLS, static assets, WebSocket upgrade]
-  CDN --> W[Static web app<br/>nginx]
+  U[Players] --> CDN[CDN / nginx<br/>static files + proxy]
   CDN --> S1[Game server 1]
   CDN --> S2[Game server 2]
   CDN --> S3[Game server N]
   S1 --> R[(Redis)]
   S2 --> R
   S3 --> R
-  S1 --> P[(PostgreSQL)]
-  S2 --> P
-  S3 --> P
+  S1 --> DB[(PostgreSQL)]
+  S2 --> DB
+  S3 --> DB
   WK[Worker] --> R
-  WK --> P
+  WK --> DB
 ```
 
-No Kubernetes, no service mesh, no message broker. Game servers are stateless,
-so scaling is "run more of them" and the load balancer needs no stickiness —
-a player reconnecting to a different instance resumes the same round.
+No Kubernetes, no service mesh, no message broker.
 
-## One box
+## One box, one command
 
 ```bash
 export SESSION_SECRET=$(node -e "console.log(require('crypto').randomBytes(32).toString('base64url'))")
 export POSTGRES_PASSWORD=$(openssl rand -base64 24)
-export PUBLIC_ORIGIN=https://friendzone.example
+export PUBLIC_ORIGIN=https://friendzone.example      # or http://localhost:8080 to try it
 
 docker compose -f docker-compose.prod.yml up -d --build
-docker compose -f docker-compose.prod.yml exec server node -e "1"   # migrations ran at boot
-docker compose -f docker-compose.prod.yml run --rm worker node dist/worker.js &
 ```
 
-Scale the game servers: `--scale server=3`. Put a proxy in front for TLS that
-forwards WebSocket upgrades and sets `X-Forwarded-For`.
+That is the whole deployment. The app container migrates the database at boot
+and, because `SEED_ON_BOOT` is set in that image, loads the game content if the
+question table is empty. Verified from a wiped database: it comes up playable
+with no second command.
+
+For real photographs in Blur Battle rather than generated placeholders, pass a
+contact address at build time, as Wikimedia asks of automated clients:
+
+```bash
+export WIKIMEDIA_USER_AGENT="FriendZone/1.0 (you@example.com)"
+docker compose -f docker-compose.prod.yml up -d --build
+```
+
+It adds a few minutes to the build while it fetches and derives 78 images.
 
 ## Images
 
-One Dockerfile, three targets:
+One Dockerfile, five targets:
 
 | Target | Contents |
 | --- | --- |
-| `server` | Bundled API, migrations included, health check, runs as `node` |
+| `allinone` | Server plus the built web app on one origin. Seeds at boot. |
+| `server` | API and WebSocket only, for the split shape |
 | `worker` | Same bundle plus `sharp`, no health check |
-| `web` | Static build behind nginx with SPA fallback |
+| `web` | Static app behind nginx, proxying `/api` and `/ws` to `server:8080` |
+| `deps` / `build` | Intermediate |
 
 The server is bundled to a single file with esbuild. The workspace packages
 export TypeScript source — which is what lets dev, tests and the editor resolve
 the same files with no build step — and bundling at deploy time keeps that
-without asking Node to resolve TypeScript at runtime.
+without asking Node to resolve TypeScript at runtime. The bundle carries its
+own migrations and seed data.
 
 ## Configuration
 
@@ -67,10 +98,30 @@ wrong, with a message naming the variable. Nothing downstream reads
 | `CORS_ORIGINS` | **yes in production** | Comma-separated. Empty is refused. |
 | `PUBLIC_WEB_ORIGIN` | yes | Used to build shareable room links |
 | `ADMIN_TOKEN` | no | **Admin routes are not registered without it** |
+| `WEB_DIST` | no | Serve the built web app from this process. Set in the `allinone` image. |
+| `SEED_ON_BOOT` | no | Load content if the question table is empty. Set in the `allinone` image. |
+| `DATA_DIR` | no | Where the seed JSON lives; inferred when unset |
 | `PLAYER_GRACE_SECONDS` | no | Default 45 |
 | `ROOM_LOBBY_TTL_SECONDS` | no | Default 1800 |
 | `SCHEDULER_TICK_MS` | no | Default 250 |
 | `RL_*` | no | `capacity:refillPerSecond` |
+
+## Content
+
+With the `allinone` or `web` image there is nothing to do: the images are
+generated during the build and shipped inside it. Building without a
+`WIKIMEDIA_USER_AGENT` produces placeholder art, which plays identically and
+needs no network.
+
+Outside Docker, build it yourself before starting:
+
+```bash
+npm run dataset:fetch     # or dataset:sample for placeholders
+npm run seed
+```
+
+`/ready` reports per-kind content counts, which is the quickest way to see
+whether a deployment has content at all.
 
 ## Behind a proxy
 
@@ -112,19 +163,6 @@ Migrations run at boot behind a Postgres advisory lock, so several instances
 starting together is safe — one migrates, the others wait and find nothing to
 do. Keep migrations backward compatible for one release, since old and new
 instances overlap during a rollout.
-
-## Content
-
-The Blur Battle images are generated, not committed — 48 MB of derived files.
-Build them as part of your release and ship them with the web image:
-
-```bash
-npm run dataset:fetch     # or dataset:sample for placeholders
-npm run seed
-```
-
-`/ready` reports per-kind content counts, which is the quickest way to see that
-a deployment has content at all.
 
 ## Operating notes
 

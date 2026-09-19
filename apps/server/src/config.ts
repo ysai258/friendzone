@@ -57,6 +57,29 @@ const schema = z.object({
   RL_WS_ACTION: rateLimit('30:10'),
 
   ADMIN_TOKEN: z.string().default(''),
+
+  /**
+   * Serve the built web app from this server.
+   *
+   * Set to the web app's dist directory to run the whole product as one
+   * container on one origin — which removes the reverse proxy, and with it
+   * CORS and cross-origin WebSocket concerns, from a small deployment. Leave
+   * unset to serve the API alone behind a CDN.
+   */
+  WEB_DIST: z.string().default(''),
+
+  /** Where the seed data lives, when this image carries it. */
+  DATA_DIR: z.string().default(''),
+
+  /**
+   * Load game content at boot if the question table is empty. Off by default,
+   * because a real deployment seeds deliberately; on, a single-service host
+   * needs no second command to become playable.
+   */
+  SEED_ON_BOOT: z
+    .string()
+    .default('false')
+    .transform((value) => value === 'true' || value === '1'),
 })
 
 export type Config = z.infer<typeof schema> & { isProduction: boolean }
