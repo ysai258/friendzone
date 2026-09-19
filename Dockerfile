@@ -31,7 +31,11 @@ FROM deps AS build
 WORKDIR /app
 COPY . .
 
-ARG WIKIMEDIA_USER_AGENT=""
+# Wikimedia asks automated clients to identify themselves with a contact. The
+# project URL is the right one here, and defaulting to it means every build
+# produces real photographs rather than placeholder art. Pass an empty string
+# to build offline:  --build-arg WIKIMEDIA_USER_AGENT=""
+ARG WIKIMEDIA_USER_AGENT="FriendZone/1.0 (https://github.com/ysai258/friendzone)"
 ENV WIKIMEDIA_USER_AGENT=${WIKIMEDIA_USER_AGENT}
 
 # Blur Battle's images are generated, not committed — they are tens of

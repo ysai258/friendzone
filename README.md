@@ -113,10 +113,15 @@ export POSTGRES_PASSWORD=$(openssl rand -base64 24)
 docker compose -f docker-compose.prod.yml up -d --build
 ```
 
-On a platform like Railway or Fly, point it at this repo, add a Postgres and a
-Redis, and set `SESSION_SECRET`, `DATABASE_URL` and `REDIS_URL`. Full steps,
-including the split shape for scale, are in
-[`docs/deployment.md`](docs/deployment.md).
+On Render, the included `render.yaml` creates the app, a Postgres and a Key
+Value instance in one step — New → Blueprint → connect this repo. It generates
+its own secret and seeds itself on first boot.
+
+On the free plan the service sleeps after 15 minutes and takes about a minute
+to wake, and the Key Value instance is in-memory and may restart, which ends
+games in progress. Nothing corrupts — a room vanishes rather than lying — but
+open the link yourself before sharing it. Details and the split shape for
+scale are in [`docs/deployment.md`](docs/deployment.md).
 
 ## Commands
 

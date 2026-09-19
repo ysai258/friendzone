@@ -41,6 +41,33 @@ graph TB
 
 No Kubernetes, no service mesh, no message broker.
 
+## Render, on the free plan
+
+A `render.yaml` blueprint creates the app, a Postgres and a Key Value
+instance in one go:
+
+  render.com -> New -> Blueprint -> connect this repo
+
+Nothing else to configure. Render generates `SESSION_SECRET`, wires
+`DATABASE_URL` and `REDIS_URL`, and the app migrates and seeds itself on
+first boot.
+
+What the free plan costs you, stated plainly because all three affect a party
+game:
+
+| | |
+| --- | --- |
+| **Cold starts** | The service suspends after 15 minutes idle and takes about a minute to wake. The first person to open your link waits that out. Open it yourself before you share it. |
+| **Key Value is in-memory and may restart at any time** | Live room state lives there. A restart ends games in progress — players are told the room is gone rather than seeing anything corrupt, but the game is over. |
+| **Postgres expires 30 days after creation** | Only history lives there, so losing it costs finished-game records, not gameplay. Recreate it or move to a paid plan. |
+
+None of these corrupt anything: every state change is one atomic
+compare-and-set, so the failure mode is a room that vanishes, not a room that
+lies. But a long session on a free instance will be interrupted eventually.
+
+Paid plans remove all three. The same blueprint works — change the `plan`
+values.
+
 ## One box, one command
 
 ```bash

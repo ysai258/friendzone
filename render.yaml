@@ -1,0 +1,69 @@
+# Render Blueprint for FriendZone.
+#
+#   render.com -> New -> Blueprint -> connect ysai258/friendzone
+#
+# Creates everything: the app, a Postgres, and a Key Value (Redis) instance,
+# all on free plans. The app serves the web client, the API and the WebSocket
+# on one origin, so there is no proxy to configure and no CORS.
+#
+# Read docs/deployment.md for what the free tier costs you in behaviour.
+
+databases:
+  - name: friendzone-db
+    plan: free
+    databaseName: friendzone
+    user: friendzone
+    region: singapore
+
+services:
+  # Live room state, the deadline index that drives every round, pub/sub, and
+  # rate limits. On the free plan this is in-memory and Render may restart it
+  # at any time, which ends games in progress — see the note in the README.
+  - type: keyvalue
+    name: friendzone-redis
+    plan: free
+    region: singapore
+    # Reachable only from inside the Render network.
+    ipAllowList: []
+    # noeviction: the room state is not a cache. Dropping keys under pressure
+    # would silently destroy live games rather than fail honestly.
+    maxmemoryPolicy: noeviction
+
+  - type: web
+    name: friendzone
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    # Liveness only. A check that queried the database would take healthy
+    # instances out of rotation during a database blip.
+    healthCheckPath: /health
+    autoDeployTrigger: commit
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: LOG_LEVEL
+        value: info
+      # Render injects PORT; the server reads it.
+      - key: DATABASE_URL
+        fromDatabase:
+          name: friendzone-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: keyvalue
+          name: friendzone-redis
+          property: connectionString
+      # Generated once by Render and then left alone. Rotating it signs every
+      # player out.
+      - key: SESSION_SECRET
+        generateValue: true
+      # The web app is served from this same process, so every request is
+      # same-origin and the allow-list is deliberately empty. PUBLIC_WEB_ORIGIN
+      # is derived from Render's own RENDER_EXTERNAL_URL.
+      - key: CORS_ORIGINS
+        value: ""
+      # Comes up playable from an empty database, with no release step.
+      - key: SEED_ON_BOOT
+        value: "true"

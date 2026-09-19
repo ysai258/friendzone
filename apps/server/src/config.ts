@@ -36,7 +36,10 @@ const schema = z.object({
   PORT: z.coerce.number().int().min(0).max(65535).default(8080),
   HOST: z.string().default('0.0.0.0'),
   CORS_ORIGINS: csvSchema,
-  PUBLIC_WEB_ORIGIN: z.url().default('http://localhost:5173'),
+  // Hosts that inject their own public URL (Render sets RENDER_EXTERNAL_URL)
+  // save an operator from setting this by hand and getting it wrong.
+  PUBLIC_WEB_ORIGIN: z.url().optional(),
+  RENDER_EXTERNAL_URL: z.url().optional(),
 
   SESSION_SECRET: z.string().min(16, 'SESSION_SECRET must be at least 16 characters'),
   SESSION_TTL_SECONDS: z.coerce.number().int().min(300).default(86_400),
@@ -82,7 +85,10 @@ const schema = z.object({
     .transform((value) => value === 'true' || value === '1'),
 })
 
-export type Config = z.infer<typeof schema> & { isProduction: boolean }
+export type Config = Omit<z.infer<typeof schema>, 'PUBLIC_WEB_ORIGIN'> & {
+  PUBLIC_WEB_ORIGIN: string
+  isProduction: boolean
+}
 
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
   const parsed = schema.safeParse(env)
@@ -91,14 +97,25 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     throw new Error(`Invalid configuration:\n${lines.join('\n')}`)
   }
 
-  const config = { ...parsed.data, isProduction: parsed.data.NODE_ENV === 'production' }
+  const config = {
+    ...parsed.data,
+    // Whatever the host says it is, then whatever was configured, then dev.
+    PUBLIC_WEB_ORIGIN:
+      parsed.data.PUBLIC_WEB_ORIGIN ?? parsed.data.RENDER_EXTERNAL_URL ?? 'http://localhost:5174',
+    isProduction: parsed.data.NODE_ENV === 'production',
+  }
 
   // A real deployment must not fall back to the example secret.
   if (config.isProduction && config.SESSION_SECRET.startsWith('dev-only')) {
     throw new Error('SESSION_SECRET is still the development placeholder. Generate a real one.')
   }
-  if (config.isProduction && config.CORS_ORIGINS.length === 0) {
-    throw new Error('CORS_ORIGINS must list the site origin in production.')
+
+  // An allow-list is only meaningful when the web app is served from somewhere
+  // else. When this process serves it too, every request is same-origin and an
+  // empty list is the stricter setting — demanding one would only invite an
+  // operator to paste a wrong value, or a wildcard.
+  if (config.isProduction && config.CORS_ORIGINS.length === 0 && config.WEB_DIST.length === 0) {
+    throw new Error('CORS_ORIGINS must list the site origin when the web app is served separately.')
   }
 
   return config
