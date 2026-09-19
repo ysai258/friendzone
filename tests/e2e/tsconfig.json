@@ -1,0 +1,10 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    // page.evaluate bodies run in the browser, so these files legitimately
+    // need the DOM lib that the Node-side config does not have.
+    "lib": ["ES2023", "DOM"],
+    "types": ["node"]
+  },
+  "include": ["**/*.ts", "../../playwright.config.ts"]
+}
