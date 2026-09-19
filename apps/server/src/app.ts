@@ -154,6 +154,13 @@ export async function buildApp(options: BuildOptions = {}): Promise<BuiltApp> {
             baseUri: ["'self'"],
             formAction: ["'self'"],
             frameAncestors: ["'none'"],
+            // Helmet adds upgrade-insecure-requests by default, which rewrites
+            // this app's own asset URLs to https. Behind TLS that is redundant
+            // — every URL here is relative, so it is already https — and over
+            // plain http it is fatal: the browser upgrades the bundle request
+            // and gets ERR_SSL_PROTOCOL_ERROR against a server with no TLS.
+            // That breaks sharing over a LAN address or a plain-http host.
+            upgradeInsecureRequests: null,
           }
         : { defaultSrc: ["'none'"], frameAncestors: ["'none'"] },
     },
