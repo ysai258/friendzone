@@ -1,0 +1,14 @@
+{
+  "name": "@friendzone/game-engine",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./*": "./src/*.ts"
+  },
+  "dependencies": {
+    "@friendzone/shared": "*",
+    "zod": "^4.6.5"
+  }
+}
