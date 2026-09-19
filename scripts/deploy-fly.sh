@@ -13,7 +13,7 @@ set -euo pipefail
 export PATH="$HOME/.fly/bin:$PATH"
 
 APP="${FLY_APP:-friendzone}"
-REGION="${FLY_REGION:-sin}"
+REGION="${FLY_REGION:-bom}"
 PG="${APP}-db"
 REDIS="${APP}-redis"
 

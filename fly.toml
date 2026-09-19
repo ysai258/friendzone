@@ -7,7 +7,7 @@
 # with Postgres and Redis attached. See docs/deployment.md for the reasoning.
 
 app = "friendzone"
-primary_region = "sin"          # Singapore; closest Fly region to India
+primary_region = "bom"          # Mumbai — lowest latency for players in India
 
 [build]
   # The default Dockerfile target is `allinone`, which is what this runs.
