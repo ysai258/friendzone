@@ -1,8 +1,11 @@
 # syntax=docker/dockerfile:1
 
 # ---------------------------------------------------------------------------
-# Targets:
-#   allinone  server + web on one origin. One container, one URL. Start here.
+# Targets. `allinone` is last, so a plain `docker build .` — which is what a
+# hosting platform runs when it finds a Dockerfile — produces the one that
+# serves the whole product.
+#
+#   allinone  server + web on one origin. One container, one URL. The default.
 #   server    API and WebSocket only, for running the web app behind a CDN.
 #   worker    background jobs (cleanup, image derivation).
 #   web       static web app behind nginx, for the split deployment.
@@ -59,17 +62,6 @@ HEALTHCHECK --interval=15s --timeout=3s --start-period=25s --retries=3 \
   CMD node -e "fetch('http://127.0.0.1:8080/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
 
 # ---------------------------------------------------------------------------
-FROM runtime-base AS allinone
-# One origin for the app, the API and the socket: no reverse proxy to
-# configure, no CORS, and a same-origin WebSocket by construction.
-COPY --from=build /app/apps/web/dist ./web
-ENV WEB_DIST=/app/web
-ENV DATA_DIR=/app/data
-# A host that offers no release step can still come up playable.
-ENV SEED_ON_BOOT=true
-CMD ["node", "dist/index.js"]
-
-# ---------------------------------------------------------------------------
 FROM runtime-base AS server
 ENV DATA_DIR=/app/data
 CMD ["node", "dist/index.js"]
@@ -91,3 +83,14 @@ FROM nginx:alpine AS web
 COPY --from=build /app/apps/web/dist /usr/share/nginx/html
 COPY infra/nginx.conf /etc/nginx/conf.d/default.conf
 EXPOSE 80
+
+# ---------------------------------------------------------------------------
+FROM runtime-base AS allinone
+# One origin for the app, the API and the socket: no reverse proxy to
+# configure, no CORS, and a same-origin WebSocket by construction.
+COPY --from=build /app/apps/web/dist ./web
+ENV WEB_DIST=/app/web
+ENV DATA_DIR=/app/data
+# A host that offers no release step can still come up playable.
+ENV SEED_ON_BOOT=true
+CMD ["node", "dist/index.js"]

@@ -101,6 +101,23 @@ profile of the server under it came back 79% idle.
 [`docs/performance.md`](docs/performance.md) has the whole investigation,
 including the optimisation that turned out not to help.
 
+## Putting it somewhere your friends can reach
+
+The default Docker build produces one container that serves the app, the API and
+the WebSocket on a single origin — so there is no proxy to configure and no CORS.
+It migrates on boot and loads the game content if the database is empty.
+
+```bash
+export SESSION_SECRET=$(node -e "console.log(require('crypto').randomBytes(32).toString('base64url'))")
+export POSTGRES_PASSWORD=$(openssl rand -base64 24)
+docker compose -f docker-compose.prod.yml up -d --build
+```
+
+On a platform like Railway or Fly, point it at this repo, add a Postgres and a
+Redis, and set `SESSION_SECRET`, `DATABASE_URL` and `REDIS_URL`. Full steps,
+including the split shape for scale, are in
+[`docs/deployment.md`](docs/deployment.md).
+
 ## Commands
 
 | | |
