@@ -16,6 +16,7 @@ function newGame(settings: Record<string, unknown> = {}) {
     settings: parsed,
     content: imagePack(10),
     recentContentIds: [],
+    hostId: roster[0]!.id,
   })
 }
 
@@ -75,13 +76,13 @@ describe('blur battle / lifecycle', () => {
 
   it('draws the same questions for the same seed and different ones otherwise', () => {
     const a = def.createGame({
-      now: T0, seed: 'alpha', players: roster, sessionId: 's', settings: def.settingsSchema.parse({ questions: 3 }), content: imagePack(10), recentContentIds: [],
+      now: T0, seed: 'alpha', players: roster, sessionId: 's', settings: def.settingsSchema.parse({ questions: 3 }), content: imagePack(10), recentContentIds: [], hostId: 'p1',
     })
     const b = def.createGame({
-      now: T0, seed: 'alpha', players: roster, sessionId: 's', settings: def.settingsSchema.parse({ questions: 3 }), content: imagePack(10), recentContentIds: [],
+      now: T0, seed: 'alpha', players: roster, sessionId: 's', settings: def.settingsSchema.parse({ questions: 3 }), content: imagePack(10), recentContentIds: [], hostId: 'p1',
     })
     const c = def.createGame({
-      now: T0, seed: 'beta', players: roster, sessionId: 's', settings: def.settingsSchema.parse({ questions: 3 }), content: imagePack(10), recentContentIds: [],
+      now: T0, seed: 'beta', players: roster, sessionId: 's', settings: def.settingsSchema.parse({ questions: 3 }), content: imagePack(10), recentContentIds: [], hostId: 'p1',
     })
     const ids = (s: unknown) => (def.getPublicState(s, null, viewCtx(T0, roster)).view)
     expect(JSON.stringify(a)).toBe(JSON.stringify(b))
@@ -222,7 +223,11 @@ describe('blur battle / round control', () => {
     for (const p of ['p1', 'p3']) s = guess(s, p, currentAnswer(state), at).state
     expect(def.getDeadline(s)!).toBeGreaterThan(at)
     // Once the grace period expires the round can close without them.
-    s = def.onPlayerInactive(s, 'p2', { now: at, seed: 'test-seed', players: dropped.map((p) => p.id === 'p2' ? { ...p, presence: 'INACTIVE' } : p) }).state
+    s = def.onPlayerInactive(
+      s,
+      'p2',
+      turnCtx(at, dropped.map((p) => (p.id === 'p2' ? { ...p, presence: 'INACTIVE' as const } : p))),
+    ).state
     expect(def.getDeadline(s)!).toBeLessThanOrEqual(at)
   })
 })

@@ -14,6 +14,7 @@ function boot(def: ErasedGameDefinition, count: number, settings: Record<string,
     settings: def.settingsSchema.parse(settings),
     content: packOf(kind, 30),
     recentContentIds: [],
+    hostId: roster[0]!.id,
   })
   return { roster, state }
 }

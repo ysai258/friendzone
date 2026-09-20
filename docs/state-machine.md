@@ -156,6 +156,12 @@ early, nothing else had to learn about it: a non-host is refused with
 `NOT_HOST`, and a second press while the next question is already loading is
 refused with `INVALID_ACTION` rather than skipping a question.
 
+`REVEAL` is also the only phase that accepts `meld/merge` and `meld/unmerge` —
+the host joining two answers that meant the same thing to the table but not to
+the key folder, and taking it back. Both are host-only and both re-score the
+round in place, which is safe precisely because the phase has no clock racing
+them.
+
 ## Movie Mafia
 
 ```mermaid

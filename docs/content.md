@@ -120,6 +120,12 @@ folds `phones`, `mobiles` and `idly`.
 Adding a group is one line in that file. Nothing else changes — the tests will
 tell you if the new group overlaps an existing one.
 
+The list is not the last line of defence, though, and it is not meant to be:
+during the results the host can join any two answers by hand and undo it. That
+covers what a dictionary cannot — an inside joke, a word in a language nobody
+wrote down, a phrase one table uses and another does not. If a pair comes up
+often enough to be worth automating, it belongs in a group here.
+
 ## What the seed refuses
 
 Both checks are in `apps/server/src/content/seed.ts` and both fail the seed

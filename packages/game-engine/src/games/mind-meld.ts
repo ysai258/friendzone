@@ -61,6 +61,16 @@ interface MeldState {
   answers: Record<PlayerId, MeldAnswer>
   /** Scored groups for the round being revealed. */
   groups: { key: string; label: string; playerIds: PlayerId[]; points: number }[]
+  /**
+   * Groups the host joined by hand, as answer key -> the key it now counts as.
+   *
+   * No dictionary covers every way a table agrees — "petrol bunk" and "gas
+   * station", an inside joke, a word in a language nobody wrote down — so the
+   * host can merge what the key folder kept apart. Kept as a map from the
+   * original keys rather than as rewritten answers so the automatic grouping
+   * is never lost: clearing this map restores it exactly.
+   */
+  mergedInto: Record<string, string>
   promptSeconds: number
 }
 
@@ -84,14 +94,34 @@ const settingsSpec: SettingField[] = [
   },
 ]
 
-const actionSchema = z.strictObject({
+const submitSchema = z.strictObject({
   type: z.literal('meld/submit'),
   payload: z.strictObject({ answer: z.string().min(1).max(60) }),
 })
 
+/** Host only. The first key is the one the merged group keeps, so the host
+ *  decides which wording ends up on screen. */
+const mergeSchema = z.strictObject({
+  type: z.literal('meld/merge'),
+  payload: z.strictObject({ keys: z.array(z.string().min(1).max(120)).min(2).max(16) }),
+})
+
+/** Host only. Throws away every merge and restores the automatic grouping. */
+const resetSchema = z.strictObject({
+  type: z.literal('meld/unmerge'),
+  payload: z.strictObject({}).default({}),
+})
+
+const actionSchema = z.discriminatedUnion('type', [submitSchema, mergeSchema, resetSchema])
+
 function parseAnswer(action: GameAction): string | null {
-  const parsed = actionSchema.safeParse(action)
+  const parsed = submitSchema.safeParse(action)
   return parsed.success ? parsed.data.payload.answer : null
+}
+
+function parseMerge(action: GameAction): string[] | null {
+  const parsed = mergeSchema.safeParse(action)
+  return parsed.success ? parsed.data.payload.keys : null
 }
 
 function currentPrompt(state: MeldState): MeldPrompt | null {
@@ -102,7 +132,34 @@ function activeIds(ctx: { players: { id: PlayerId; presence: string }[] }): Play
   return ctx.players.filter((p) => p.presence !== 'INACTIVE').map((p) => p.id)
 }
 
-function validate(state: MeldState, playerId: PlayerId, action: GameAction, allowEdits: boolean): Result<void> {
+function validate(
+  state: MeldState,
+  playerId: PlayerId,
+  action: GameAction,
+  ctx: { hostId: PlayerId },
+  allowEdits: boolean,
+): Result<void> {
+  if (action.type === 'meld/merge' || action.type === 'meld/unmerge') {
+    // Regrouping is a host call, and only while the results are on screen.
+    if (playerId !== ctx.hostId) return reject('NOT_HOST')
+    if (state.phase !== 'REVEAL') return reject('INVALID_ACTION', 'The results are not up yet.')
+    if (action.type === 'meld/unmerge') {
+      return Object.keys(state.mergedInto).length === 0
+        ? reject('INVALID_ACTION', 'Nothing has been merged.')
+        : accept
+    }
+    const keys = parseMerge(action)
+    if (keys === null) return reject('INVALID_ACTION')
+    const live = new Set(state.groups.map((g) => g.key))
+    if (keys.some((key) => !live.has(key))) {
+      // Two hosts cannot race here, but a stale screen can: the keys a client
+      // is looking at may already have been merged away.
+      return reject('INVALID_ACTION', 'Those groups have already changed.')
+    }
+    if (new Set(keys).size < 2) return reject('INVALID_ACTION', 'Pick two groups to join.')
+    return accept
+  }
+
   if (parseAnswer(action) === null) return reject('INVALID_ACTION')
   if (state.phase !== 'PROMPT') return reject('ROUND_CLOSED')
   if (currentPrompt(state) === null) return reject('INVALID_ROUND')
@@ -113,16 +170,30 @@ function validate(state: MeldState, playerId: PlayerId, action: GameAction, allo
 /**
  * Bucket the round's answers and price each group. A group of one earns
  * nothing: being original is its own reward.
+ *
+ * `mergedInto` is the host's own judgement, applied on top of the key folder:
+ * an answer counts as whichever key its own key has been merged into.
  */
-function scoreRound(answers: Record<PlayerId, MeldAnswer>): {
+function scoreRound(
+  answers: Record<PlayerId, MeldAnswer>,
+  mergedInto: Record<string, string> = {},
+): {
   groups: { key: string; label: string; playerIds: PlayerId[]; points: number }[]
   deltas: Record<PlayerId, number>
 } {
   const buckets = new Map<string, { label: string; playerIds: PlayerId[] }>()
   for (const [playerId, answer] of Object.entries(answers)) {
-    const bucket = buckets.get(answer.key)
-    if (bucket === undefined) buckets.set(answer.key, { label: answer.text, playerIds: [playerId] })
+    const key = mergedInto[answer.key] ?? answer.key
+    const bucket = buckets.get(key)
+    if (bucket === undefined) buckets.set(key, { label: answer.text, playerIds: [playerId] })
     else bucket.playerIds.push(playerId)
+  }
+
+  // A merged group is labelled by the answer whose key it kept, which is the
+  // one the host tapped first — not by whoever happened to answer earliest.
+  for (const [key, bucket] of buckets) {
+    const owner = Object.entries(answers).find(([, answer]) => answer.key === key)
+    if (owner !== undefined) bucket.label = owner[1].text
   }
 
   const total = Object.keys(answers).length
@@ -138,6 +209,54 @@ function scoreRound(answers: Record<PlayerId, MeldAnswer>): {
   return { groups, deltas }
 }
 
+/** What each player has already been paid for the round on screen. */
+function awarded(groups: MeldState['groups']): Record<PlayerId, number> {
+  const paid: Record<PlayerId, number> = {}
+  for (const group of groups) for (const playerId of group.playerIds) paid[playerId] = group.points
+  return paid
+}
+
+/**
+ * Re-score the round on screen and pay only the difference.
+ *
+ * The round's points were applied when the reveal opened, and the room adds
+ * deltas to a running total rather than replacing it, so a regroup has to
+ * settle up: positive when a merge grows a group, negative when the host
+ * undoes one.
+ */
+function regroup(state: MeldState, mergedInto: Record<string, string>) {
+  const { groups } = scoreRound(state.answers, mergedInto)
+  const before = awarded(state.groups)
+  const after = awarded(groups)
+  const deltas: Record<PlayerId, number> = {}
+  for (const playerId of new Set([...Object.keys(before), ...Object.keys(after)])) {
+    const change = (after[playerId] ?? 0) - (before[playerId] ?? 0)
+    if (change !== 0) deltas[playerId] = change
+  }
+  return transition(
+    { ...state, groups, mergedInto },
+    [{ type: 'ROUND_ENDED' as const, data: { round: state.roundIndex + 1, groups: groups.length, regrouped: true } }],
+    deltas,
+  )
+}
+
+/**
+ * Fold the listed keys together, keeping the first.
+ *
+ * Existing merges that pointed at one of the absorbed keys are repointed, so
+ * the map stays one level deep and a chain of merges cannot build up.
+ */
+function mergeKeys(mergedInto: Record<string, string>, keys: string[]): Record<string, string> {
+  const [target, ...absorbed] = keys
+  if (target === undefined) return mergedInto
+  const next = { ...mergedInto }
+  for (const key of absorbed) {
+    for (const [from, to] of Object.entries(next)) if (to === key) next[from] = target
+    next[key] = target
+  }
+  return next
+}
+
 /** Where the game goes when the host leaves the results screen. */
 function nextAfterReveal(state: MeldState, now: number): MeldState {
   if (state.roundIndex + 1 >= state.prompts.length) {
@@ -151,6 +270,8 @@ function nextAfterReveal(state: MeldState, now: number): MeldState {
     phaseEndsAt: now + COUNTDOWN_MS,
     answers: {},
     groups: [],
+    // The host's merges belong to the round they were made in.
+    mergedInto: {},
   }
 }
 
@@ -201,6 +322,7 @@ export const mindMeld: ErasedGameDefinition = defineGame<MeldState, MeldSettings
       phaseEndsAt: ctx.now + COUNTDOWN_MS,
       answers: {},
       groups: [],
+      mergedInto: {},
       promptSeconds: ctx.settings.seconds,
     }
   },
@@ -230,11 +352,18 @@ export const mindMeld: ErasedGameDefinition = defineGame<MeldState, MeldSettings
     return transition(nextAfterReveal(state, ctx.now), revealExitEvents(state))
   },
 
-  validateAction: (state, playerId, action) => validate(state, playerId, action, true),
+  validateAction: (state, playerId, action, ctx) => validate(state, playerId, action, ctx, true),
 
   applyAction(state, playerId, action, ctx) {
+    if (!validate(state, playerId, action, ctx, true).ok) return noChange(state)
+
+    // The host joining two groups the key folder kept apart, or undoing it.
+    if (action.type === 'meld/unmerge') return regroup(state, {})
+    const merging = parseMerge(action)
+    if (merging !== null) return regroup(state, mergeKeys(state.mergedInto, merging))
+
     const text = parseAnswer(action)
-    if (text === null || !validate(state, playerId, action, true).ok) return noChange(state)
+    if (text === null) return noChange(state)
 
     const answer: MeldAnswer = { text: text.trim().slice(0, 60), key: meldKey(text), at: ctx.now }
     let next: MeldState = { ...state, answers: { ...state.answers, [playerId]: answer } }
@@ -261,6 +390,7 @@ export const mindMeld: ErasedGameDefinition = defineGame<MeldState, MeldSettings
             phaseEndsAt: state.phaseEndsAt + state.promptSeconds * 1000,
             answers: {},
             groups: [],
+            mergedInto: {},
           },
           [{ type: 'ROUND_STARTED', data: { round: state.roundIndex + 1, total: state.prompts.length } }],
         )
@@ -326,6 +456,9 @@ export const mindMeld: ErasedGameDefinition = defineGame<MeldState, MeldSettings
       // waiting for rather than leaving the screen looking stuck.
       view['awaitingHost'] = true
       view['isLastRound'] = state.roundIndex + 1 >= state.prompts.length
+      // So the host's screen can offer to undo, and everyone's can say that
+      // the grouping in front of them is not purely the machine's doing.
+      view['merged'] = Object.keys(state.mergedInto).length > 0
     }
 
     return {

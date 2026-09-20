@@ -44,6 +44,7 @@ export function buildRoomView(args: {
         presence: p.presence,
       })),
       roomCode: room.code,
+      hostId: room.hostId,
     }
     game = args.definition.getPublicState(room.session.state, viewerId, ctx)
     phaseStartedAt = readPhaseTime(room.session.state, 'phaseStartedAt')

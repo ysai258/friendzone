@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ROOM_ACTIONS, type PublicRoomView } from '@friendzone/shared'
 import type { GameProps } from './index.tsx'
 import { Button, Card, TextInput } from '../components/ui.tsx'
@@ -14,6 +14,7 @@ interface MeldView {
   loners?: number
   awaitingHost?: boolean
   isLastRound?: boolean
+  merged?: boolean
 }
 
 export function MindMeld({ connection, room }: GameProps) {
@@ -99,19 +100,44 @@ function Groups({
   const groups = view.groups ?? []
   const isHost = room.viewerId === room.hostId
   const hostName = room.players.find((p) => p.isHost)?.name ?? 'the host'
+  const awaiting = view.awaitingHost === true
+
+  // Groups the host has picked out to join together. Cleared whenever the
+  // round moves on or the grouping changes underneath it, so a stale
+  // selection can never be applied to groups that are no longer on screen.
+  const [picked, setPicked] = useState<string[]>([])
+  const signature = `${room.game?.roundNumber ?? 0}:${groups.map((g) => g.key).join('|')}`
+  useEffect(() => setPicked([]), [signature])
+
+  const canRegroup = isHost && awaiting
+  const toggle = (key: string) =>
+    setPicked((current) => (current.includes(key) ? current.filter((k) => k !== key) : [...current, key]))
+
+  const join = () => {
+    if (picked.length < 2) return
+    // The first one picked keeps its wording, which is why order matters here.
+    connection.send('meld/merge', { keys: picked })
+    setPicked([])
+  }
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-2">
         {groups.map((group, index) => {
           const matched = group.playerIds.length > 1
-          return (
-            <Card
-              key={group.key}
-              className={`animate-rise flex flex-col gap-2 ${matched ? 'border-emerald-400/40 bg-emerald-500/10' : ''}`}
-              // Staggered so the big matches land first and it reads as a reveal.
-            >
+          const order = picked.indexOf(group.key)
+          const selected = order >= 0
+          const body = (
+            <>
               <div className="flex items-baseline justify-between gap-3" style={{ animationDelay: `${index * 60}ms` }}>
-                <p className="text-lg font-bold">{group.label}</p>
+                <p className="flex min-w-0 items-baseline gap-2 text-lg font-bold">
+                  {selected && (
+                    <span className="shrink-0 rounded-full bg-violet-500 px-2 text-xs leading-5 text-white" aria-hidden>
+                      {order + 1}
+                    </span>
+                  )}
+                  <span className="truncate">{group.label}</span>
+                </p>
                 {group.points > 0 ? (
                   <span className="tabular shrink-0 font-bold text-emerald-300">+{group.points}</span>
                 ) : (
@@ -125,22 +151,79 @@ function Groups({
                   </span>
                 ))}
               </div>
-            </Card>
+            </>
+          )
+
+          const tone = matched ? 'border-emerald-400/40 bg-emerald-500/10' : ''
+          if (!canRegroup) {
+            // Staggered so the big matches land first and it reads as a reveal.
+            return (
+              <Card key={group.key} className={`animate-rise flex flex-col gap-2 ${tone}`}>
+                {body}
+              </Card>
+            )
+          }
+          return (
+            <button
+              key={group.key}
+              type="button"
+              aria-pressed={selected}
+              aria-label={`${group.label}, ${group.playerIds.length} ${group.playerIds.length === 1 ? 'player' : 'players'}`}
+              onClick={() => toggle(group.key)}
+              className={`card animate-rise flex flex-col gap-2 p-4 text-left transition ${tone} ${
+                selected ? 'ring-2 ring-violet-400' : ''
+              }`}
+            >
+              {body}
+            </button>
           )
         })}
         {groups.length === 0 && <p className="py-6 text-center text-sm text-muted">Nobody answered in time.</p>}
       </div>
 
+      {/* The machine folds "phone" and "mobile" together on its own; this is
+          for everything it cannot know — an inside joke, a word in another
+          language, two spellings nobody has written down. */}
+      {canRegroup && groups.length > 1 && (
+        <p className="text-center text-xs text-muted">
+          {picked.length === 0
+            ? 'Tap two answers that meant the same thing to join them.'
+            : picked.length === 1
+              ? 'Now tap the one it should join.'
+              : `${picked.length} answers selected.`}
+        </p>
+      )}
+
+      {view.merged === true && !canRegroup && (
+        <p className="text-center text-xs text-muted">{hostName} joined some of these answers.</p>
+      )}
+
       <Scoreboard entries={room.scoreboard} viewerId={room.viewerId} showDeltas compact />
 
       {/* No timer here on purpose: the argument about who said what is the
           best part of this game, so the round ends when the host says so. */}
-      {view.awaitingHost === true && (
+      {awaiting && (
         <div className="sticky bottom-4 flex flex-col gap-2">
           {isHost ? (
-            <Button size="lg" onClick={() => connection.send(ROOM_ACTIONS.CONTINUE)}>
-              {view.isLastRound === true ? 'See final results →' : 'Next question →'}
-            </Button>
+            <>
+              {picked.length >= 2 && (
+                <Button size="lg" variant="ghost" onClick={join}>
+                  Join {picked.length} answers
+                </Button>
+              )}
+              {view.merged === true && picked.length < 2 && (
+                <Button
+                  size="lg"
+                  variant="ghost"
+                  onClick={() => connection.send('meld/unmerge')}
+                >
+                  Undo joins
+                </Button>
+              )}
+              <Button size="lg" onClick={() => connection.send(ROOM_ACTIONS.CONTINUE)}>
+                {view.isLastRound === true ? 'See final results →' : 'Next question →'}
+              </Button>
+            </>
           ) : (
             <p className="py-2 text-center text-sm text-muted">
               Talk it over — {hostName} moves it on when you&rsquo;re done.

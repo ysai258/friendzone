@@ -122,6 +122,17 @@ interface BaseContext {
   /** Everyone holding a seat, ordered by joinSeq. Includes disconnected players:
    *  a dropped socket does not forfeit a turn until the grace period expires. */
   players: EnginePlayer[]
+  /**
+   * Who is currently host.
+   *
+   * The room enforces host-only *room* actions itself, but a game action can
+   * also be one — Mind Meld lets the host merge two groups the key folder kept
+   * apart — and the game is the only thing that knows which of its actions
+   * those are. A room always has a host, so this is always set; it changes
+   * when succession runs, which is exactly the right behaviour if the original
+   * host walked off mid-round.
+   */
+  hostId: PlayerId
 }
 
 export interface CreateContext<Cfg> extends BaseContext {

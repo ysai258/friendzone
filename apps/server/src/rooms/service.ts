@@ -506,7 +506,10 @@ export class RoomService {
   // Internals
   // -------------------------------------------------------------------------
 
-  private turnContext(room: RoomRecord, now: number): { now: number; seed: string; players: TurnContext['players'] } {
+  private turnContext(
+    room: RoomRecord,
+    now: number,
+  ): { now: number; seed: string; players: TurnContext['players']; hostId: PlayerId } {
     return {
       now,
       seed: room.seed,
@@ -516,6 +519,7 @@ export class RoomService {
         joinSeq: p.joinSeq,
         presence: p.presence,
       })),
+      hostId: room.hostId,
     }
   }
 

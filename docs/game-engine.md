@@ -47,6 +47,10 @@ interface GameDefinition<S, Cfg> {
 }
 ```
 
+Every context carries `hostId`. The room enforces host-only *room* actions
+itself, but a game action can be one too — Mind Meld's regrouping is — and only
+the game knows which of its actions those are.
+
 ### Every method is pure
 
 Given the same state, action and context, a reducer produces the same
@@ -265,6 +269,15 @@ key is order-independent, which is what keeps the reducer pure.
 
 The synonym list is editorial data, and what belongs in it is in
 [content.md](content.md#answers-that-mean-the-same-thing).
+
+No list is ever complete, so the host has the last word: while the results are
+on screen they can tap two groups and join them, and undo it. That re-scores
+the round and pays the *difference*, because the room adds deltas to a running
+total rather than replacing it — a merge that grows a group pays each member
+the increase, and an undo pays it back as a negative. The automatic grouping is
+never overwritten: the host's decisions live in a separate `mergedInto` map
+from answer key to answer key, so clearing it restores exactly what the machine
+produced.
 
 ## Adding a game
 

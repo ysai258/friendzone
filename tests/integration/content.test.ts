@@ -307,6 +307,57 @@ describe('mind meld / the host controls progression', () => {
     expect(host.room!.game!.roundNumber).toBe(round + 1)
   }, 60_000)
 
+  it('lets the host join two groups the key folder kept apart', async () => {
+    const s = await server()
+    const { host, others } = await room(s, 'mind-meld', ['Host', 'B', 'C'])
+    host.send(ROOM_ACTIONS.UPDATE_CONFIG, { settings: { rounds: 3, seconds: 10 } })
+    await host.waitForRoom((r) => (r.config.settings as { seconds?: number }).seconds === 10)
+    host.send(ROOM_ACTIONS.START_GAME)
+
+    const everyone = [host, ...others]
+    await Promise.all(everyone.map((c) => c.waitForPhase('PROMPT', 25_000)))
+    // Three answers no dictionary would fold together.
+    const answers = ['petrol bunk', 'gas station', 'library']
+    everyone.forEach((client, i) => client.send('meld/submit', { answer: answers[i]! }))
+    await Promise.all(everyone.map((c) => c.waitForPhase('REVEAL', 25_000)))
+
+    const groupsOf = (client: TestClient) =>
+      (client.view['groups'] ?? []) as { key: string; label: string; playerIds: string[]; points: number }[]
+    expect(groupsOf(host)).toHaveLength(3)
+    const scoreBefore = host.room?.scoreboard.find((e) => e.playerId === host.playerId)?.score ?? 0
+
+    const keys = groupsOf(host)
+      .filter((g) => g.label !== 'library')
+      .map((g) => g.key)
+    host.send('meld/merge', { keys })
+
+    // Everyone sees the join, not just the host who made it.
+    await Promise.all(everyone.map((c) => c.waitForRoom(() => groupsOf(c).length === 2, 15_000)))
+    const joined = groupsOf(host).find((g) => g.playerIds.length === 2)
+    expect(joined?.points).toBeGreaterThan(0)
+    expect(host.view['merged']).toBe(true)
+
+    // And the scoreboard the room owns has actually moved.
+    const scoreAfter = host.room?.scoreboard.find((e) => e.playerId === host.playerId)?.score ?? 0
+    expect(scoreAfter).toBe(scoreBefore + joined!.points)
+
+    // Undo puts it back, points and all.
+    host.send('meld/unmerge')
+    await host.waitForRoom(() => groupsOf(host).length === 3, 15_000)
+    expect(host.room?.scoreboard.find((e) => e.playerId === host.playerId)?.score).toBe(scoreBefore)
+  }, 60_000)
+
+  it('refuses to regroup for anyone but the host', async () => {
+    const s = await server()
+    const { host, others } = await intoReveal(s)
+    const guest = others[0]!
+    const groups = (host.view['groups'] ?? []) as { key: string }[]
+
+    guest.send('meld/merge', { keys: groups.map((g) => g.key) })
+    await guest.waitFor((m) => m.t === 'error' && m.error.code === 'NOT_HOST', 15_000)
+    expect((host.view['groups'] as unknown[]).length).toBe(groups.length)
+  }, 60_000)
+
   it('keeps the results on screen across a reconnect', async () => {
     const s = await server()
     const { host } = await intoReveal(s)

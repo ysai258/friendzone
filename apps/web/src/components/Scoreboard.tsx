@@ -41,8 +41,14 @@ export function Scoreboard({
               <span className="truncate font-semibold">{entry.name}</span>
               {isYou && <span className="text-xs font-bold text-violet-300">you</span>}
             </span>
-            {showDeltas && entry.delta !== null && entry.delta > 0 && (
-              <span className="animate-pop tabular text-sm font-bold text-emerald-300">+{entry.delta}</span>
+            {showDeltas && entry.delta !== null && entry.delta !== 0 && (
+              // Negative happens when the host undoes a join they had made,
+              // and a score that moves without saying so looks like a bug.
+              <span
+                className={`animate-pop tabular text-sm font-bold ${entry.delta > 0 ? 'text-emerald-300' : 'text-rose-300'}`}
+              >
+                {entry.delta > 0 ? `+${entry.delta}` : `−${Math.abs(entry.delta)}`}
+              </span>
             )}
             <span className="tabular w-16 text-right text-lg font-extrabold">{entry.score.toLocaleString()}</span>
           </li>

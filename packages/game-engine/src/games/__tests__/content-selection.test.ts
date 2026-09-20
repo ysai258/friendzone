@@ -29,6 +29,7 @@ function boot(gameId: string, playerCount: number, settings: Record<string, unkn
     settings: def.settingsSchema.parse(settings),
     content: packOf(kind, 40),
     recentContentIds: recent,
+    hostId: roster[0]!.id,
   })
   return { def, roster, state }
 }
@@ -206,6 +207,7 @@ describe('mind meld / the host moves it on', () => {
       settings: def.settingsSchema.parse({ rounds: 3, seconds: 20 }),
       content: packOf('prompt', 40),
       recentContentIds: [],
+      hostId: roster[0]!.id,
     })
     // Into the prompt, everyone answers, then the clock closes the round.
     let now = T0
@@ -269,6 +271,7 @@ describe('mind meld / the host moves it on', () => {
         settings: def.settingsSchema.parse({ rounds: 5 }),
         content: packOf('prompt', 40),
         recentContentIds: recent,
+        hostId: roster[0]!.id,
       })
     const first = make([])
     const used = def.usedContentIds?.(first) ?? []
@@ -291,6 +294,7 @@ describe('mind meld / grouping answers', () => {
       settings: def.settingsSchema.parse({ rounds: 3, seconds: 20 }),
       content: packOf('prompt', 40),
       recentContentIds: [],
+      hostId: roster[0]!.id,
     })
     let now = T0
     for (let i = 0; i < 6 && def.getPhase(state) !== 'PROMPT'; i++) {

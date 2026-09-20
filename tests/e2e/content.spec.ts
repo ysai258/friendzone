@@ -192,6 +192,57 @@ test.describe('Mind Meld waits for the host', () => {
   })
 })
 
+test.describe('the host can join answers the machine kept apart', () => {
+  test('two answers become one group, and the scores follow', async ({ browser }) => {
+    const hostContext = await browser.newContext()
+    const guestContext = await browser.newContext()
+    const hostPage = await hostContext.newPage()
+    const code = await createRoom(hostPage, 'Yashwanth', 'Mind Meld')
+    const guestPage = await joinRoom(guestContext, code, 'Rahul')
+
+    await hostPage.locator('#setting-rounds').fill('3')
+    await hostPage.locator('#setting-seconds').fill('15')
+    await hostPage.waitForTimeout(500)
+    await hostPage.getByRole('button', { name: 'Start game' }).click()
+
+    // Two ways of saying one thing that no dictionary would fold together.
+    for (const [page, answer] of [
+      [hostPage, 'petrol bunk'],
+      [guestPage, 'gas station'],
+    ] as const) {
+      await expect(page.getByPlaceholder('Your answer')).toBeVisible({ timeout: 25_000 })
+      await page.getByPlaceholder('Your answer').fill(answer)
+      await page.getByRole('button', { name: 'Lock in' }).click()
+    }
+
+    await expect(hostPage.getByText('Tap two answers that meant the same thing to join them.')).toBeVisible({
+      timeout: 30_000,
+    })
+    // Both are alone, so nobody has scored.
+    await expect(hostPage.getByText('alone')).toHaveCount(2)
+
+    await hostPage.getByRole('button', { name: /^petrol bunk/ }).click()
+    await expect(hostPage.getByText('Now tap the one it should join.')).toBeVisible()
+    await hostPage.getByRole('button', { name: /^gas station/ }).click()
+    await hostPage.getByRole('button', { name: 'Join 2 answers' }).click()
+
+    // One group, both names in it, points on the board — on both screens.
+    await expect(hostPage.getByText('alone')).toHaveCount(0)
+    await expect(hostPage.getByText('petrol bunk')).toBeVisible()
+    await expect(guestPage.getByText(/Yashwanth joined some of these answers/)).toBeVisible({ timeout: 15_000 })
+
+    // And it can be taken back.
+    await hostPage.getByRole('button', { name: 'Undo joins' }).click()
+    await expect(hostPage.getByText('alone')).toHaveCount(2)
+
+    // The round still ends when the host says so.
+    await hostPage.getByRole('button', { name: 'Next question →' }).click()
+    await expect(hostPage.getByPlaceholder('Your answer')).toBeVisible({ timeout: 20_000 })
+
+    await Promise.all([hostContext.close(), guestContext.close()])
+  })
+})
+
 test.describe('Who Am I? is one category', () => {
   test('everyone at the table is from the category the host chose', async ({ browser }) => {
     const hostContext = await browser.newContext()

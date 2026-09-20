@@ -13,14 +13,16 @@ export function players(count: number, overrides: Partial<EnginePlayer>[] = []):
   }))
 }
 
+/** The first seat is the host, as it is in a real room. */
+const hostOf = (roster: EnginePlayer[]): string => roster[0]?.id ?? 'p1'
+
 export function turnCtx(now: number, roster: EnginePlayer[], actionId?: string): TurnContext {
-  return actionId === undefined
-    ? { now, seed: 'test-seed', players: roster }
-    : { now, seed: 'test-seed', players: roster, actionId }
+  const base = { now, seed: 'test-seed', players: roster, hostId: hostOf(roster) }
+  return actionId === undefined ? base : { ...base, actionId }
 }
 
 export function viewCtx(now: number, roster: EnginePlayer[]): ViewContext {
-  return { now, seed: 'test-seed', players: roster, roomCode: 'TEST1' }
+  return { now, seed: 'test-seed', players: roster, roomCode: 'TEST1', hostId: hostOf(roster) }
 }
 
 /** Deliberately unlike one another: titles a single edit apart would be judged
