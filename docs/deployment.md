@@ -79,9 +79,9 @@ docker compose -f docker-compose.prod.yml up -d --build
 ```
 
 That is the whole deployment. The app container migrates the database at boot
-and, because `SEED_ON_BOOT` is set in that image, loads the game content if the
-question table is empty. Verified from a wiped database: it comes up playable
-with no second command.
+and, because `SEED_ON_BOOT` is set in that image, brings the content library in
+line with the data files it carries. Verified from a wiped database: it comes
+up playable with no second command.
 
 For real photographs in Blur Battle rather than generated placeholders, pass a
 contact address at build time, as Wikimedia asks of automated clients:
@@ -126,7 +126,7 @@ wrong, with a message naming the variable. Nothing downstream reads
 | `PUBLIC_WEB_ORIGIN` | yes | Used to build shareable room links |
 | `ADMIN_TOKEN` | no | **Admin routes are not registered without it** |
 | `WEB_DIST` | no | Serve the built web app from this process. Set in the `allinone` image. |
-| `SEED_ON_BOOT` | no | Load content if the question table is empty. Set in the `allinone` image. |
+| `SEED_ON_BOOT` | no | Reconcile the content library with this image's data files at boot. Set in the `allinone` image. |
 | `DATA_DIR` | no | Where the seed JSON lives; inferred when unset |
 | `PLAYER_GRACE_SECONDS` | no | Default 45 |
 | `ROOM_LOBBY_TTL_SECONDS` | no | Default 1800 |
@@ -148,7 +148,29 @@ npm run seed
 ```
 
 `/ready` reports per-kind content counts, which is the quickest way to see
-whether a deployment has content at all.
+whether a deployment has content at all. A healthy deployment built from
+this repo reports `emoji 351, identity 177, image 79, mafia 90, prompt 221`.
+
+### Updating content on a live deployment
+
+`npm run seed` against a production database is safe to run repeatedly, and
+safe to run while people are playing:
+
+- it is **idempotent** — the same files produce the same rows;
+- it is **scoped to a dataset** — a file only ever adds, updates or removes
+  rows carrying its own `dataset_id`, so loading the Telugu films cannot touch
+  Mind Meld's prompts, and a partial data directory cannot empty the library;
+- an item dropped from a file is **deleted before** the inserts run, which is
+  what frees its `(kind, answer_key)` for a renamed replacement;
+- a room already playing is unaffected: content is copied into the session at
+  `createGame` and never re-read mid-game.
+
+`SEED_ON_BOOT` (set in the `allinone` image, and therefore on Render) does this
+on every boot, behind a Postgres advisory lock so instances starting together
+do not race. That is how content reaches a host with no release step: push,
+Render rebuilds, the new container reconciles the library as it starts. A boot
+seed that fails is logged and the server starts anyway, still serving whatever
+the database already holds.
 
 ## Behind a proxy
 

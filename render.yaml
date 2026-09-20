@@ -64,6 +64,8 @@ services:
       # is derived from Render's own RENDER_EXTERNAL_URL.
       - key: CORS_ORIGINS
         value: ""
-      # Comes up playable from an empty database, with no release step.
+      # Comes up playable from an empty database, and reconciles the content
+      # library with this build's data files on every boot — which is how new
+      # or corrected content reaches a service that has no release step.
       - key: SEED_ON_BOOT
         value: "true"

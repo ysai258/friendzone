@@ -66,7 +66,7 @@ pipeline for data nobody reads.
 | 3 | Room system: create, join, presence, host migration, reconnect | |
 | 4 | Game engine: the contract, pure reducers, deadline scheduling | |
 | 5 | Five games | All five, each with its own mechanic |
-| 6 | Content pipeline and seeds | 78 images + 213 authored items |
+| 6 | Content pipeline and seeds | 79 images + 839 authored items |
 | 7 | Reliability: idempotency, grace, graceful shutdown, rate limits | |
 | 8 | Observability: structured logs, metrics, admin views | |
 | 9 | Performance: measure, profile, fix what is actually slow | Two findings, one non-fix |

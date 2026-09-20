@@ -30,7 +30,7 @@ interface GameDefinition<S, Cfg> {
   actionSchema: z.ZodType<GameAction>
 
   contentRequest(settings): ContentRequest
-  createGame(ctx): S
+  createGame(ctx): S               // ctx carries what this room played recently
 
   getPublicState(state, viewerId, ctx): GamePublicState
   validateAction(state, playerId, action, ctx): Result<void>
@@ -41,6 +41,9 @@ interface GameDefinition<S, Cfg> {
   getDeadline(state): number | null
   getPhase(state): string
   isGameOver(state): boolean
+
+  usedContentIds?(state): string[]         // what this session dealt, for the room to remember
+  hostAdvance?(state, ctx): Transition<S>  // a phase the host ends, not the clock
 }
 ```
 
@@ -84,6 +87,66 @@ cumulative scores, which is why the leaderboard, the final results screen and
 Play Again work identically for all five games without any of them implementing
 a scoreboard.
 
+## Choosing content
+
+Three things decide what a room plays: the filter the host set, the difficulty
+they prefer, and what this room has seen recently. All three are applied on the
+server. A client that lies about its settings gets the same treatment as one
+that tells the truth — settings are validated by `settingsSchema`, and the draw
+happens inside the reducer.
+
+### The host's filter
+
+`contentRequest(settings)` turns settings into a request. Two filters are
+honoured absolutely and never relaxed:
+
+| Filter | Used by | Meaning |
+| --- | --- | --- |
+| `languages` | Emoji Movie, Movie Mafia | Film industries to draw from. Default `['telugu', 'hindi']` |
+| `category` | Who Am I? | One celebrity category for the whole game |
+
+Difficulty, by contrast, is a preference: if a difficulty leaves too small a
+pool the provider widens it and sets `widened` rather than failing. The
+distinction matters because the failure modes are different. A Hard-only room
+that gets a Medium film is mildly disappointed; a Telugu-only room that gets a
+Hindi film has had its choice ignored, and a table of Who Am I? where four
+players are actors and the fifth is a cricketer is not a game at all.
+
+That last case is what `strict` is for: the request fails loudly with
+`CONTENT_UNAVAILABLE` rather than mixing categories. `strict` measures against
+`minimum` (what the game cannot play without — one person per seat) rather than
+`count` (how large a pool it would like, for variety across repeat plays), so
+asking for headroom never turns a perfectly playable category into an error.
+
+### Not repeating yourself
+
+The room remembers what it has dealt, per content kind, in `recentContent` on
+the room record:
+
+```ts
+recentContent: { emoji: ['te-baahubali', 'hi-3-idiots', …], identity: […] }
+```
+
+`startGame` passes that list into `createGame`, and games draw with `pickFresh`,
+which prefers items the room has not seen and tops up stalest-first only when
+history has used up the pool. Afterwards the room records what the session
+actually dealt, via `usedContentIds`, capped per kind (60 films, 40 people, 80
+prompts, 30 mafia subjects).
+
+Three properties fall out of putting the history on the room record rather than
+in a client, a session or a query:
+
+- it survives a reconnect, a host migration and a server restart, because it is
+  part of the state every instance reads;
+- `resetToLobby` deliberately keeps it, because Play Again is exactly when a
+  repeat would be noticed;
+- it is per room, so two parties on the same instance do not influence each
+  other's draws.
+
+There is no `ORDER BY random()` anywhere. Selection is a pure function of the
+room's seed and its history, which is what makes "did this room repeat itself?"
+a question a unit test can answer.
+
 ## Hidden information
 
 `getPublicState(state, viewerId, ctx)` is the only place a secret can be
@@ -125,13 +188,27 @@ how "round ends → reveal → countdown → next round" happens in a single wri
 The guard is there because a game with a bug that never settles would otherwise
 take the instance with it.
 
+### Phases with no clock
+
+`getDeadline` returning `null` means nothing will ever move this phase along by
+itself. Mind Meld's reveal is deliberately one of those: the argument about who
+said what is the best part of the game, and a five-second timer was cutting it
+off. The host ends it instead.
+
+A game opts in by implementing `hostAdvance`, which the room's `room/continue`
+action calls when there is no deadline to settle. It is host-only, like every
+other room-level control, and returns `null` when the phase is not one the host
+may end — so a second tap on "Next question" is an `INVALID_ACTION`, not a
+skipped question. The room view publishes `deadlineAt: null` for such a phase,
+so no screen shows a countdown parked at zero.
+
 ## The five games
 
 | Game | Phases | What it exercises |
 | --- | --- | --- |
 | Blur Battle | COUNTDOWN → QUESTION → REVEAL → … | Progressive disclosure, speed scoring, one-shot commitment |
 | Emoji Movie | COUNTDOWN → QUESTION → REVEAL → … | Open racing with per-player cooldowns and attempt caps |
-| Mind Meld | COUNTDOWN → PROMPT → REVEAL → … | Simultaneous submission, answer clustering, no right answer |
+| Mind Meld | COUNTDOWN → PROMPT → REVEAL → … | Simultaneous submission, answer clustering, host-ended phases |
 | Who Am I? | ASSIGN → ASK → VOTE → RESULT → … | Turn order, per-player secrets, voting, hint economy |
 | Movie Mafia | ROLES → DISCUSSION → VOTE → RESULT → … | Asymmetric secrets, elimination, team scoring |
 

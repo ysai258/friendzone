@@ -76,19 +76,71 @@ need to know what a "blur stage" is, and a game gaining a field does not need a
 migration.
 
 **Selection happens in memory, not in SQL.** The server loads a whole kind once
-and caches it for five minutes, then filters difficulty and category in process,
-so starting a game is usually zero queries and survives a brief Postgres outage.
-`questions_pick_idx` leads on `kind` accordingly. At the current scale Postgres
-correctly chooses a sequential scan over 291 rows; the index earns its keep as
-the library grows.
+and caches it for five minutes, then filters language, category and difficulty
+in process, so starting a game is usually zero queries and survives a brief
+Postgres outage. `questions_pick_idx` leads on `kind` accordingly. At the
+current scale Postgres correctly chooses a sequential scan over ~900 rows; the
+index earns its keep as the library grows.
+
+There is deliberately no `ORDER BY random()`. Which item a room gets depends on
+the room's seed and the room's recent history, both of which live in state the
+database does not hold — see [the game engine](game-engine.md#choosing-content).
 
 **`questions(kind, answer_key)` is unique.** `answer_key` is the normalised
 answer, so two items a player could not tell apart cannot both be in the pool.
 This is enforced at seed time and fails loudly.
 
+**Language lives in the payload, not a column.** `questions.payload` is the
+`ContentItem`, and a movie's `language` is one of its fields. Filtering happens
+in memory over a cached pool, so lifting it into a column would buy an index
+nothing queries. `category` is a column only because the pipeline and the admin
+page group by it.
+
 **There is no `answers` table.** Persisting every submission would turn a party
 game into a write-heavy pipeline for data nobody reads. Answers live in the
 session state and are summarised into `game_results` when the game ends.
+
+## The content library
+
+What the datasets contain and the rules they were written to is
+[content.md](content.md); this is how they reach Postgres.
+
+```
+data/seed/
+  movies/telugu.json      135   Emoji Movie: one file per language
+  movies/hindi.json        72
+  movies/english.json      60
+  movies/tamil.json        48
+  movies/malayalam.json    36
+  mafia.json               90   Movie Mafia subjects, with fan and imposter clues
+  prompts.json            221   Mind Meld, across 17 themes
+  identities.json         177   Who Am I?, across 7 categories
+  image-subjects.json      79   Blur Battle; the pipeline derives the blur ladder
+```
+
+918 items across the files. Blur Battle is the one kind seeded from the
+pipeline's output rather than from its subject list, so how many of its 79
+subjects arrive depends on the pipeline: the placeholder build keeps all of
+them, while the Wikimedia fetch in this repo's development database rejected
+`im-macaron` and loaded 78.
+
+One file per language keeps the diff to twenty lines when someone adds twenty
+Tamil films, and makes an item's language a property of where it lives rather
+than a field somebody can forget to set.
+
+Seeding is idempotent and scoped to a dataset: rows in the file are upserted,
+and rows that are in the dataset's table but no longer in its file are deleted
+**before** the inserts run. The ordering is not incidental. `questions(kind,
+answer_key)` is unique and does not filter on `active`, so retiring a row by
+flagging it inactive does not release its answer key — a renamed item would
+collide with its own former self. Nothing outside the dataset being loaded is
+touched, so a deploy can never empty the library.
+
+The seed also refuses answers a player could not tell apart. Identical
+normalised answers would violate the unique index anyway; near-identical ones
+would not, and the games forgive typos, so two titles one edit apart mean one
+is silently accepted for the other. `Gamyam` and `Gaayam` are both real Telugu
+films and one edit apart, which is how this check came to exist.
 
 ## Writes are off the hot path
 

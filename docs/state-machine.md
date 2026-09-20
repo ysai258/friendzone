@@ -131,6 +131,31 @@ whole ladder and blurring it in CSS would put the answer one devtools panel
 away, so each unlock is a server transition and the payload carries exactly one
 image URL.
 
+## Mind Meld
+
+```mermaid
+stateDiagram-v2
+  [*] --> COUNTDOWN
+  COUNTDOWN --> PROMPT: countdown ends
+  PROMPT --> REVEAL: timer, or everybody answered
+  REVEAL --> COUNTDOWN: host presses Next question
+  REVEAL --> FINISHED: host presses See final results
+```
+
+Every arrow out of `REVEAL` is a person, not a clock. `getDeadline` returns
+`null` there, so the scheduler has nothing to fire and the room publishes
+`deadlineAt: null` — no screen shows a countdown, and nothing moves until the
+host sends `room/continue`, which the game answers through `hostAdvance`.
+
+This replaced a five-second automatic transition. The five seconds were spent
+reading the groups; the argument about who said "pizza" started at about second
+four and was cut off every time.
+
+Because it is the same host-only `room/continue` that settles a timed phase
+early, nothing else had to learn about it: a non-host is refused with
+`NOT_HOST`, and a second press while the next question is already loading is
+refused with `INVALID_ACTION` rather than skipping a question.
+
 ## Movie Mafia
 
 ```mermaid

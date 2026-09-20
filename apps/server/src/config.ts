@@ -75,9 +75,10 @@ const schema = z.object({
   DATA_DIR: z.string().default(''),
 
   /**
-   * Load game content at boot if the question table is empty. Off by default,
-   * because a real deployment seeds deliberately; on, a single-service host
-   * needs no second command to become playable.
+   * Reconcile the game content library with this image's data files at boot.
+   * Off by default, because a real deployment seeds deliberately; on, a
+   * single-service host needs no second command to become playable, and a
+   * redeploy is how new content reaches it.
    */
   SEED_ON_BOOT: z
     .string()

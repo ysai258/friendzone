@@ -59,7 +59,7 @@ export async function buildApp(options: BuildOptions = {}): Promise<BuiltApp> {
   const pool = createPool(config, logger)
   if (options.migrate !== false) await runMigrations(pool, logger)
 
-  if (config.SEED_ON_BOOT) await seedIfEmpty(pool, config, logger)
+  if (config.SEED_ON_BOOT) await seedAtBoot(pool, config, logger)
 
   const redis = await createRedis(config, logger)
   const scripts = defineScripts(redis.command)
@@ -278,26 +278,40 @@ async function registerWebApp(app: FastifyInstance, root: string, logger: Logger
 }
 
 /**
- * Load content if there is none.
+ * Bring the content library in line with the data this image carries.
  *
- * For hosts that run one service and offer no release step. Deliberately
- * opt-in and deliberately conditional: an existing library is never touched,
- * and a failure is logged rather than fatal, because a server with no
- * questions can still run a lobby and say so.
+ * For hosts that run one service and offer no release step: the only moment a
+ * deploy can update content is boot. It reconciles rather than skips, because
+ * "seed only when empty" means a deployment that already has content can never
+ * receive a correction — a new language, a fixed clue, a film that turned out
+ * to be two films.
+ *
+ * Safe to do on every boot because the seed is idempotent and scoped per
+ * dataset: it only adds, updates or removes rows carrying that dataset's id,
+ * and a dataset whose file is missing from the image is left alone entirely.
+ * An advisory lock serialises instances starting together, and a failure is
+ * logged rather than fatal — the existing library is still there, and a server
+ * that cannot re-seed can still run a lobby and say so on /ready.
  */
-async function seedIfEmpty(pool: Pool, config: Config, logger: Logger): Promise<void> {
+const SEED_LOCK_ID = 8_213_005
+
+async function seedAtBoot(pool: Pool, config: Config, logger: Logger): Promise<void> {
+  const client = await pool.connect()
   try {
-    const counts = await contentCounts(pool)
-    const total = Object.values(counts).reduce((a, b) => a + b, 0)
-    if (total > 0) {
-      logger.info({ counts }, 'content already loaded; skipping boot seed')
-      return
-    }
-    logger.info('no content found; seeding')
+    await client.query('SELECT pg_advisory_lock($1)', [SEED_LOCK_ID])
     const results = await seedContent(pool, { dataDir: resolveDataDir(config.DATA_DIR) })
-    logger.info({ loaded: results.map((r) => `${r.kind}:${r.loaded}`) }, 'content seeded')
+    // Every row is upserted whether or not it changed, so "loaded" is the size
+    // of the library rather than a count of edits; only removals are news.
+    const removed = results.reduce((total, r) => total + r.retired, 0)
+    logger.info(
+      { counts: await contentCounts(pool), removed },
+      'content reconciled with the data files in this build',
+    )
   } catch (error) {
-    logger.error({ err: error }, 'boot seed failed; start the server with content already loaded')
+    logger.error({ err: error }, 'boot seed failed; serving whatever content the database already holds')
+  } finally {
+    await client.query('SELECT pg_advisory_unlock($1)', [SEED_LOCK_ID]).catch(() => undefined)
+    client.release()
   }
 }
 

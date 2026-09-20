@@ -20,10 +20,10 @@ No signup. No downloads. Just friends.
 | Game | What it is | Players |
 | --- | --- | --- |
 | 🌀 **Blur Battle** | A picture sharpens step by step. Name it early through the fog for more points — one guess each. | 1–12 |
-| 🎬 **Emoji Movie** | A film as three emoji. Everyone races, wrong guesses only cost you time. | 1–12 |
+| 🎬 **Emoji Movie** | A film as three emoji. Everyone races, wrong guesses only cost you time. Telugu, Hindi, Tamil, Malayalam or English — the host picks. | 1–12 |
 | 🧠 **Mind Meld** | One prompt, everyone answers at once, points for agreeing. Being clever is a trap. | 2–16 |
-| 🕵️ **Who Am I?** | A secret identity on your forehead that everyone but you can see. | 3–10 |
-| 🎭 **Movie Mafia** | Everyone gets a clue about the same film. One clue is wrong, and its holder does not know. | 4–12 |
+| 🕵️ **Who Am I?** | A secret identity on your forehead that everyone but you can see. One category per game: Telugu actors, cricketers, singers… | 3–10 |
+| 🎭 **Movie Mafia** | Everyone gets a clue about the same film. One clue is wrong, and its holder does not know. Same language picker as Emoji Movie. | 4–12 |
 
 ## Running it
 
@@ -33,7 +33,7 @@ npm install
 cp .env.example .env
 docker compose up -d          # PostgreSQL and Redis
 npm run dataset:sample        # generated placeholder art, no network needed
-npm run seed                  # loads all five games' content
+npm run seed                  # loads all five games' content (~900 items)
 npm run dev                   # http://localhost:5174
 ```
 
@@ -79,6 +79,18 @@ computes the same new host. [`docs/reliability.md`](docs/reliability.md)
 **Games are plugins.** The room service has no branch on which game is running.
 A game declares its settings, its actions and how to build a view, and the
 platform does the rest. [`docs/game-engine.md`](docs/game-engine.md)
+
+**A room does not repeat itself.** What was played is remembered on the room
+record, so the next game — and the one after Play Again, and the one after a
+reconnect — draws from what nobody has seen yet. The host's language and
+category choices are filters the server honours absolutely, never a hint.
+[`docs/game-engine.md`](docs/game-engine.md#choosing-content),
+[`docs/content.md`](docs/content.md)
+
+**Some phases end when a person says so.** Mind Meld's reveal has no timer at
+all: comparing answers is the best part, so the host moves it on. The same
+`room/continue` action covers both, and games without a clock simply publish no
+deadline. [`docs/state-machine.md`](docs/state-machine.md)
 
 ## Measured, not estimated
 
@@ -162,8 +174,12 @@ Blur Battle images come from Wikimedia Commons under CC0, public domain, CC BY
 or CC BY-SA. NonCommercial and NoDerivatives files are filtered out at fetch
 time, because this project generates derivatives and cannot promise
 non-commercial use on a deployer's behalf. Every image carries its author,
-source and licence through to the reveal screen. The other four games' content
-is original to this project.
+source and licence through to the reveal screen. The other four games' content is
+original to this project: 351 films across five languages, 90 Movie Mafia
+subjects, 221 Mind Meld prompts and 177 identities across seven categories, all
+hand-written and checked at seed time for answers a player could not tell
+apart. What gets in, and how to add more, is in
+[`docs/content.md`](docs/content.md).
 
 The pipeline identifies itself to Wikimedia with a contact address, limits
 concurrency, caches what it downloads, and uses the documented API. It does not
