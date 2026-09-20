@@ -242,6 +242,30 @@ eight.
 Mind Meld scores agreement instead: a group of *n* out of *t* answers earns
 `1000 × (0.35 + 0.65 × n/t)`, and a unique answer earns nothing.
 
+### How Mind Meld decides two answers are the same
+
+Exact match on a key, built by `meldKey` in `packages/shared/src/normalize.ts`:
+
+1. normalise — accents, case, punctuation, a leading article;
+2. stem each word, then fold the ending (`y` → `i`, trailing `e` dropped,
+   doubled consonant collapsed), so `movie`/`movies` and `phone`/`phones` land
+   on one key;
+3. replace each word with its group leader from `SYNONYM_GROUPS`, so `mobile`
+   becomes `phone` and `chai` becomes `tea`;
+4. deduplicate, sort and join — which makes `hot coffee` and `coffee, hot` the
+   same answer, and collapses `mobile phone` onto `phone`.
+
+Never a fuzzy comparison, though the other games' `matchAnswer` does forgive
+typos. The difference is that `matchAnswer` judges a guess against a known
+title, where "close" can only mean "right"; Mind Meld clusters players against
+each other with no ground truth, and nearness is not transitive — A near B and
+B near C would not make A near C, so the groups would depend on the order
+answers arrived in and the same round would score differently on a replay. A
+key is order-independent, which is what keeps the reducer pure.
+
+The synonym list is editorial data, and what belongs in it is in
+[content.md](content.md#answers-that-mean-the-same-thing).
+
 ## Adding a game
 
 1. Write a definition in `packages/game-engine/src/games/`.

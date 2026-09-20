@@ -276,3 +276,68 @@ describe('mind meld / the host moves it on', () => {
     expect((def.usedContentIds?.(second) ?? []).some((id) => used.includes(id))).toBe(false)
   })
 })
+
+describe('mind meld / grouping answers', () => {
+  const def = gameRegistry.get('mind-meld')
+
+  /** Play one round with the given answers and return the scored groups. */
+  function roundWith(answers: string[]) {
+    const roster = players(answers.length)
+    let state: unknown = def.createGame({
+      now: T0,
+      seed: 'meld-groups',
+      players: roster,
+      sessionId: 'sess',
+      settings: def.settingsSchema.parse({ rounds: 3, seconds: 20 }),
+      content: packOf('prompt', 40),
+      recentContentIds: [],
+    })
+    let now = T0
+    for (let i = 0; i < 6 && def.getPhase(state) !== 'PROMPT'; i++) {
+      now = def.getDeadline(state) ?? now + 1
+      state = def.advance(state, turnCtx(now, roster)).state
+    }
+    answers.forEach((answer, i) => {
+      state = def.applyAction(state, roster[i]!.id, { type: 'meld/submit', payload: { answer } }, turnCtx(now, roster)).state
+    })
+    now = def.getDeadline(state) ?? now
+    const settled = def.advance(state, turnCtx(now, roster))
+    const view = def.getPublicState(settled.state, 'p1', viewCtx(now, roster))
+    return {
+      groups: (view.view as { groups: { label: string; playerIds: string[]; points: number }[] }).groups,
+      deltas: settled.scoreDeltas ?? {},
+    }
+  }
+
+  it('scores two people who wrote the same thing differently as one group', () => {
+    // The complaint this answers: one player types "phone", another types
+    // "mobile", and the game tells them they disagreed.
+    const { groups, deltas } = roundWith(['phone', 'mobile', 'laptop'])
+    expect(groups).toHaveLength(2)
+    const together = groups.find((g) => g.playerIds.length === 2)
+    expect(together?.playerIds).toEqual(['p1', 'p2'])
+    expect(deltas['p1']).toBeGreaterThan(0)
+    expect(deltas['p1']).toBe(deltas['p2'])
+    // Being on your own still earns nothing.
+    expect(deltas['p3']).toBeUndefined()
+  })
+
+  it('groups spelling, plurals and phrasing together', () => {
+    expect(roundWith(['Biryani', 'biriyani', 'BIRYANI!']).groups).toHaveLength(1)
+    expect(roundWith(['movie', 'movies', 'film']).groups).toHaveLength(1)
+    expect(roundWith(['air conditioner', 'AC', 'ac']).groups).toHaveLength(1)
+    expect(roundWith(['amma', 'mother', 'mom']).groups).toHaveLength(1)
+  })
+
+  it('still keeps answers apart when they are genuinely different', () => {
+    const { groups } = roundWith(['tea', 'coffee', 'juice'])
+    expect(groups).toHaveLength(3)
+    expect(groups.every((g) => g.points === 0)).toBe(true)
+  })
+
+  it('labels the group with what somebody actually typed', () => {
+    // The key is "phon"; nobody wants to read that on the results screen.
+    const { groups } = roundWith(['Mobile', 'phone'])
+    expect(groups[0]?.label).toBe('Mobile')
+  })
+})

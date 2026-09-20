@@ -91,6 +91,35 @@ movies, travel, school and college, work, friendship, funny, hypothetical,
 preferences, association, cricket and sport, technology, childhood, festivals
 and family) so a long evening does not circle one topic.
 
+## Answers that mean the same thing
+
+`packages/shared/src/synonyms.ts` is a curated list of groups whose members
+Mind Meld treats as one answer — `phone`/`mobile`/`cell phone`,
+`tea`/`chai`, `biryani`/`biriyani`, `amma`/`mother`/`mom`. Scoring rewards
+agreement, so two people who picked different words for the same thing have
+been cheated by the software rather than out-guessed by each other.
+
+The rules it is written to:
+
+- **Only true equivalence.** `tea`/`chai` yes, `tea`/`coffee` no. If a group
+  would merge two answers a player could have deliberately chosen between, it
+  does not belong.
+- **No ambiguous words.** Indian English uses *picture* for both a photo and a
+  film, and *hotel* for both a place to sleep and a place to eat. Neither is in
+  the list: an unmerged pair costs one round, a wrongly merged pair is a bug
+  nobody at the table can see.
+- **Spellings count.** Half the value is `chapati`/`chapathi` and
+  `colour`/`color` — one word typed by two people.
+- **One group per word**, or the fold would depend on which group was read
+  first. A test enforces it, along with "every variant reaches its leader" and
+  "no two groups collapse into one key".
+
+Plurals, gerunds and `-y`/`-ie` endings need no entry: the stemmer already
+folds `phones`, `mobiles` and `idly`.
+
+Adding a group is one line in that file. Nothing else changes — the tests will
+tell you if the new group overlaps an existing one.
+
 ## What the seed refuses
 
 Both checks are in `apps/server/src/content/seed.ts` and both fail the seed

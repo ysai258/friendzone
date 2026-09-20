@@ -34,8 +34,11 @@ import {
  * length hint. All a player sees is who has locked in. If answers leaked, the
  * game would collapse into copying the first person to type.
  *
- * Answers are bucketed by meldKey, which folds case, punctuation, plurals and
- * gerunds together, so "sleeping" and "Sleep!" land in the same group.
+ * Answers are bucketed by meldKey, which folds case, punctuation, word order,
+ * plurals and gerunds together — so "sleeping" and "Sleep!" land in the same
+ * group — and then folds a curated list of equivalents, so "phone", "mobile"
+ * and "cell phone" do too. Agreeing is the whole game; losing points because
+ * two people picked different words for one thing is the software's fault.
  */
 
 const COUNTDOWN_MS = 3_000

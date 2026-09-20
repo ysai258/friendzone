@@ -4,6 +4,8 @@
  * player's typing.
  */
 
+import { SYNONYM_GROUPS } from './synonyms.ts'
+
 const ARTICLES = /^(the|a|an)\s+/
 
 /**
@@ -92,30 +94,96 @@ export function matchAnswer(guess: string, accepted: readonly string[]): AnswerM
 /**
  * Bucket free-text answers that mean the same thing, for Mind Meld. Looser than
  * matchAnswer: here we are clustering players against each other, not against a
- * known truth, so "sleeping" and "sleep" must land together.
+ * known truth, so "sleeping" and "sleep" must land together — and so must
+ * "phone" and "mobile", which is what SYNONYM_GROUPS is for.
+ *
+ * Exact match on this key, never a fuzzy comparison. Clustering by edit
+ * distance is not transitive — A near B and B near C does not make A near C —
+ * so the groups would depend on the order answers arrived in, and the same
+ * round would score differently on a replay. A key is order-independent, which
+ * is what lets the reducer stay pure.
  */
 export function meldKey(input: string): string {
   const base = normalizeAnswer(input)
   if (base.length === 0) return ''
-  return base
+
+  const words = base
     .split(' ')
     .map(stem)
     .filter((w) => w.length > 0)
+    .map((w) => WORD_SYNONYMS.get(w) ?? w)
+
+  // Deduplicated because a synonym can collapse two words into one: "mobile
+  // phone" becomes phone twice, and must key the same as "phone".
+  const key = [...new Set(words)].sort().join(' ')
+  return PHRASE_SYNONYMS.get(key) ?? key
+}
+
+/**
+ * Crude suffix stripper, then a fold that makes the endings consistent.
+ *
+ * The fold is the part that matters. Stripping alone left "movie" and "movies"
+ * in different groups (-ies became -y, so "movy"), and "phone" and "phones" in
+ * different groups (the doubled-letter rule ate the wrong letter). Folding a
+ * trailing "y" to "i" and dropping a trailing "e" afterwards puts every form of
+ * a word on the same key: movie/movies -> movi, city/cities -> citi,
+ * phone/phones -> phon.
+ */
+function stem(word: string): string {
+  let w = word
+  if (w.length > 3) {
+    for (const suffix of ['ing', 'ies', 'es', 'ed', 's']) {
+      if (w.endsWith(suffix) && w.length - suffix.length >= 3) {
+        w = w.slice(0, w.length - suffix.length)
+        if (suffix === 'ies') w += 'y'
+        break
+      }
+    }
+  }
+  return fold(w)
+}
+
+function fold(word: string): string {
+  let w = word
+  if (w.length <= 3) return w
+  if (w.endsWith('y')) w = `${w.slice(0, -1)}i`
+  // Every trailing e, not just one: the -es rule takes two characters off
+  // "coffees" and the -s rule takes one off "coffee", and both have to land in
+  // the same place.
+  else while (w.length > 3 && w.endsWith('e')) w = w.slice(0, -1)
+  // "runn" -> "run": the stripper leaves a doubled consonant behind.
+  if (w.length > 3 && w.at(-1) === w.at(-2)) w = w.slice(0, -1)
+  return w
+}
+
+/** A single word folded the way meldKey folds it, with no synonym applied. */
+function plainKey(raw: string): string {
+  return [
+    ...new Set(
+      normalizeAnswer(raw)
+        .split(' ')
+        .map(stem)
+        .filter((w) => w.length > 0),
+    ),
+  ]
     .sort()
     .join(' ')
 }
 
-/** Crude suffix stripper. Enough to merge plurals and gerunds; no more. */
-function stem(word: string): string {
-  if (word.length <= 3) return word
-  for (const suffix of ['ing', 'ies', 'es', 'ed', 's']) {
-    if (word.endsWith(suffix) && word.length - suffix.length >= 3) {
-      let base = word.slice(0, word.length - suffix.length)
-      if (suffix === 'ies') base += 'y'
-      // "sleeping" -> "sleep", but "running" -> "runn" -> "run"
-      if (base.length > 3 && base.at(-1) === base.at(-2)) base = base.slice(0, -1)
-      return base
-    }
+/**
+ * The synonym groups, indexed for lookup: one-word variants by their stem,
+ * several-word variants by the key their words produce ("air conditioner" ->
+ * "air condition"), both pointing at their group's first entry.
+ */
+const WORD_SYNONYMS = new Map<string, string>()
+const PHRASE_SYNONYMS = new Map<string, string>()
+for (const group of SYNONYM_GROUPS) {
+  const canonical = plainKey(group[0] ?? '')
+  if (canonical.length === 0) continue
+  for (const variant of group) {
+    const key = plainKey(variant)
+    if (key.length === 0 || key === canonical) continue
+    if (key.includes(' ')) PHRASE_SYNONYMS.set(key, canonical)
+    else WORD_SYNONYMS.set(key, canonical)
   }
-  return word
 }
