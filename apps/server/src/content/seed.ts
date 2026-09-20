@@ -1,8 +1,8 @@
-import { readFile } from 'node:fs/promises'
+import { readdir, readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import type { Pool } from 'pg'
-import { normalizeAnswer } from '@friendzone/shared'
-import type { ContentItem } from '@friendzone/game-engine'
+import { editDistance, normalizeAnswer, typoAllowance } from '@friendzone/shared'
+import type { ContentItem, MovieLanguage } from '@friendzone/game-engine'
 
 /**
  * Load every game's content into Postgres.
@@ -24,6 +24,46 @@ export interface SeedOptions {
   /** Root holding `seed/` and, if the pipeline has run, `out/`. */
   dataDir: string
   log?: (message: string) => void
+}
+
+/**
+ * Reject content whose answers a player could not distinguish.
+ *
+ * Two kinds of collision matter. Identical normalised answers would violate
+ * the unique index and fail the insert anyway. Near-identical ones would not:
+ * the games forgive typos, so two titles a single edit apart mean one is
+ * accepted for the other, silently, in production. "Gamyam" and "Gaayam" are
+ * one edit apart, and both are real films.
+ *
+ * Checked here rather than in the pipeline so it applies to every kind of
+ * content, including the hand-written ones.
+ */
+export function findConfusableAnswers(items: readonly ContentItem[]): string[] {
+  const problems: string[] = []
+  const entries = items.map((item) => ({ id: item.id, key: normalizeAnswer(answerFor(item)) }))
+
+  const byKey = new Map<string, string[]>()
+  for (const entry of entries) {
+    const list = byKey.get(entry.key) ?? []
+    list.push(entry.id)
+    byKey.set(entry.key, list)
+  }
+  for (const [key, ids] of byKey) {
+    if (ids.length > 1) problems.push(`identical answer "${key}": ${ids.join(', ')}`)
+  }
+
+  for (let i = 0; i < entries.length; i++) {
+    for (let j = i + 1; j < entries.length; j++) {
+      const a = entries[i]!
+      const b = entries[j]!
+      if (a.key === b.key) continue
+      const allowance = typoAllowance(a.key.length)
+      if (allowance > 0 && editDistance(a.key, b.key, allowance) <= allowance) {
+        problems.push(`"${a.key}" (${a.id}) is within the typo allowance of "${b.key}" (${b.id})`)
+      }
+    }
+  }
+  return problems
 }
 
 export async function seedContent(pool: Pool, options: SeedOptions): Promise<SeedResult[]> {
@@ -66,17 +106,31 @@ async function seedImages(pool: Pool, options: SeedOptions): Promise<SeedResult>
 }
 
 async function seedEmoji(pool: Pool, options: SeedOptions): Promise<SeedResult> {
-  const raw = await readJson<{ items: RawEmoji[] }>(options, 'emoji-movies.json')
-  const items: ContentItem[] = raw.items.map((item) => ({
-    kind: 'emoji',
-    id: item.id,
-    title: item.title,
-    aliases: item.aliases,
-    emojis: item.emojis,
-    year: item.year,
-    category: 'film',
-    difficulty: item.difficulty,
-  }))
+  // One file per language, so adding an industry is a new file rather than an
+  // edit to a single enormous one.
+  const dir = join(options.dataDir, 'seed', 'movies')
+  const files = (await readdir(dir)).filter((f) => f.endsWith('.json')).sort()
+
+  const items: ContentItem[] = []
+  for (const file of files) {
+    const raw = JSON.parse(await readFile(join(dir, file), 'utf8')) as {
+      language: MovieLanguage
+      items: RawEmoji[]
+    }
+    for (const item of raw.items) {
+      items.push({
+        kind: 'emoji',
+        id: item.id,
+        title: item.title,
+        aliases: item.aliases,
+        emojis: item.emojis,
+        year: item.year,
+        category: 'film',
+        difficulty: item.difficulty,
+        language: raw.language,
+      })
+    }
+  }
   return upsert(pool, options, {
     datasetId: 'emoji-movies',
     kind: 'emoji',
@@ -114,7 +168,9 @@ async function seedPrompts(pool: Pool, options: SeedOptions): Promise<SeedResult
     kind: 'prompt',
     id: item.id,
     prompt: item.prompt,
-    category: 'everyday',
+    // The theme the prompt was written for. Not filtered on today, but it is
+    // what keeps the bank diverse and lets a category filter be added later.
+    category: item.category,
     difficulty: item.difficulty,
   }))
   return upsert(pool, options, {
@@ -137,6 +193,7 @@ async function seedMafia(pool: Pool, options: SeedOptions): Promise<SeedResult> 
     imposterClue: item.imposterClue,
     category: 'film',
     difficulty: item.difficulty,
+    language: item.language,
   }))
   return upsert(pool, options, {
     datasetId: 'mafia-subjects',
@@ -155,6 +212,17 @@ async function upsert(
   options: SeedOptions,
   args: { datasetId: string; kind: string; version: string; source: string; license: string; items: ContentItem[] },
 ): Promise<SeedResult> {
+  // Prompts are questions rather than answers, so near-duplicate wording is
+  // fine; everything with a guessable answer is checked.
+  if (args.kind !== 'prompt') {
+    const problems = findConfusableAnswers(args.items)
+    if (problems.length > 0) {
+      throw new Error(
+        `${args.datasetId} has answers players could not tell apart:\n  ${problems.slice(0, 10).join('\n  ')}`,
+      )
+    }
+  }
+
   const client = await pool.connect()
   let loaded = 0
   let skipped = 0
@@ -162,6 +230,18 @@ async function upsert(
 
   try {
     await client.query('BEGIN')
+
+    // Remove what this dataset no longer contains, before inserting what it
+    // does. Order matters: the unique index on (kind, answer_key) does not care
+    // whether a row is active, so a retired row still occupies its answer and a
+    // rebuild that renamed ids would collide with its own previous version.
+    const { rowCount: removed } = await client.query(
+      `DELETE FROM questions WHERE dataset_id = $1 AND NOT (id = ANY($2::text[]))`,
+      [args.datasetId, args.items.map((item) => item.id)],
+    )
+    retired = removed ?? 0
+    if (retired > 0) options.log?.(`  removed ${retired} item(s) no longer in ${args.datasetId}`)
+
     await client.query(
       `INSERT INTO datasets (id, kind, version, source, license, item_count)
        VALUES ($1, $2, $3, $4, $5, $6)
@@ -190,21 +270,6 @@ async function upsert(
       if (result.rowCount === 1) loaded++
       else skipped++
     }
-
-    // Anything this dataset used to contain and no longer does is retired
-    // rather than left behind. Without this, rebuilding a dataset that drops an
-    // item leaves a row pointing at image files that no longer exist, and the
-    // game eventually deals that question to somebody.
-    const { rowCount } = await client.query(
-      `UPDATE questions
-          SET active = FALSE
-        WHERE dataset_id = $1
-          AND active
-          AND NOT (id = ANY($2::text[]))`,
-      [args.datasetId, args.items.map((item) => item.id)],
-    )
-    retired = rowCount ?? 0
-    if (retired > 0) options.log?.(`  retired ${retired} item(s) no longer in ${args.datasetId}`)
 
     await client.query('COMMIT')
   } catch (error) {
@@ -241,5 +306,5 @@ async function readJson<T>(options: SeedOptions, name: string): Promise<T> {
 
 interface RawEmoji { id: string; title: string; emojis: string; year: number; difficulty: 'easy' | 'medium' | 'hard'; aliases: string[] }
 interface RawIdentity { id: string; name: string; category: string; difficulty: 'easy' | 'medium' | 'hard'; aliases: string[]; hints: string[] }
-interface RawPrompt { id: string; prompt: string; difficulty: 'easy' | 'medium' | 'hard' }
-interface RawMafia { id: string; title: string; difficulty: 'easy' | 'medium' | 'hard'; fanClue: string; imposterClue: string }
+interface RawPrompt { id: string; prompt: string; category: string; difficulty: 'easy' | 'medium' | 'hard' }
+interface RawMafia { id: string; title: string; difficulty: 'easy' | 'medium' | 'hard'; fanClue: string; imposterClue: string; language: MovieLanguage }

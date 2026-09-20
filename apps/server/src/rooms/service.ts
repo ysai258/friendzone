@@ -11,7 +11,7 @@ import {
   type RoomCode,
   type RoomConfig,
 } from '@friendzone/shared'
-import { DEFAULT_GAME_ID } from '@friendzone/game-engine'
+import { DEFAULT_GAME_ID, RECENT_LIMITS } from '@friendzone/game-engine'
 import type { EngineEvent, ErasedGameDefinition, GameRegistry, TurnContext } from '@friendzone/game-engine'
 import type { Config } from '../config.ts'
 import type { Logger } from '../logger.ts'
@@ -28,6 +28,7 @@ import {
   nextEvents,
   playersByJoinSeq,
   reconcileHost,
+  recordContentUse,
   rememberAction,
   resetToLobby,
   seatCount,
@@ -342,24 +343,42 @@ export class RoomService {
 
       case ROOM_ACTIONS.CONTINUE: {
         requireHost()
-        // Skipping a results screen the table has finished reading. Expressed
-        // without touching game state: settle the room as though the current
-        // phase's clock had already run out, and the game's own advance does
-        // the rest. Restricted to result and countdown phases so "continue"
-        // can never cut a live round short.
+        // Two shapes of "move it along", both host-only.
+        //
+        // A phase with a clock is skipped by settling the room as though that
+        // clock had run out; the game's own advance does the rest.
+        //
+        // A phase with no clock is waiting on a person by design — Mind Meld's
+        // results screen, which stays up so the table can argue — and only the
+        // game knows whether it can be advanced. hostAdvance returns null when
+        // it cannot, which is what makes a double-tap harmless.
         if (room.status !== 'ROUND_RESULT' && room.status !== 'STARTING') {
           throw new AppError('INVALID_ACTION', 'There is nothing to skip right now.')
         }
-        const definition = room.session === null ? null : this.registry.get(room.session.gameId)
-        const deadline = definition === null || room.session === null
-          ? null
-          : definition.getDeadline(room.session.state)
-        const reduction: Reduction<undefined> = {
+
+        const session = room.session
+        if (session === null) throw new AppError('GAME_NOT_STARTED')
+        const definition = this.registry.get(session.gameId)
+        const deadline = definition.getDeadline(session.state)
+
+        if (deadline === null) {
+          const pushed = definition.hostAdvance?.(session.state, this.turnContext(room, now))
+          if (pushed === undefined || pushed === null) {
+            throw new AppError('INVALID_ACTION', 'There is nothing to skip right now.')
+          }
+          const advanced = applyScoreDeltas(
+            { ...room, session: { ...session, state: pushed.state }, lastActivityAt: now },
+            pushed.scoreDeltas ?? {},
+          )
+          return { room: advanced, events: pushed.events, value: undefined }
+        }
+
+        return {
           room: { ...room, lastActivityAt: now },
           events: [],
           value: undefined,
+          settleAt: deadline,
         }
-        return deadline === null ? reduction : { ...reduction, settleAt: deadline }
       }
 
       case ROOM_ACTIONS.START_GAME:
@@ -414,7 +433,11 @@ export class RoomService {
     if (seated > definition.maxPlayers) throw new AppError('TOO_MANY_PLAYERS')
 
     const settings = definition.settingsSchema.parse(room.config.settings)
-    const pack = await this.content.load(definition.contentRequest(settings))
+    const request = definition.contentRequest(settings)
+    const pack = await this.content.load({
+      ...request,
+      excludeIds: room.recentContent[request.kind] ?? [],
+    })
     const sessionId = randomUUID()
 
     await this.transact(args.code, (current) => {
@@ -430,10 +453,22 @@ export class RoomService {
         sessionId,
         settings,
         content: pack,
+        // What this room has already played. The game prefers anything else.
+        recentContentIds: current.recentContent[request.kind] ?? [],
       })
 
+      // Record the draw so the next game in this room avoids it. Done here,
+      // inside the same compare-and-set as the session itself, so a room can
+      // never end up having played content it did not remember.
+      const remembered = recordContentUse(
+        rememberAction(current, args.actionId),
+        request.kind,
+        definition.usedContentIds?.(state) ?? [],
+        RECENT_LIMITS[request.kind],
+      )
+
       const started: RoomRecord = {
-        ...rememberAction(current, args.actionId),
+        ...remembered,
         status: 'PLAYING',
         session: { sessionId, gameId: definition.id, state, startedAt: now },
         scores: Object.fromEntries(Object.keys(current.players).map((id) => [id, 0])),

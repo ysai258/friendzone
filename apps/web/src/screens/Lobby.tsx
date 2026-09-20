@@ -252,6 +252,49 @@ function SettingControl({
     )
   }
 
+  if (field.kind === 'multi') {
+    const selected = Array.isArray(value) ? (value as string[]) : field.default
+    const toggle = (option: string) => {
+      const next = selected.includes(option)
+        ? selected.filter((v) => v !== option)
+        : [...selected, option]
+      // Never send an empty set: the server would only substitute the default
+      // back, and a lobby showing nothing selected looks broken.
+      onChange(next.length === 0 ? field.default : next)
+    }
+    return (
+      <fieldset className="flex flex-col gap-2" disabled={disabled}>
+        <legend className="text-sm font-semibold">
+          {field.label}
+          {field.help !== undefined && <span className="block text-xs font-normal text-muted">{field.help}</span>}
+        </legend>
+        <div className="flex flex-wrap gap-1.5">
+          {field.options.map((option) => {
+            const on = selected.includes(option.value)
+            return (
+              <button
+                key={option.value}
+                type="button"
+                role="checkbox"
+                aria-checked={on}
+                disabled={disabled}
+                onClick={() => toggle(option.value)}
+                className={`flex min-h-10 items-center gap-1.5 rounded-xl border px-3 text-sm font-semibold transition disabled:opacity-50 ${
+                  on
+                    ? 'border-violet-400/60 bg-violet-500/20 text-chalk'
+                    : 'border-white/12 bg-white/5 text-muted hover:text-chalk'
+                }`}
+              >
+                <span aria-hidden className="text-xs">{on ? '☑' : '☐'}</span>
+                {option.label}
+              </button>
+            )
+          })}
+        </div>
+      </fieldset>
+    )
+  }
+
   if (field.kind === 'choice') {
     const selected = typeof value === 'string' ? value : field.default
     return (

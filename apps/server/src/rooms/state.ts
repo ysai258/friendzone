@@ -41,6 +41,15 @@ export interface RoomRecord {
   closedAt: number | null
   /** Games played in this room so far, incremented by Play Again. */
   sessionCount: number
+  /**
+   * Content this room has already played, per kind, newest last.
+   *
+   * Lives here rather than in a game's own state because it has to outlive the
+   * game: the complaint it answers is the same films and prompts coming back
+   * on consecutive evenings, which is a property of the room, not the session.
+   * Being part of the room state, it survives a reconnect and a Play Again.
+   */
+  recentContent: Record<string, string[]>
 }
 
 export interface GameSessionRecord {
@@ -246,6 +255,7 @@ export function createRoom(args: {
     lastActivityAt: args.now,
     closedAt: null,
     sessionCount: 0,
+    recentContent: {},
   }
   return addPlayer(empty, args.hostId, args.hostName, args.now)
 }
@@ -254,11 +264,32 @@ export function createRoom(args: {
 export function resetToLobby(room: RoomRecord, now: number): RoomRecord {
   return {
     ...room,
+    // recentContent is deliberately kept: playing again is exactly when
+    // repeats would otherwise show up.
     status: 'LOBBY',
     session: null,
     scores: Object.fromEntries(Object.keys(room.players).map((id) => [id, 0])),
     lastDeltas: {},
     lastActivityAt: now,
+  }
+}
+
+/** Fold the content a finished draw used into this room's history. */
+export function recordContentUse(
+  room: RoomRecord,
+  kind: string,
+  usedIds: readonly string[],
+  limit: number,
+): RoomRecord {
+  if (usedIds.length === 0) return room
+  const previous = room.recentContent[kind] ?? []
+  const next = [...previous.filter((id) => !usedIds.includes(id)), ...usedIds]
+  return {
+    ...room,
+    recentContent: {
+      ...room.recentContent,
+      [kind]: next.length > limit ? next.slice(next.length - limit) : next,
+    },
   }
 }
 

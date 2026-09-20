@@ -7,6 +7,7 @@ import { Banner, GameHeader, PlayerName, readView } from './shared.tsx'
 
 interface WhoAmIView {
   identities: Record<string, { name: string; category: string }>
+  categoryLabel?: string
   asker: string | null
   question: string | null
   votedPlayerIds: string[]
@@ -29,6 +30,14 @@ export function WhoAmI({ connection, room }: GameProps) {
   return (
     <div className="flex flex-col gap-4">
       <GameHeader connection={connection} room={room} label="🕵️ Who Am I?" accent="bg-amber-400" />
+
+      {/* Everyone at the table is from one category, and knowing which one is
+          half the game — it is the boundary your questions live inside. */}
+      {view.categoryLabel !== undefined && (
+        <p className="text-center text-sm text-muted">
+          Everyone here is one of the <span className="font-bold text-chalk">{view.categoryLabel}</span>
+        </p>
+      )}
 
       {/* The board: everyone's card, face out. Yours is the one you cannot read. */}
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">

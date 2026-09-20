@@ -9,7 +9,15 @@ import {
   type Result,
   type SettingField,
 } from '@friendzone/shared'
-import { expectItems, type ContentRequest, type IdentityCard } from '../content.ts'
+import {
+  expectItems,
+  IDENTITY_CATEGORIES,
+  IDENTITY_CATEGORY_LABELS,
+  type ContentRequest,
+  type IdentityCard,
+  type IdentityCategory,
+} from '../content.ts'
+import { pickFresh } from '../selection.ts'
 import { clamp } from '../scoring.ts'
 import {
   defineGame,
@@ -35,6 +43,9 @@ import {
  * nothing to read out of the payload. The test suite asserts this directly.
  */
 
+/** Everyone at the table needs their own person, so this is also the smallest
+ *  category the game can be played with. */
+const MAX_PLAYERS = 10
 const ASSIGN_MS = 4_000
 const RESULT_MS = 5_000
 const MAX_POINTS = 1_000
@@ -56,6 +67,8 @@ interface WhoAmIState {
   phase: Phase
   /** Identity per player. Never sent whole to anybody. */
   identities: Record<PlayerId, IdentityCard>
+  /** The one category every identity in this game came from. */
+  category: IdentityCategory
   /** Fixed turn order, so a reconnect cannot reshuffle whose turn it is. */
   order: PlayerId[]
   turnIndex: number
@@ -75,6 +88,7 @@ interface WhoAmIState {
 }
 
 const settingsSchema = z.strictObject({
+  category: z.enum(IDENTITY_CATEGORIES).default('telugu-actors'),
   askSeconds: z.int().min(15).max(120).default(45),
   voteSeconds: z.int().min(5).max(45).default(15),
   maxTurns: z.int().min(3).max(20).default(10),
@@ -84,6 +98,14 @@ const settingsSchema = z.strictObject({
 type WhoAmISettings = z.infer<typeof settingsSchema>
 
 const settingsSpec: SettingField[] = [
+  {
+    key: 'category',
+    label: 'Who is everyone?',
+    help: 'One category per game, so the questions actually narrow things down.',
+    kind: 'choice',
+    default: 'telugu-actors',
+    options: IDENTITY_CATEGORIES.map((value) => ({ value, label: IDENTITY_CATEGORY_LABELS[value] })),
+  },
   { key: 'askSeconds', label: 'Time to ask', kind: 'int', min: 15, max: 120, step: 5, default: 45, unit: 's' },
   { key: 'voteSeconds', label: 'Time to vote', kind: 'int', min: 5, max: 45, step: 5, default: 15, unit: 's' },
   { key: 'maxTurns', label: 'Turns each', kind: 'int', min: 3, max: 20, step: 1, default: 10 },
@@ -185,27 +207,47 @@ export const whoAmI: ErasedGameDefinition = defineGame<WhoAmIState, WhoAmISettin
     playable: true,
   },
   minPlayers: 3,
-  maxPlayers: 10,
+  maxPlayers: MAX_PLAYERS,
   settingsSpec,
   settingsSchema,
   actionSchema,
 
   contentRequest(settings): ContentRequest {
-    // One card per seat, with headroom so a late joiner does not exhaust the pool.
-    return { kind: 'identity', count: 24, difficulty: settings.difficulty, category: null }
+    return {
+      kind: 'identity',
+      // Plenty of headroom over the biggest table, so a room can play the same
+      // category repeatedly without cycling back immediately.
+      count: 40,
+      // ...but the table is the real requirement. A category with thirty
+      // people is a fine game of Who Am I?; only one that cannot seat everyone
+      // is broken.
+      minimum: MAX_PLAYERS,
+      difficulty: settings.difficulty,
+      category: settings.category,
+      // Refuse rather than widen: a category that cannot fill the table is a
+      // broken game, not a reason to start mixing in cricketers.
+      strict: true,
+    }
   },
 
   createGame(ctx: CreateContext<WhoAmISettings>): WhoAmIState {
     const pool = expectItems(ctx.content, 'identity')
     const rng = createRng(ctx.seed, 'who-am-i', ctx.sessionId)
     const order = ctx.players.map((p) => p.id)
-    const cards = rng.sample(pool, order.length)
+    // Everyone from one category, nobody twice, preferring people this room
+    // has not worn recently.
+    const cards = pickFresh(pool, { count: order.length, recentIds: ctx.recentContentIds, rng }).items
 
     const identities: Record<PlayerId, IdentityCard> = {}
     const turnsUsed: Record<PlayerId, number> = {}
     const hintsShown: Record<PlayerId, number> = {}
     order.forEach((id, i) => {
-      const card = cards[i] ?? pool[i % pool.length]
+      // pickFresh returns distinct cards, and the content request is strict so
+      // the pool is guaranteed to cover the table. If a card is still missing,
+      // leave the seat unassigned rather than wrapping around the pool and
+      // handing two players the same person — a duplicate identity makes the
+      // whole game unwinnable, and an empty seat is at least visible.
+      const card = cards[i]
       if (card !== undefined) identities[id] = card
       turnsUsed[id] = 0
       hintsShown[id] = 0
@@ -214,6 +256,7 @@ export const whoAmI: ErasedGameDefinition = defineGame<WhoAmIState, WhoAmISettin
     return {
       sessionId: ctx.sessionId,
       phase: 'ASSIGN',
+      category: ctx.settings.category,
       identities,
       order,
       turnIndex: 0,
@@ -234,6 +277,7 @@ export const whoAmI: ErasedGameDefinition = defineGame<WhoAmIState, WhoAmISettin
   getDeadline: (state) => (state.phase === 'FINISHED' ? null : state.phaseEndsAt),
   getPhase: (state) => state.phase,
   isGameOver: (state) => state.phase === 'FINISHED',
+  usedContentIds: (state) => Object.values(state.identities).map((card) => card.id),
 
   validateAction(state, playerId, action): Result<void> {
     const parsed = parse(action)
@@ -424,6 +468,8 @@ export const whoAmI: ErasedGameDefinition = defineGame<WhoAmIState, WhoAmISettin
     const myHints = viewerId === null ? 0 : (state.hintsShown[viewerId] ?? 0)
 
     const view: Record<string, unknown> = {
+      category: state.category,
+      categoryLabel: IDENTITY_CATEGORY_LABELS[state.category],
       identities: others,
       asker,
       question: state.question,

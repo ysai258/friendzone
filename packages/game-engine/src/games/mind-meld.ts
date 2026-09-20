@@ -10,6 +10,7 @@ import {
   type SettingField,
 } from '@friendzone/shared'
 import { expectItems, type ContentRequest, type MeldPrompt } from '../content.ts'
+import { pickFresh } from '../selection.ts'
 import { meldScore } from '../scoring.ts'
 import {
   defineGame,
@@ -38,7 +39,6 @@ import {
  */
 
 const COUNTDOWN_MS = 3_000
-const REVEAL_MS = 9_000
 
 type Phase = 'COUNTDOWN' | 'PROMPT' | 'REVEAL' | 'FINISHED'
 
@@ -135,6 +135,28 @@ function scoreRound(answers: Record<PlayerId, MeldAnswer>): {
   return { groups, deltas }
 }
 
+/** Where the game goes when the host leaves the results screen. */
+function nextAfterReveal(state: MeldState, now: number): MeldState {
+  if (state.roundIndex + 1 >= state.prompts.length) {
+    return { ...state, phase: 'FINISHED', phaseStartedAt: now, phaseEndsAt: now }
+  }
+  return {
+    ...state,
+    roundIndex: state.roundIndex + 1,
+    phase: 'COUNTDOWN',
+    phaseStartedAt: now,
+    phaseEndsAt: now + COUNTDOWN_MS,
+    answers: {},
+    groups: [],
+  }
+}
+
+function revealExitEvents(state: MeldState) {
+  return state.roundIndex + 1 >= state.prompts.length
+    ? [{ type: 'GAME_COMPLETED' as const, data: { rounds: state.prompts.length } }]
+    : []
+}
+
 // ---------------------------------------------------------------------------
 
 export const mindMeld: ErasedGameDefinition = defineGame<MeldState, MeldSettings>({
@@ -157,7 +179,8 @@ export const mindMeld: ErasedGameDefinition = defineGame<MeldState, MeldSettings
 
   contentRequest: (settings): ContentRequest => ({
     kind: 'prompt',
-    count: settings.rounds,
+    // Far more than a game needs, so the draw has room to avoid repeats.
+    count: Math.max(settings.rounds * 12, 80),
     difficulty: 'mixed',
     category: null,
   }),
@@ -165,11 +188,12 @@ export const mindMeld: ErasedGameDefinition = defineGame<MeldState, MeldSettings
   createGame(ctx: CreateContext<MeldSettings>): MeldState {
     const pool = expectItems(ctx.content, 'prompt')
     const rng = createRng(ctx.seed, 'mind-meld', ctx.sessionId)
+    const drawn = pickFresh(pool, { count: ctx.settings.rounds, recentIds: ctx.recentContentIds, rng })
     return {
       sessionId: ctx.sessionId,
       phase: 'COUNTDOWN',
       roundIndex: 0,
-      prompts: rng.sample(pool, ctx.settings.rounds),
+      prompts: drawn.items,
       phaseStartedAt: ctx.now,
       phaseEndsAt: ctx.now + COUNTDOWN_MS,
       answers: {},
@@ -178,9 +202,30 @@ export const mindMeld: ErasedGameDefinition = defineGame<MeldState, MeldSettings
     }
   },
 
-  getDeadline: (state) => (state.phase === 'FINISHED' ? null : state.phaseEndsAt),
+  /**
+   * No clock on the reveal.
+   *
+   * The whole point of this game is the argument that follows — who said what,
+   * and who was being clever instead of obvious. A timer cut that short every
+   * time, so the results screen now waits for the host.
+   */
+  getDeadline: (state) =>
+    state.phase === 'FINISHED' || state.phase === 'REVEAL' ? null : state.phaseEndsAt,
   getPhase: (state) => state.phase,
   isGameOver: (state) => state.phase === 'FINISHED',
+  usedContentIds: (state) => state.prompts.map((p) => p.id),
+
+  /**
+   * Host pressed Next Question.
+   *
+   * Returns null unless the reveal is actually on screen, which is what makes
+   * a double-tap or a held button harmless: the second call finds the game
+   * already in the next countdown and does nothing.
+   */
+  hostAdvance(state, ctx) {
+    if (state.phase !== 'REVEAL') return null
+    return transition(nextAfterReveal(state, ctx.now), revealExitEvents(state))
+  },
 
   validateAction: (state, playerId, action) => validate(state, playerId, action, true),
 
@@ -222,33 +267,19 @@ export const mindMeld: ErasedGameDefinition = defineGame<MeldState, MeldSettings
         if (ctx.now < state.phaseEndsAt) return noChange(state)
         const { groups, deltas } = scoreRound(state.answers)
         return transition(
-          { ...state, phase: 'REVEAL', phaseStartedAt: state.phaseEndsAt, phaseEndsAt: state.phaseEndsAt + REVEAL_MS, groups },
+          // phaseEndsAt equals phaseStartedAt: there is nothing to count down
+          // here, and getDeadline returning null keeps the room from
+          // publishing a deadline at all, so no screen draws a dead timer.
+          { ...state, phase: 'REVEAL', phaseStartedAt: state.phaseEndsAt, phaseEndsAt: state.phaseEndsAt, groups },
           [{ type: 'ROUND_ENDED', data: { round: state.roundIndex + 1, groups: groups.length } }],
           deltas,
         )
       }
 
-      case 'REVEAL': {
-        if (ctx.now < state.phaseEndsAt) return noChange(state)
-        if (state.roundIndex + 1 >= state.prompts.length) {
-          return transition(
-            { ...state, phase: 'FINISHED', phaseStartedAt: state.phaseEndsAt, phaseEndsAt: state.phaseEndsAt },
-            [{ type: 'GAME_COMPLETED', data: { rounds: state.prompts.length } }],
-          )
-        }
-        return transition(
-          {
-            ...state,
-            roundIndex: state.roundIndex + 1,
-            phase: 'COUNTDOWN',
-            phaseStartedAt: state.phaseEndsAt,
-            phaseEndsAt: state.phaseEndsAt + COUNTDOWN_MS,
-            answers: {},
-            groups: [],
-          },
-          [],
-        )
-      }
+      case 'REVEAL':
+        // Waits for the host. getDeadline returns null here, so the scheduler
+        // never calls this; the branch exists so the switch stays exhaustive.
+        return noChange(state)
 
       case 'FINISHED':
         return noChange(state)
@@ -286,6 +317,12 @@ export const mindMeld: ErasedGameDefinition = defineGame<MeldState, MeldSettings
     if (state.phase === 'REVEAL' || state.phase === 'FINISHED') {
       view['groups'] = state.groups
       view['loners'] = state.groups.filter((g) => g.playerIds.length === 1).length
+    }
+    if (state.phase === 'REVEAL') {
+      // Drives the host's button, and tells everyone else what they are
+      // waiting for rather than leaving the screen looking stuck.
+      view['awaitingHost'] = true
+      view['isLastRound'] = state.roundIndex + 1 >= state.prompts.length
     }
 
     return {

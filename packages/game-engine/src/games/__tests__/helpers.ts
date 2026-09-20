@@ -84,7 +84,7 @@ export function settle<S>(
 
 // --- content packs for the other games --------------------------------------
 
-import type { ContentItem, EmojiQuestion, IdentityCard, MafiaSubject, MeldPrompt } from '../../content.ts'
+import type { ContentItem, EmojiQuestion, IdentityCard, MafiaSubject, MeldPrompt, MovieLanguage } from '../../content.ts'
 
 const EMOJI_TITLES = [
   ['Jurassic Park', '🦕 🏝️ 🚙'],
@@ -110,9 +110,13 @@ export function emojiQuestion(n: number, over: Partial<EmojiQuestion> = {}): Emo
     year: 1990 + n,
     category: 'film',
     difficulty: 'medium',
+    language: FIXTURE_LANGUAGES[(n - 1) % FIXTURE_LANGUAGES.length] as MovieLanguage,
     ...over,
   }
 }
+
+/** Cycled through the fixtures so a language filter has something to select. */
+const FIXTURE_LANGUAGES = ['telugu', 'hindi', 'tamil', 'malayalam', 'english'] as const
 
 const IDENTITY_NAMES = [
   'Cleopatra', 'Serena Williams', 'Sherlock Holmes', 'Marie Curie', 'Bruce Wayne',
@@ -121,7 +125,11 @@ const IDENTITY_NAMES = [
 ]
 
 export function identityCard(n: number, over: Partial<IdentityCard> = {}): IdentityCard {
-  const name = IDENTITY_NAMES[(n - 1) % IDENTITY_NAMES.length] as string
+  // One id, one person — as in the real dataset. Cycling a short list would
+  // hand two players the same name and hide a genuine duplicate bug.
+  const base = IDENTITY_NAMES[(n - 1) % IDENTITY_NAMES.length] as string
+  const round = Math.floor((n - 1) / IDENTITY_NAMES.length)
+  const name = round === 0 ? base : `${base} ${'I'.repeat(round + 1)}`
   return {
     kind: 'identity',
     id: `id-${n}`,
@@ -154,6 +162,7 @@ export function mafiaSubject(n: number, over: Partial<MafiaSubject> = {}): Mafia
     imposterClue: `IMPOSTERCLUE${n}: something happens outdoors.`,
     category: 'film',
     difficulty: 'medium',
+    language: FIXTURE_LANGUAGES[(n - 1) % FIXTURE_LANGUAGES.length] as MovieLanguage,
     ...over,
   }
 }

@@ -13,6 +13,7 @@ interface EmojiView {
   cooldownMs: number
   answer?: string
   year?: number | null
+  languageLabel?: string
   results?: { playerId: string; solved: boolean; points: number; place: number | null; attempts: number; lastGuess: string | null }[]
   yourAttempts?: string[]
   yourSolved?: boolean
@@ -111,7 +112,9 @@ function Reveal({ view, room }: { view: EmojiView; room: PublicRoomView }) {
       <div className="animate-pop text-center">
         <p className="text-sm font-semibold text-muted">It was</p>
         <p className="text-3xl font-extrabold">{view.answer}</p>
-        {view.year != null && <p className="text-sm text-muted">{view.year}</p>}
+        <p className="text-sm text-muted">
+          {[view.year, view.languageLabel].filter((part) => part != null && part !== '').join(' · ')}
+        </p>
       </div>
 
       {(view.results ?? []).length > 0 && (

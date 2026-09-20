@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { PublicRoomView } from '@friendzone/shared'
+import { ROOM_ACTIONS, type PublicRoomView } from '@friendzone/shared'
 import type { GameProps } from './index.tsx'
 import { Button, Card, TextInput } from '../components/ui.tsx'
 import { Scoreboard } from '../components/Scoreboard.tsx'
@@ -12,6 +12,8 @@ interface MeldView {
   yourAnswer?: string
   groups?: { key: string; label: string; playerIds: string[]; points: number }[]
   loners?: number
+  awaitingHost?: boolean
+  isLastRound?: boolean
 }
 
 export function MindMeld({ connection, room }: GameProps) {
@@ -37,7 +39,11 @@ export function MindMeld({ connection, room }: GameProps) {
         <p className="text-2xl font-bold leading-snug">{view.prompt}</p>
       </Card>
 
-      {phase === 'PROMPT' ? <Answering connection={connection} view={view} room={room} /> : <Groups view={view} room={room} />}
+      {phase === 'PROMPT' ? (
+        <Answering connection={connection} view={view} room={room} />
+      ) : (
+        <Groups connection={connection} view={view} room={room} />
+      )}
     </div>
   )
 }
@@ -81,8 +87,18 @@ function Answering({ connection, view, room }: { connection: GameProps['connecti
   )
 }
 
-function Groups({ view, room }: { view: MeldView; room: PublicRoomView }) {
+function Groups({
+  connection,
+  view,
+  room,
+}: {
+  connection: GameProps['connection']
+  view: MeldView
+  room: PublicRoomView
+}) {
   const groups = view.groups ?? []
+  const isHost = room.viewerId === room.hostId
+  const hostName = room.players.find((p) => p.isHost)?.name ?? 'the host'
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-2">
@@ -116,6 +132,22 @@ function Groups({ view, room }: { view: MeldView; room: PublicRoomView }) {
       </div>
 
       <Scoreboard entries={room.scoreboard} viewerId={room.viewerId} showDeltas compact />
+
+      {/* No timer here on purpose: the argument about who said what is the
+          best part of this game, so the round ends when the host says so. */}
+      {view.awaitingHost === true && (
+        <div className="sticky bottom-4 flex flex-col gap-2">
+          {isHost ? (
+            <Button size="lg" onClick={() => connection.send(ROOM_ACTIONS.CONTINUE)}>
+              {view.isLastRound === true ? 'See final results →' : 'Next question →'}
+            </Button>
+          ) : (
+            <p className="py-2 text-center text-sm text-muted">
+              Talk it over — {hostName} moves it on when you&rsquo;re done.
+            </p>
+          )}
+        </div>
+      )}
     </div>
   )
 }

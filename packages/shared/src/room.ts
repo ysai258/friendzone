@@ -109,6 +109,9 @@ export type SettingField =
   | { key: string; label: string; help?: string; kind: 'int'; min: number; max: number; step: number; default: number; unit?: string }
   | { key: string; label: string; help?: string; kind: 'bool'; default: boolean }
   | { key: string; label: string; help?: string; kind: 'choice'; options: { value: string; label: string }[]; default: string }
+  /** Several values at once, rendered as checkboxes. An empty selection falls
+   *  back to the default rather than serving an empty pool. */
+  | { key: string; label: string; help?: string; kind: 'multi'; options: { value: string; label: string }[]; default: string[] }
 
 export interface GameCatalogEntry {
   id: string

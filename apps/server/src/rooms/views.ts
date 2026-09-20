@@ -55,7 +55,13 @@ export function buildRoomView(args: {
     // away. Publishing it would make every client's timer jump backwards each
     // time the image sharpened, and two clients a step apart would disagree
     // about when the round ends.
-    deadlineAt = readPhaseTime(room.session.state, 'phaseEndsAt') ?? args.definition.getDeadline(room.session.state)
+    //
+    // A phase the game is not counting down at all — Mind Meld's discussion,
+    // or a finished game — has no deadline to publish: its phaseEndsAt is
+    // already in the past, and sending it parks a dead timer at zero on every
+    // screen. getDeadline() returning null is exactly that statement.
+    const scheduled = args.definition.getDeadline(room.session.state)
+    deadlineAt = scheduled === null ? null : (readPhaseTime(room.session.state, 'phaseEndsAt') ?? scheduled)
   }
 
   return {

@@ -63,13 +63,28 @@ export class RoomStore {
     const raw = await this.redis.hmget(this.keys.room(code), 'version', 'state')
     const [version, state] = raw
     if (version == null || state == null) return null
-    return { room: JSON.parse(state) as RoomRecord, version: Number(version) }
+    return { room: RoomStore.hydrateRecord(JSON.parse(state) as RoomRecord), version: Number(version) }
   }
 
   async require(code: RoomCode): Promise<VersionedRoom> {
     const found = await this.read(code)
     if (found === null) throw new AppError('ROOM_NOT_FOUND')
     return found
+  }
+
+  /**
+   * Fill in fields a room written by an older release does not carry.
+   *
+   * Rooms outlive a deploy. The JSON in Redis was written by whichever version
+   * was running when the room was created, so a field added in this release is
+   * simply absent from it — and reading through `undefined` would throw on the
+   * first action after a rollout, in a room full of people. Defaulting once on
+   * the way in is cheaper and safer than guarding every use.
+   */
+  private static hydrateRecord(room: RoomRecord): RoomRecord {
+    const partial = room as Partial<RoomRecord>
+    if (partial.recentContent === undefined) return { ...room, recentContent: {} }
+    return room
   }
 
   /** Create a room, failing if the code is already taken. */

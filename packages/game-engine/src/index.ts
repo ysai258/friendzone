@@ -1,6 +1,7 @@
 export * from './types.ts'
 export * from './content.ts'
 export * from './scoring.ts'
+export * from './selection.ts'
 export * from './registry.ts'
 
 import { GameRegistry } from './registry.ts'

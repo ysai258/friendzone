@@ -34,27 +34,58 @@ export class ContentProvider {
   async load(request: ContentRequest): Promise<ContentPack> {
     const pool = await this.pool_(request.kind)
 
-    const filtered = pool.filter((item) => {
-      if (request.difficulty !== 'mixed' && item.difficulty !== request.difficulty) return false
+    // Language and category are what the host actually chose, so they are
+    // applied first and — for category — never relaxed.
+    const byIdentity = pool.filter((item) => {
       if (request.category !== null && item.category !== request.category) return false
+      if (request.languages !== undefined && request.languages.length > 0) {
+        if (item.kind === 'emoji' || item.kind === 'mafia') {
+          if (!request.languages.includes(item.language)) return false
+        }
+      }
       return true
     })
 
-    // Fall back rather than refuse: a host who picked "hard landmarks" and a
-    // dataset that is thin there should still get a game, just a broader one.
-    const chosen = filtered.length >= request.count ? filtered : pool
-
-    if (chosen.length === 0) {
-      throw new AppError('CONTENT_UNAVAILABLE', 'No questions are loaded for this game. Run `npm run seed`.')
-    }
-    if (chosen.length < request.count) {
-      this.logger.warn(
-        { kind: request.kind, wanted: request.count, available: chosen.length },
-        'content pool smaller than requested; questions will repeat',
+    if (byIdentity.length === 0) {
+      throw new AppError(
+        'CONTENT_UNAVAILABLE',
+        request.category !== null
+          ? 'There is no content for that category yet.'
+          : 'There are no movies loaded for those languages.',
       )
     }
 
-    return { kind: request.kind, items: chosen }
+    // Strict callers would rather fail than play something nobody asked for.
+    // Who Am I? is the case: a table where one player is from a different
+    // category is a broken game, not a slightly wider one.
+    const minimum = request.minimum ?? request.count
+    if (request.strict === true && byIdentity.length < minimum) {
+      throw new AppError(
+        'CONTENT_UNAVAILABLE',
+        `That category only has ${byIdentity.length} people, and this game needs ${minimum}.`,
+      )
+    }
+
+    // Difficulty is a preference rather than a constraint, so it relaxes when
+    // it would otherwise leave too little to play with.
+    const byDifficulty =
+      request.difficulty === 'mixed'
+        ? byIdentity
+        : byIdentity.filter((item) => item.difficulty === request.difficulty)
+    const chosen = byDifficulty.length >= request.count ? byDifficulty : byIdentity
+    const widened = chosen !== byDifficulty
+
+    if (chosen.length < request.count) {
+      this.logger.warn(
+        { kind: request.kind, wanted: request.count, available: chosen.length, category: request.category },
+        'content pool smaller than requested',
+      )
+    }
+
+    // excludeIds is honoured by the game's own draw rather than here: the game
+    // needs the whole eligible pool to fall back into when history has used up
+    // everything, and dropping rows at this layer would hide that option.
+    return { kind: request.kind, items: chosen, widened }
   }
 
   private async pool_(kind: ContentItem['kind']): Promise<ContentItem[]> {

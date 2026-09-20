@@ -23,6 +23,7 @@ interface MafiaView {
   outcome?: 'FANS_WIN' | 'IMPOSTER_WINS'
   imposterId?: string
   subject?: string
+  languageLabel?: string
   fanClue?: string
   imposterClue?: string
 }
@@ -192,7 +193,10 @@ function Result({ view, room }: { view: MafiaView; room: PublicRoomView }) {
           )}
           {view.subject !== undefined && (
             <div className="flex flex-col gap-2 pt-2 text-left">
-              <p className="text-center text-sm text-muted">The film was <span className="font-bold text-chalk">{view.subject}</span></p>
+              <p className="text-center text-sm text-muted">
+                The film was <span className="font-bold text-chalk">{view.subject}</span>
+                {view.languageLabel !== undefined && ` (${view.languageLabel})`}
+              </p>
               <div className="rounded-xl bg-black/25 p-3">
                 <p className="text-xs font-bold uppercase tracking-wider text-sky-300">Everyone else read</p>
                 <p className="text-sm">{view.fanClue}</p>
@@ -216,6 +220,7 @@ export function MovieMafiaEpilogue({ room }: { room: PublicRoomView }) {
     <Card className="flex flex-col gap-1 text-center">
       <p className="text-xs font-bold uppercase tracking-wider text-muted">The film was</p>
       <p className="text-lg font-bold">{view.subject}</p>
+      {view.languageLabel !== undefined && <p className="text-xs text-muted">{view.languageLabel}</p>}
       {view.imposterId !== undefined && (
         <p className="text-sm text-muted">
           Imposter: <PlayerName room={room} playerId={view.imposterId} />

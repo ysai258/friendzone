@@ -1,0 +1,598 @@
+{
+  "$comment": "Hindi films for Emoji Movie. Mainstream titles across eras, chosen for instant recognition.",
+  "language": "hindi",
+  "items": [
+    {
+      "id": "hi-sholay",
+      "title": "Sholay",
+      "year": 1975,
+      "difficulty": "easy",
+      "emojis": "🔥 🐎 🚂",
+      "aliases": []
+    },
+    {
+      "id": "hi-ddlj",
+      "title": "Dilwale Dulhania Le Jayenge",
+      "year": 1995,
+      "difficulty": "easy",
+      "emojis": "🚂 🌾 💍",
+      "aliases": [
+        "DDLJ"
+      ]
+    },
+    {
+      "id": "hi-3-idiots",
+      "title": "3 Idiots",
+      "year": 2009,
+      "difficulty": "easy",
+      "emojis": "3️⃣ 🎓 🤝",
+      "aliases": [
+        "Three Idiots"
+      ]
+    },
+    {
+      "id": "hi-dangal",
+      "title": "Dangal",
+      "year": 2016,
+      "difficulty": "easy",
+      "emojis": "🤼 👧 🥇",
+      "aliases": []
+    },
+    {
+      "id": "hi-lagaan",
+      "title": "Lagaan",
+      "year": 2001,
+      "difficulty": "easy",
+      "emojis": "🏏 🌾 🇬🇧",
+      "aliases": []
+    },
+    {
+      "id": "hi-pk",
+      "title": "PK",
+      "year": 2014,
+      "difficulty": "easy",
+      "emojis": "👽 📻 ❓",
+      "aliases": []
+    },
+    {
+      "id": "hi-gangs",
+      "title": "Gangs of Wasseypur",
+      "year": 2012,
+      "difficulty": "medium",
+      "emojis": "⛏️ 🔫 👨‍👦",
+      "aliases": []
+    },
+    {
+      "id": "hi-zindagi",
+      "title": "Zindagi Na Milegi Dobara",
+      "year": 2011,
+      "difficulty": "medium",
+      "emojis": "3️⃣ 🇪🇸 🪂",
+      "aliases": [
+        "ZNMD"
+      ]
+    },
+    {
+      "id": "hi-queen",
+      "title": "Queen",
+      "year": 2014,
+      "difficulty": "medium",
+      "emojis": "👰 ✈️ 🗼",
+      "aliases": []
+    },
+    {
+      "id": "hi-andhadhun",
+      "title": "Andhadhun",
+      "year": 2018,
+      "difficulty": "medium",
+      "emojis": "🎹 🕶️ 🐰",
+      "aliases": []
+    },
+    {
+      "id": "hi-munna-bhai",
+      "title": "Munna Bhai MBBS",
+      "year": 2003,
+      "difficulty": "medium",
+      "emojis": "🩺 🤗 😂",
+      "aliases": []
+    },
+    {
+      "id": "hi-lage-raho",
+      "title": "Lage Raho Munna Bhai",
+      "year": 2006,
+      "difficulty": "hard",
+      "emojis": "👻 🕊️ 📻",
+      "aliases": []
+    },
+    {
+      "id": "hi-swades",
+      "title": "Swades",
+      "year": 2004,
+      "difficulty": "medium",
+      "emojis": "🚀 🏘️ 💡",
+      "aliases": []
+    },
+    {
+      "id": "hi-chak-de",
+      "title": "Chak De India",
+      "year": 2007,
+      "difficulty": "medium",
+      "emojis": "🏑 👩‍🦰 🇮🇳",
+      "aliases": []
+    },
+    {
+      "id": "hi-taare-zameen",
+      "title": "Taare Zameen Par",
+      "year": 2007,
+      "difficulty": "medium",
+      "emojis": "🎨 👦 🌟",
+      "aliases": []
+    },
+    {
+      "id": "hi-kabhi-khushi",
+      "title": "Kabhi Khushi Kabhie Gham",
+      "year": 2001,
+      "difficulty": "medium",
+      "emojis": "👨‍👩‍👦 💔 🏰",
+      "aliases": [
+        "K3G"
+      ]
+    },
+    {
+      "id": "hi-kuch-kuch",
+      "title": "Kuch Kuch Hota Hai",
+      "year": 1998,
+      "difficulty": "medium",
+      "emojis": "🏀 💌 👧",
+      "aliases": []
+    },
+    {
+      "id": "hi-dil-chahta",
+      "title": "Dil Chahta Hai",
+      "year": 2001,
+      "difficulty": "medium",
+      "emojis": "3️⃣ 🚗 🏖️",
+      "aliases": []
+    },
+    {
+      "id": "hi-rang-de",
+      "title": "Rang De Basanti",
+      "year": 2006,
+      "difficulty": "medium",
+      "emojis": "🎥 ✊ 🕯️",
+      "aliases": []
+    },
+    {
+      "id": "hi-gully-boy",
+      "title": "Gully Boy",
+      "year": 2019,
+      "difficulty": "medium",
+      "emojis": "🎤 🏙️ 🎧",
+      "aliases": []
+    },
+    {
+      "id": "hi-bajrangi",
+      "title": "Bajrangi Bhaijaan",
+      "year": 2015,
+      "difficulty": "medium",
+      "emojis": "👧 🇵🇰 🙏",
+      "aliases": []
+    },
+    {
+      "id": "hi-sultan",
+      "title": "Sultan",
+      "year": 2016,
+      "difficulty": "medium",
+      "emojis": "🤼 🏅 💔",
+      "aliases": []
+    },
+    {
+      "id": "hi-don",
+      "title": "Don",
+      "year": 2006,
+      "difficulty": "medium",
+      "emojis": "🕴️ 🎭 🔫",
+      "aliases": []
+    },
+    {
+      "id": "hi-om-shanti",
+      "title": "Om Shanti Om",
+      "year": 2007,
+      "difficulty": "medium",
+      "emojis": "🎬 🔄 🔥",
+      "aliases": []
+    },
+    {
+      "id": "hi-jab-we-met",
+      "title": "Jab We Met",
+      "year": 2007,
+      "difficulty": "medium",
+      "emojis": "🚂 💑 😄",
+      "aliases": []
+    },
+    {
+      "id": "hi-yeh-jawaani",
+      "title": "Yeh Jawaani Hai Deewani",
+      "year": 2013,
+      "difficulty": "medium",
+      "emojis": "🏔️ 📷 💃",
+      "aliases": [
+        "YJHD"
+      ]
+    },
+    {
+      "id": "hi-barfi",
+      "title": "Barfi",
+      "year": 2012,
+      "difficulty": "medium",
+      "emojis": "🤫 🧏 ☂️",
+      "aliases": []
+    },
+    {
+      "id": "hi-kahaani",
+      "title": "Kahaani",
+      "year": 2012,
+      "difficulty": "medium",
+      "emojis": "🤰 🔍 🏙️",
+      "aliases": []
+    },
+    {
+      "id": "hi-a-wednesday",
+      "title": "A Wednesday",
+      "year": 2008,
+      "difficulty": "hard",
+      "emojis": "📞 🗓️ 💣",
+      "aliases": []
+    },
+    {
+      "id": "hi-special-26",
+      "title": "Special 26",
+      "year": 2013,
+      "difficulty": "hard",
+      "emojis": "🕴️ 💼 🎭",
+      "aliases": []
+    },
+    {
+      "id": "hi-udaan",
+      "title": "Udaan",
+      "year": 2010,
+      "difficulty": "hard",
+      "emojis": "✍️ 👨‍👦 🏃",
+      "aliases": []
+    },
+    {
+      "id": "hi-masaan",
+      "title": "Masaan",
+      "year": 2015,
+      "difficulty": "hard",
+      "emojis": "🔥 🛶 💔",
+      "aliases": []
+    },
+    {
+      "id": "hi-tumbbad",
+      "title": "Tumbbad",
+      "year": 2018,
+      "difficulty": "medium",
+      "emojis": "🌧️ 🪙 👹",
+      "aliases": []
+    },
+    {
+      "id": "hi-stree",
+      "title": "Stree",
+      "year": 2018,
+      "difficulty": "medium",
+      "emojis": "👻 👗 🏘️",
+      "aliases": []
+    },
+    {
+      "id": "hi-badhaai-ho",
+      "title": "Badhaai Ho",
+      "year": 2018,
+      "difficulty": "hard",
+      "emojis": "🤰 👵 😳",
+      "aliases": []
+    },
+    {
+      "id": "hi-article-15",
+      "title": "Article 15",
+      "year": 2019,
+      "difficulty": "hard",
+      "emojis": "👮 ⚖️ 🌾",
+      "aliases": []
+    },
+    {
+      "id": "hi-shershaah",
+      "title": "Shershaah",
+      "year": 2021,
+      "difficulty": "medium",
+      "emojis": "🎖️ 🏔️ 💔",
+      "aliases": []
+    },
+    {
+      "id": "hi-uri",
+      "title": "Uri The Surgical Strike",
+      "year": 2019,
+      "difficulty": "medium",
+      "emojis": "🎖️ 🌙 💥",
+      "aliases": [
+        "Uri"
+      ]
+    },
+    {
+      "id": "hi-padmaavat",
+      "title": "Padmaavat",
+      "year": 2018,
+      "difficulty": "medium",
+      "emojis": "👑 🔥 ⚔️",
+      "aliases": []
+    },
+    {
+      "id": "hi-bajirao",
+      "title": "Bajirao Mastani",
+      "year": 2015,
+      "difficulty": "medium",
+      "emojis": "🗡️ 💃 👑",
+      "aliases": []
+    },
+    {
+      "id": "hi-devdas",
+      "title": "Devdas",
+      "year": 2002,
+      "difficulty": "medium",
+      "emojis": "🥃 💔 💃",
+      "aliases": []
+    },
+    {
+      "id": "hi-mughal",
+      "title": "Mughal-e-Azam",
+      "year": 1960,
+      "difficulty": "hard",
+      "emojis": "👑 💃 🧱",
+      "aliases": [
+        "Mughal e Azam"
+      ]
+    },
+    {
+      "id": "hi-deewar",
+      "title": "Deewaar",
+      "year": 1975,
+      "difficulty": "hard",
+      "emojis": "👬 🏗️ 🔱",
+      "aliases": [
+        "Deewar"
+      ]
+    },
+    {
+      "id": "hi-mr-india",
+      "title": "Mr India",
+      "year": 1987,
+      "difficulty": "medium",
+      "emojis": "⌚ 👻 🧒",
+      "aliases": []
+    },
+    {
+      "id": "hi-andaz-apna",
+      "title": "Andaz Apna Apna",
+      "year": 1994,
+      "difficulty": "hard",
+      "emojis": "👬 💰 😂",
+      "aliases": []
+    },
+    {
+      "id": "hi-hera-pheri",
+      "title": "Hera Pheri",
+      "year": 2000,
+      "difficulty": "medium",
+      "emojis": "📞 💰 😂",
+      "aliases": []
+    },
+    {
+      "id": "hi-golmaal",
+      "title": "Golmaal",
+      "year": 2006,
+      "difficulty": "hard",
+      "emojis": "4️⃣ 🙈 😂",
+      "aliases": []
+    },
+    {
+      "id": "hi-welcome",
+      "title": "Welcome",
+      "year": 2007,
+      "difficulty": "hard",
+      "emojis": "🤵 🔫 😂",
+      "aliases": []
+    },
+    {
+      "id": "hi-bhool-bhulaiyaa",
+      "title": "Bhool Bhulaiyaa",
+      "year": 2007,
+      "difficulty": "medium",
+      "emojis": "👻 💃 🏰",
+      "aliases": []
+    },
+    {
+      "id": "hi-singham",
+      "title": "Singham",
+      "year": 2011,
+      "difficulty": "medium",
+      "emojis": "🦁 👮 😤",
+      "aliases": []
+    },
+    {
+      "id": "hi-dhoom",
+      "title": "Dhoom",
+      "year": 2004,
+      "difficulty": "medium",
+      "emojis": "🏍️ 🎭 🚔",
+      "aliases": []
+    },
+    {
+      "id": "hi-krrish",
+      "title": "Krrish",
+      "year": 2006,
+      "difficulty": "medium",
+      "emojis": "🦸 🌑 💪",
+      "aliases": []
+    },
+    {
+      "id": "hi-ra-one",
+      "title": "Ra One",
+      "year": 2011,
+      "difficulty": "hard",
+      "emojis": "🎮 🤖 ⚡",
+      "aliases": []
+    },
+    {
+      "id": "hi-piku",
+      "title": "Piku",
+      "year": 2015,
+      "difficulty": "hard",
+      "emojis": "🚗 👨‍👧 🚽",
+      "aliases": []
+    },
+    {
+      "id": "hi-english-vinglish",
+      "title": "English Vinglish",
+      "year": 2012,
+      "difficulty": "hard",
+      "emojis": "🍮 🔤 🗽",
+      "aliases": []
+    },
+    {
+      "id": "hi-neerja",
+      "title": "Neerja",
+      "year": 2016,
+      "difficulty": "hard",
+      "emojis": "✈️ 🎖️ 💔",
+      "aliases": []
+    },
+    {
+      "id": "hi-raazi",
+      "title": "Raazi",
+      "year": 2018,
+      "difficulty": "hard",
+      "emojis": "🕵️‍♀️ 💍 📻",
+      "aliases": []
+    },
+    {
+      "id": "hi-jawan",
+      "title": "Jawan",
+      "year": 2023,
+      "difficulty": "easy",
+      "emojis": "🎭 🚇 ✊",
+      "aliases": []
+    },
+    {
+      "id": "hi-pathaan",
+      "title": "Pathaan",
+      "year": 2023,
+      "difficulty": "easy",
+      "emojis": "🕵️ 💥 🧊",
+      "aliases": []
+    },
+    {
+      "id": "hi-animal",
+      "title": "Animal",
+      "year": 2023,
+      "difficulty": "medium",
+      "emojis": "🪓 👨‍👦 🩸",
+      "aliases": []
+    },
+    {
+      "id": "hi-12th-fail",
+      "title": "12th Fail",
+      "year": 2023,
+      "difficulty": "medium",
+      "emojis": "📚 👮 ✍️",
+      "aliases": []
+    },
+    {
+      "id": "hi-laapataa",
+      "title": "Laapataa Ladies",
+      "year": 2024,
+      "difficulty": "medium",
+      "emojis": "👰 🚂 🔀",
+      "aliases": []
+    },
+    {
+      "id": "hi-munjya",
+      "title": "Munjya",
+      "year": 2024,
+      "difficulty": "hard",
+      "emojis": "👹 🌳 😱",
+      "aliases": []
+    },
+    {
+      "id": "hi-kantara-hi",
+      "title": "Chhichhore",
+      "year": 2019,
+      "difficulty": "medium",
+      "emojis": "🎓 🏥 🔙",
+      "aliases": []
+    },
+    {
+      "id": "hi-shubh-mangal",
+      "title": "Shubh Mangal Saavdhan",
+      "year": 2017,
+      "difficulty": "hard",
+      "emojis": "💍 😬 💊",
+      "aliases": []
+    },
+    {
+      "id": "hi-dil-se",
+      "title": "Dil Se",
+      "year": 1998,
+      "difficulty": "hard",
+      "emojis": "🚂 💣 💔",
+      "aliases": []
+    },
+    {
+      "id": "hi-satya",
+      "title": "Satya",
+      "year": 1998,
+      "difficulty": "hard",
+      "emojis": "🏙️ 🔫 🌧️",
+      "aliases": []
+    },
+    {
+      "id": "hi-company",
+      "title": "Company",
+      "year": 2002,
+      "difficulty": "hard",
+      "emojis": "🏢 🔫 🤝",
+      "aliases": []
+    },
+    {
+      "id": "hi-black",
+      "title": "Black",
+      "year": 2005,
+      "difficulty": "hard",
+      "emojis": "🙈 🙉 👩‍🏫",
+      "aliases": []
+    },
+    {
+      "id": "hi-guru",
+      "title": "Guru",
+      "year": 2007,
+      "difficulty": "hard",
+      "emojis": "🏭 📈 🧵",
+      "aliases": []
+    },
+    {
+      "id": "hi-paan-singh",
+      "title": "Paan Singh Tomar",
+      "year": 2012,
+      "difficulty": "hard",
+      "emojis": "🏃 🎖️ 🔫",
+      "aliases": []
+    },
+    {
+      "id": "hi-talvar",
+      "title": "Talvar",
+      "year": 2015,
+      "difficulty": "hard",
+      "emojis": "🔍 🏠 ❓",
+      "aliases": []
+    }
+  ]
+}

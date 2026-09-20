@@ -8,7 +8,15 @@ import {
   type Result,
   type SettingField,
 } from '@friendzone/shared'
-import { expectItems, type ContentRequest, type MafiaSubject } from '../content.ts'
+import {
+  expectItems,
+  MOVIE_LANGUAGES,
+  MOVIE_LANGUAGE_LABELS,
+  type ContentRequest,
+  type MafiaSubject,
+  type MovieLanguage,
+} from '../content.ts'
+import { pickFresh } from '../selection.ts'
 import {
   defineGame,
   noChange,
@@ -75,11 +83,18 @@ interface MafiaState {
   outcome: 'FANS_WIN' | 'IMPOSTER_WINS' | null
 }
 
+/** Same default as Emoji Movie, for the same reason. */
+const DEFAULT_LANGUAGES: MovieLanguage[] = ['telugu', 'hindi']
+
 const settingsSchema = z.strictObject({
   discussionSeconds: z.int().min(30).max(240).default(90),
   voteSeconds: z.int().min(15).max(90).default(30),
   rounds: z.int().min(1).max(5).default(3),
   difficulty: z.enum(['easy', 'medium', 'hard', 'mixed']).default('mixed'),
+  languages: z
+    .array(z.enum(MOVIE_LANGUAGES))
+    .default(DEFAULT_LANGUAGES)
+    .transform((values) => (values.length === 0 ? DEFAULT_LANGUAGES : [...new Set(values)])),
 })
 
 type MafiaSettings = z.infer<typeof settingsSchema>
@@ -88,6 +103,14 @@ const settingsSpec: SettingField[] = [
   { key: 'discussionSeconds', label: 'Discussion', kind: 'int', min: 30, max: 240, step: 15, default: 90, unit: 's' },
   { key: 'voteSeconds', label: 'Voting', kind: 'int', min: 15, max: 90, step: 5, default: 30, unit: 's' },
   { key: 'rounds', label: 'Max rounds', kind: 'int', min: 1, max: 5, step: 1, default: 3 },
+  {
+    key: 'languages',
+    label: 'Movie languages',
+    help: 'Which film industries the secret is drawn from.',
+    kind: 'multi',
+    default: DEFAULT_LANGUAGES,
+    options: MOVIE_LANGUAGES.map((value) => ({ value, label: MOVIE_LANGUAGE_LABELS[value] })),
+  },
   {
     key: 'difficulty',
     label: 'Difficulty',
@@ -179,15 +202,19 @@ export const movieMafia: ErasedGameDefinition = defineGame<MafiaState, MafiaSett
 
   contentRequest: (settings): ContentRequest => ({
     kind: 'mafia',
-    count: 12,
+    // One film per game, so the pool is entirely about not repeating it.
+    count: 40,
     difficulty: settings.difficulty,
     category: null,
+    languages: settings.languages,
   }),
 
   createGame(ctx: CreateContext<MafiaSettings>): MafiaState {
     const pool = expectItems(ctx.content, 'mafia')
     const rng = createRng(ctx.seed, 'movie-mafia', ctx.sessionId)
-    const subject = rng.pick(pool)
+    // One subject, preferring one this room has not had recently.
+    const drawn = pickFresh(pool, { count: 1, recentIds: ctx.recentContentIds, rng })
+    const subject = drawn.items[0] ?? rng.pick(pool)
     const ids = ctx.players.map((p) => p.id)
     const imposterId = rng.pick(ids)
 
@@ -216,6 +243,7 @@ export const movieMafia: ErasedGameDefinition = defineGame<MafiaState, MafiaSett
   getDeadline: (state) => (state.phase === 'FINISHED' ? null : state.phaseEndsAt),
   getPhase: (state) => state.phase,
   isGameOver: (state) => state.phase === 'FINISHED',
+  usedContentIds: (state) => [state.subject.id],
 
   validateAction(state, playerId, action): Result<void> {
     const parsed = parse(action)
@@ -408,6 +436,8 @@ export const movieMafia: ErasedGameDefinition = defineGame<MafiaState, MafiaSett
       view['outcome'] = state.outcome
       view['imposterId'] = state.imposterId
       view['subject'] = state.subject.title
+      view['language'] = state.subject.language
+      view['languageLabel'] = MOVIE_LANGUAGE_LABELS[state.subject.language]
       view['fanClue'] = state.subject.fanClue
       view['imposterClue'] = state.subject.imposterClue
     }

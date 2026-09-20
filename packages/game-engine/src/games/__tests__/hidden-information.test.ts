@@ -32,6 +32,7 @@ function boot(def: ErasedGameDefinition, playerCount: number) {
     sessionId: `sess-${def.id}`,
     settings,
     content: packOf(kind, 30),
+    recentContentIds: [],
   })
   return { roster, state }
 }

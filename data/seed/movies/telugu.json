@@ -1,0 +1,1124 @@
+{
+  "$comment": "Telugu films for Emoji Movie. Curated for recognition, not count: every title here is one a Telugu-speaking friend group would name without hesitation. Spans the 1980s to now, across stars, directors and genres. Clues use themes, characters, objects and plot beats — never a literal spelling of the title.",
+  "language": "telugu",
+  "items": [
+    {
+      "id": "te-baahubali",
+      "title": "Baahubali",
+      "year": 2015,
+      "difficulty": "easy",
+      "emojis": "👑 🏔️ ⚔️",
+      "aliases": [
+        "Baahubali The Beginning",
+        "Bahubali",
+        "Baahubali 2",
+        "Baahubali The Conclusion"
+      ]
+    },
+    {
+      "id": "te-rrr",
+      "title": "RRR",
+      "year": 2022,
+      "difficulty": "easy",
+      "emojis": "🔥 💧 🐅",
+      "aliases": [
+        "Rise Roar Revolt",
+        "Roudram Ranam Rudhiram"
+      ]
+    },
+    {
+      "id": "te-pushpa",
+      "title": "Pushpa",
+      "year": 2021,
+      "difficulty": "easy",
+      "emojis": "🌳 🚚 🔴",
+      "aliases": [
+        "Pushpa The Rise"
+      ]
+    },
+    {
+      "id": "te-arjun-reddy",
+      "title": "Arjun Reddy",
+      "year": 2017,
+      "difficulty": "easy",
+      "emojis": "🩺 💔 🥃",
+      "aliases": []
+    },
+    {
+      "id": "te-ala-vaikuntha",
+      "title": "Ala Vaikunthapurramuloo",
+      "year": 2020,
+      "difficulty": "easy",
+      "emojis": "👶 🔄 🏡",
+      "aliases": [
+        "Ala Vaikunthapurramloo",
+        "AVPL"
+      ]
+    },
+    {
+      "id": "te-athadu",
+      "title": "Athadu",
+      "year": 2005,
+      "difficulty": "medium",
+      "emojis": "🎯 🎭 👨‍👩‍👧",
+      "aliases": []
+    },
+    {
+      "id": "te-pokiri",
+      "title": "Pokiri",
+      "year": 2006,
+      "difficulty": "easy",
+      "emojis": "🔫 🕵️ 😎",
+      "aliases": []
+    },
+    {
+      "id": "te-magadheera",
+      "title": "Magadheera",
+      "year": 2009,
+      "difficulty": "easy",
+      "emojis": "⚔️ 🔄 🐎",
+      "aliases": []
+    },
+    {
+      "id": "te-eega",
+      "title": "Eega",
+      "year": 2012,
+      "difficulty": "easy",
+      "emojis": "🪰 😤 ⚰️",
+      "aliases": [
+        "Makkhi",
+        "Naan Ee"
+      ]
+    },
+    {
+      "id": "te-rangasthalam",
+      "title": "Rangasthalam",
+      "year": 2018,
+      "difficulty": "easy",
+      "emojis": "🌾 🦻 🔫",
+      "aliases": []
+    },
+    {
+      "id": "te-jersey",
+      "title": "Jersey",
+      "year": 2019,
+      "difficulty": "easy",
+      "emojis": "🏏 👨‍👦 🎽",
+      "aliases": []
+    },
+    {
+      "id": "te-dasara",
+      "title": "Dasara",
+      "year": 2023,
+      "difficulty": "medium",
+      "emojis": "🍺 ⛏️ 🔥",
+      "aliases": []
+    },
+    {
+      "id": "te-salaar",
+      "title": "Salaar",
+      "year": 2023,
+      "difficulty": "easy",
+      "emojis": "🤝 ⚔️ 🏙️",
+      "aliases": []
+    },
+    {
+      "id": "te-devara",
+      "title": "Devara",
+      "year": 2024,
+      "difficulty": "medium",
+      "emojis": "🌊 🦈 ⚔️",
+      "aliases": []
+    },
+    {
+      "id": "te-khaleja",
+      "title": "Khaleja",
+      "year": 2010,
+      "difficulty": "medium",
+      "emojis": "🚕 🙏 🌄",
+      "aliases": []
+    },
+    {
+      "id": "te-julayi",
+      "title": "Julayi",
+      "year": 2012,
+      "difficulty": "medium",
+      "emojis": "🎰 🏦 😏",
+      "aliases": []
+    },
+    {
+      "id": "te-race-gurram",
+      "title": "Race Gurram",
+      "year": 2014,
+      "difficulty": "medium",
+      "emojis": "🏃 👮 😜",
+      "aliases": []
+    },
+    {
+      "id": "te-srimanthudu",
+      "title": "Srimanthudu",
+      "year": 2015,
+      "difficulty": "medium",
+      "emojis": "💰 🏘️ 🌱",
+      "aliases": []
+    },
+    {
+      "id": "te-fidaa",
+      "title": "Fidaa",
+      "year": 2017,
+      "difficulty": "medium",
+      "emojis": "🌾 ✈️ 💔",
+      "aliases": []
+    },
+    {
+      "id": "te-geetha-govindam",
+      "title": "Geetha Govindam",
+      "year": 2018,
+      "difficulty": "easy",
+      "emojis": "👨‍🏫 😳 🚌",
+      "aliases": []
+    },
+    {
+      "id": "te-mirchi",
+      "title": "Mirchi",
+      "year": 2013,
+      "difficulty": "medium",
+      "emojis": "🌶️ ☮️ ⚔️",
+      "aliases": []
+    },
+    {
+      "id": "te-temper",
+      "title": "Temper",
+      "year": 2015,
+      "difficulty": "medium",
+      "emojis": "👮 😡 ⚖️",
+      "aliases": []
+    },
+    {
+      "id": "te-gabbar-singh",
+      "title": "Gabbar Singh",
+      "year": 2012,
+      "difficulty": "medium",
+      "emojis": "👮 🕶️ 💃",
+      "aliases": []
+    },
+    {
+      "id": "te-businessman",
+      "title": "Businessman",
+      "year": 2012,
+      "difficulty": "medium",
+      "emojis": "💼 🔫 🏙️",
+      "aliases": []
+    },
+    {
+      "id": "te-leader",
+      "title": "Leader",
+      "year": 2010,
+      "difficulty": "hard",
+      "emojis": "🗳️ 🎓 🏛️",
+      "aliases": []
+    },
+    {
+      "id": "te-bommarillu",
+      "title": "Bommarillu",
+      "year": 2006,
+      "difficulty": "medium",
+      "emojis": "👨‍👦 🎈 💐",
+      "aliases": []
+    },
+    {
+      "id": "te-orange",
+      "title": "Orange",
+      "year": 2010,
+      "difficulty": "hard",
+      "emojis": "🍊 🇦🇺 💔",
+      "aliases": []
+    },
+    {
+      "id": "te-manam",
+      "title": "Manam",
+      "year": 2014,
+      "difficulty": "medium",
+      "emojis": "👴 👨 👶",
+      "aliases": []
+    },
+    {
+      "id": "te-oopiri",
+      "title": "Oopiri",
+      "year": 2016,
+      "difficulty": "hard",
+      "emojis": "♿ 🤝 🚗",
+      "aliases": [
+        "Thozha"
+      ]
+    },
+    {
+      "id": "te-kushi",
+      "title": "Kushi",
+      "year": 2001,
+      "difficulty": "medium",
+      "emojis": "💑 🎸 😄",
+      "aliases": []
+    },
+    {
+      "id": "te-thammudu",
+      "title": "Thammudu",
+      "year": 1999,
+      "difficulty": "hard",
+      "emojis": "🥋 👨‍👦 🏆",
+      "aliases": []
+    },
+    {
+      "id": "te-indra",
+      "title": "Indra",
+      "year": 2002,
+      "difficulty": "medium",
+      "emojis": "🔱 🚜 ⚔️",
+      "aliases": []
+    },
+    {
+      "id": "te-simhadri",
+      "title": "Simhadri",
+      "year": 2003,
+      "difficulty": "medium",
+      "emojis": "🦁 🛕 ⚔️",
+      "aliases": []
+    },
+    {
+      "id": "te-yamadonga",
+      "title": "Yamadonga",
+      "year": 2007,
+      "difficulty": "medium",
+      "emojis": "💀 🃏 👑",
+      "aliases": []
+    },
+    {
+      "id": "te-sye",
+      "title": "Sye",
+      "year": 2004,
+      "difficulty": "hard",
+      "emojis": "🏉 🎓 ⚔️",
+      "aliases": []
+    },
+    {
+      "id": "te-ready",
+      "title": "Ready",
+      "year": 2008,
+      "difficulty": "medium",
+      "emojis": "💍 🏠 😅",
+      "aliases": []
+    },
+    {
+      "id": "te-dookudu",
+      "title": "Dookudu",
+      "year": 2011,
+      "difficulty": "medium",
+      "emojis": "👮 😴 🎭",
+      "aliases": []
+    },
+    {
+      "id": "te-mahanati",
+      "title": "Mahanati",
+      "year": 2018,
+      "difficulty": "medium",
+      "emojis": "🎬 ⭐ 📰",
+      "aliases": []
+    },
+    {
+      "id": "te-c-o-kancharapalem",
+      "title": "C/o Kancharapalem",
+      "year": 2018,
+      "difficulty": "hard",
+      "emojis": "💌 🏘️ 4️⃣",
+      "aliases": [
+        "Care of Kancharapalem"
+      ]
+    },
+    {
+      "id": "te-sita-ramam",
+      "title": "Sita Ramam",
+      "year": 2022,
+      "difficulty": "medium",
+      "emojis": "💌 🎖️ ❄️",
+      "aliases": []
+    },
+    {
+      "id": "te-hi-nanna",
+      "title": "Hi Nanna",
+      "year": 2023,
+      "difficulty": "medium",
+      "emojis": "👨‍👧 📸 🌧️",
+      "aliases": []
+    },
+    {
+      "id": "te-kalki-2898",
+      "title": "Kalki 2898 AD",
+      "year": 2024,
+      "difficulty": "easy",
+      "emojis": "🤖 🏜️ ⏳",
+      "aliases": [
+        "Kalki"
+      ]
+    },
+    {
+      "id": "te-hanu-man",
+      "title": "HanuMan",
+      "year": 2024,
+      "difficulty": "easy",
+      "emojis": "🐒 💎 🦸",
+      "aliases": []
+    },
+    {
+      "id": "te-sankranthiki",
+      "title": "Sankranthiki Vasthunam",
+      "year": 2025,
+      "difficulty": "hard",
+      "emojis": "🎉 👮 👨‍👩‍👧",
+      "aliases": []
+    },
+    {
+      "id": "te-vikramarkudu",
+      "title": "Vikramarkudu",
+      "year": 2006,
+      "difficulty": "medium",
+      "emojis": "👮 👧 😈",
+      "aliases": []
+    },
+    {
+      "id": "te-chatrapathi",
+      "title": "Chatrapathi",
+      "year": 2005,
+      "difficulty": "medium",
+      "emojis": "⚓ 🛶 ⚔️",
+      "aliases": []
+    },
+    {
+      "id": "te-arya",
+      "title": "Arya",
+      "year": 2004,
+      "difficulty": "medium",
+      "emojis": "💘 🎓 😜",
+      "aliases": []
+    },
+    {
+      "id": "te-arya-2",
+      "title": "Arya 2",
+      "year": 2009,
+      "difficulty": "hard",
+      "emojis": "😵 👬 🔪",
+      "aliases": []
+    },
+    {
+      "id": "te-desamuduru",
+      "title": "Desamuduru",
+      "year": 2007,
+      "difficulty": "hard",
+      "emojis": "📹 🏔️ 🛕",
+      "aliases": []
+    },
+    {
+      "id": "te-parugu",
+      "title": "Parugu",
+      "year": 2008,
+      "difficulty": "hard",
+      "emojis": "🏃 💐 👨‍👧",
+      "aliases": []
+    },
+    {
+      "id": "te-vedam",
+      "title": "Vedam",
+      "year": 2010,
+      "difficulty": "hard",
+      "emojis": "5️⃣ 🏥 🕯️",
+      "aliases": []
+    },
+    {
+      "id": "te-happy-days",
+      "title": "Happy Days",
+      "year": 2007,
+      "difficulty": "medium",
+      "emojis": "🎓 👫 📚",
+      "aliases": []
+    },
+    {
+      "id": "te-nuvvu-naaku",
+      "title": "Nuvvu Naaku Nachav",
+      "year": 2001,
+      "difficulty": "hard",
+      "emojis": "💑 👨‍👩‍👧 💐",
+      "aliases": []
+    },
+    {
+      "id": "te-okkadu",
+      "title": "Okkadu",
+      "year": 2003,
+      "difficulty": "medium",
+      "emojis": "🏃 🛡️ 👰",
+      "aliases": []
+    },
+    {
+      "id": "te-nuvvostanante",
+      "title": "Nuvvostanante Nenoddantana",
+      "year": 2005,
+      "difficulty": "hard",
+      "emojis": "🏡 💔 👨‍👩‍👧",
+      "aliases": []
+    },
+    {
+      "id": "te-godavari",
+      "title": "Godavari",
+      "year": 2006,
+      "difficulty": "hard",
+      "emojis": "🚢 🌊 💑",
+      "aliases": []
+    },
+    {
+      "id": "te-aithe",
+      "title": "Aithe",
+      "year": 2003,
+      "difficulty": "hard",
+      "emojis": "4️⃣ 💰 😰",
+      "aliases": []
+    },
+    {
+      "id": "te-anand",
+      "title": "Anand",
+      "year": 2004,
+      "difficulty": "hard",
+      "emojis": "🏡 💑 🎻",
+      "aliases": []
+    },
+    {
+      "id": "te-gamyam",
+      "title": "Gamyam",
+      "year": 2008,
+      "difficulty": "hard",
+      "emojis": "🏍️ 🛣️ 🙏",
+      "aliases": []
+    },
+    {
+      "id": "te-prasthanam",
+      "title": "Prasthanam",
+      "year": 2010,
+      "difficulty": "hard",
+      "emojis": "🗳️ 👨‍👦 🔫",
+      "aliases": []
+    },
+    {
+      "id": "te-eeram-pilla",
+      "title": "Pilla Zamindar",
+      "year": 2011,
+      "difficulty": "hard",
+      "emojis": "🏰 🎓 💰",
+      "aliases": []
+    },
+    {
+      "id": "te-swamy-ra-ra",
+      "title": "Swamy Ra Ra",
+      "year": 2013,
+      "difficulty": "hard",
+      "emojis": "🗿 🕵️ 😂",
+      "aliases": []
+    },
+    {
+      "id": "te-attarintiki",
+      "title": "Attarintiki Daredi",
+      "year": 2013,
+      "difficulty": "medium",
+      "emojis": "🚗 🏡 😇",
+      "aliases": []
+    },
+    {
+      "id": "te-1-nenokkadine",
+      "title": "1 Nenokkadine",
+      "year": 2014,
+      "difficulty": "medium",
+      "emojis": "🥁 🧠 🔍",
+      "aliases": [
+        "One Nenokkadine"
+      ]
+    },
+    {
+      "id": "te-baadshah",
+      "title": "Baadshah",
+      "year": 2013,
+      "difficulty": "hard",
+      "emojis": "🕶️ 💼 🚨",
+      "aliases": []
+    },
+    {
+      "id": "te-s-o-satyamurthy",
+      "title": "S/O Satyamurthy",
+      "year": 2015,
+      "difficulty": "hard",
+      "emojis": "👨‍👦 💸 😇",
+      "aliases": [
+        "Son of Satyamurthy"
+      ]
+    },
+    {
+      "id": "te-a-aa",
+      "title": "A Aa",
+      "year": 2016,
+      "difficulty": "hard",
+      "emojis": "🏡 👧 🔁",
+      "aliases": []
+    },
+    {
+      "id": "te-duvvada",
+      "title": "Duvvada Jagannadham",
+      "year": 2017,
+      "difficulty": "hard",
+      "emojis": "🍛 🔫 🧑‍🍳",
+      "aliases": [
+        "DJ"
+      ]
+    },
+    {
+      "id": "te-bharat-ane-nenu",
+      "title": "Bharat Ane Nenu",
+      "year": 2018,
+      "difficulty": "medium",
+      "emojis": "🏛️ 🎓 ✍️",
+      "aliases": []
+    },
+    {
+      "id": "te-maharshi",
+      "title": "Maharshi",
+      "year": 2019,
+      "difficulty": "hard",
+      "emojis": "💼 🌾 🤝",
+      "aliases": []
+    },
+    {
+      "id": "te-sarileru",
+      "title": "Sarileru Neekevvaru",
+      "year": 2020,
+      "difficulty": "medium",
+      "emojis": "🎖️ 😄 👩‍🏫",
+      "aliases": []
+    },
+    {
+      "id": "te-vakeel-saab",
+      "title": "Vakeel Saab",
+      "year": 2021,
+      "difficulty": "medium",
+      "emojis": "⚖️ 👩‍⚖️ 3️⃣",
+      "aliases": []
+    },
+    {
+      "id": "te-uppena",
+      "title": "Uppena",
+      "year": 2021,
+      "difficulty": "medium",
+      "emojis": "🌊 💔 🎣",
+      "aliases": []
+    },
+    {
+      "id": "te-love-story",
+      "title": "Love Story",
+      "year": 2021,
+      "difficulty": "hard",
+      "emojis": "💃 🏙️ 💔",
+      "aliases": []
+    },
+    {
+      "id": "te-shyam-singha-roy",
+      "title": "Shyam Singha Roy",
+      "year": 2021,
+      "difficulty": "medium",
+      "emojis": "🔄 ✍️ 🕯️",
+      "aliases": []
+    },
+    {
+      "id": "te-bheemla-nayak",
+      "title": "Bheemla Nayak",
+      "year": 2022,
+      "difficulty": "medium",
+      "emojis": "👮 😤 🚙",
+      "aliases": []
+    },
+    {
+      "id": "te-karthikeya-2",
+      "title": "Karthikeya 2",
+      "year": 2022,
+      "difficulty": "medium",
+      "emojis": "🪈 🔱 🗺️",
+      "aliases": []
+    },
+    {
+      "id": "te-virupaksha",
+      "title": "Virupaksha",
+      "year": 2023,
+      "difficulty": "medium",
+      "emojis": "🕯️ 🏘️ 😱",
+      "aliases": []
+    },
+    {
+      "id": "te-balagam",
+      "title": "Balagam",
+      "year": 2023,
+      "difficulty": "hard",
+      "emojis": "🐄 ⚰️ 👨‍👩‍👦",
+      "aliases": []
+    },
+    {
+      "id": "te-hit-the-first",
+      "title": "HIT",
+      "year": 2020,
+      "difficulty": "hard",
+      "emojis": "🔍 🚔 😰",
+      "aliases": [
+        "HIT The First Case"
+      ]
+    },
+    {
+      "id": "te-evaru",
+      "title": "Evaru",
+      "year": 2019,
+      "difficulty": "hard",
+      "emojis": "🔍 🔄 😶",
+      "aliases": []
+    },
+    {
+      "id": "te-goodachari",
+      "title": "Goodachari",
+      "year": 2018,
+      "difficulty": "medium",
+      "emojis": "🕵️ 🎯 🤫",
+      "aliases": []
+    },
+    {
+      "id": "te-agent-sai",
+      "title": "Agent Sai Srinivasa Athreya",
+      "year": 2019,
+      "difficulty": "hard",
+      "emojis": "🔎 😂 📁",
+      "aliases": [
+        "Agent Sai"
+      ]
+    },
+    {
+      "id": "te-jathi-ratnalu",
+      "title": "Jathi Ratnalu",
+      "year": 2021,
+      "difficulty": "medium",
+      "emojis": "3️⃣ 🤪 🚔",
+      "aliases": []
+    },
+    {
+      "id": "te-f2",
+      "title": "F2",
+      "year": 2019,
+      "difficulty": "hard",
+      "emojis": "😩 👫 😂",
+      "aliases": [
+        "Fun and Frustration"
+      ]
+    },
+    {
+      "id": "te-f3",
+      "title": "F3",
+      "year": 2022,
+      "difficulty": "hard",
+      "emojis": "💰 😩 😂",
+      "aliases": []
+    },
+    {
+      "id": "te-ante-sundaraniki",
+      "title": "Ante Sundaraniki",
+      "year": 2022,
+      "difficulty": "hard",
+      "emojis": "🙏 ✝️ 💑",
+      "aliases": []
+    },
+    {
+      "id": "te-brochevarevarura",
+      "title": "Brochevarevarura",
+      "year": 2019,
+      "difficulty": "hard",
+      "emojis": "🎓 🚗 🔀",
+      "aliases": []
+    },
+    {
+      "id": "te-pelli-choopulu",
+      "title": "Pelli Choopulu",
+      "year": 2016,
+      "difficulty": "medium",
+      "emojis": "🍳 🚚 💑",
+      "aliases": []
+    },
+    {
+      "id": "te-kshanam",
+      "title": "Kshanam",
+      "year": 2016,
+      "difficulty": "hard",
+      "emojis": "👧 ❓ 🔍",
+      "aliases": []
+    },
+    {
+      "id": "te-anukokunda",
+      "title": "Anukokunda Oka Roju",
+      "year": 2005,
+      "difficulty": "hard",
+      "emojis": "📅 ❓ 😱",
+      "aliases": []
+    },
+    {
+      "id": "te-ashta-chamma",
+      "title": "Ashta Chamma",
+      "year": 2008,
+      "difficulty": "hard",
+      "emojis": "🎭 💑 😄",
+      "aliases": []
+    },
+    {
+      "id": "te-ala-modalaindi",
+      "title": "Ala Modalaindi",
+      "year": 2011,
+      "difficulty": "hard",
+      "emojis": "💘 🔁 😄",
+      "aliases": []
+    },
+    {
+      "id": "te-manmadhudu",
+      "title": "Manmadhudu",
+      "year": 2002,
+      "difficulty": "medium",
+      "emojis": "🚫👩 😏 💘",
+      "aliases": []
+    },
+    {
+      "id": "te-murari",
+      "title": "Murari",
+      "year": 2001,
+      "difficulty": "medium",
+      "emojis": "🛕 👑 🕯️",
+      "aliases": []
+    },
+    {
+      "id": "te-santosham",
+      "title": "Santosham",
+      "year": 2002,
+      "difficulty": "hard",
+      "emojis": "😊 💑 ✈️",
+      "aliases": []
+    },
+    {
+      "id": "te-jalsa",
+      "title": "Jalsa",
+      "year": 2008,
+      "difficulty": "hard",
+      "emojis": "🎉 🕶️ 🔫",
+      "aliases": []
+    },
+    {
+      "id": "te-kick",
+      "title": "Kick",
+      "year": 2009,
+      "difficulty": "hard",
+      "emojis": "⚡ 😎 💰",
+      "aliases": []
+    },
+    {
+      "id": "te-adurs",
+      "title": "Adurs",
+      "year": 2010,
+      "difficulty": "hard",
+      "emojis": "👯 🙏 😂",
+      "aliases": []
+    },
+    {
+      "id": "te-nenu-sailaja",
+      "title": "Nenu Sailaja",
+      "year": 2016,
+      "difficulty": "hard",
+      "emojis": "💑 😄 🎒",
+      "aliases": []
+    },
+    {
+      "id": "te-majili",
+      "title": "Majili",
+      "year": 2019,
+      "difficulty": "hard",
+      "emojis": "🏏 💔 💍",
+      "aliases": []
+    },
+    {
+      "id": "te-ninnu-kori",
+      "title": "Ninnu Kori",
+      "year": 2017,
+      "difficulty": "hard",
+      "emojis": "💔 🇺🇸 💍",
+      "aliases": []
+    },
+    {
+      "id": "te-tholi-prema",
+      "title": "Tholi Prema",
+      "year": 1998,
+      "difficulty": "medium",
+      "emojis": "💘 🎓 💌",
+      "aliases": []
+    },
+    {
+      "id": "te-nuvve-kavali",
+      "title": "Nuvve Kavali",
+      "year": 2000,
+      "difficulty": "hard",
+      "emojis": "👫 🏡 💘",
+      "aliases": []
+    },
+    {
+      "id": "te-sirivennela",
+      "title": "Sirivennela",
+      "year": 1986,
+      "difficulty": "hard",
+      "emojis": "🪈 🎨 🌙",
+      "aliases": []
+    },
+    {
+      "id": "te-shiva",
+      "title": "Shiva",
+      "year": 1989,
+      "difficulty": "medium",
+      "emojis": "🚲 ⛓️ 🎓",
+      "aliases": []
+    },
+    {
+      "id": "te-money",
+      "title": "Money",
+      "year": 1993,
+      "difficulty": "hard",
+      "emojis": "💵 😂 🏃",
+      "aliases": []
+    },
+    {
+      "id": "te-jagadeka-veerudu",
+      "title": "Jagadeka Veerudu Athiloka Sundari",
+      "year": 1990,
+      "difficulty": "hard",
+      "emojis": "🧚 👑 ✨",
+      "aliases": []
+    },
+    {
+      "id": "te-mayabazar",
+      "title": "Mayabazar",
+      "year": 1957,
+      "difficulty": "medium",
+      "emojis": "🪄 🍽️ 👰",
+      "aliases": []
+    },
+    {
+      "id": "te-sagara-sangamam",
+      "title": "Sagara Sangamam",
+      "year": 1983,
+      "difficulty": "hard",
+      "emojis": "💃 🥃 🎭",
+      "aliases": []
+    },
+    {
+      "id": "te-swathi-muthyam",
+      "title": "Swathi Muthyam",
+      "year": 1986,
+      "difficulty": "hard",
+      "emojis": "🤍 👨 👩‍🍼",
+      "aliases": []
+    },
+    {
+      "id": "te-missamma",
+      "title": "Missamma",
+      "year": 1955,
+      "difficulty": "hard",
+      "emojis": "👰 🎭 😄",
+      "aliases": []
+    },
+    {
+      "id": "te-annamayya",
+      "title": "Annamayya",
+      "year": 1997,
+      "difficulty": "hard",
+      "emojis": "🎶 🛕 🙏",
+      "aliases": []
+    },
+    {
+      "id": "te-narasimha-naidu",
+      "title": "Narasimha Naidu",
+      "year": 2001,
+      "difficulty": "hard",
+      "emojis": "🔱 🚜 ⚔️",
+      "aliases": []
+    },
+    {
+      "id": "te-samarasimha",
+      "title": "Samarasimha Reddy",
+      "year": 1999,
+      "difficulty": "hard",
+      "emojis": "🏇 ⚔️ 👑",
+      "aliases": []
+    },
+    {
+      "id": "te-choodalani-vundi",
+      "title": "Choodalani Vundi",
+      "year": 1998,
+      "difficulty": "hard",
+      "emojis": "👀 💘 🥋",
+      "aliases": []
+    },
+    {
+      "id": "te-student-no-1",
+      "title": "Student No 1",
+      "year": 2001,
+      "difficulty": "hard",
+      "emojis": "🎓 1️⃣ 😤",
+      "aliases": []
+    },
+    {
+      "id": "te-aadi",
+      "title": "Aadi",
+      "year": 2002,
+      "difficulty": "hard",
+      "emojis": "⚔️ 👨‍👦 🔥",
+      "aliases": []
+    },
+    {
+      "id": "te-varsham",
+      "title": "Varsham",
+      "year": 2004,
+      "difficulty": "medium",
+      "emojis": "🌧️ 💘 ☂️",
+      "aliases": []
+    },
+    {
+      "id": "te-bunny",
+      "title": "Bunny",
+      "year": 2005,
+      "difficulty": "hard",
+      "emojis": "🐰 🎓 💃",
+      "aliases": []
+    },
+    {
+      "id": "te-bhadra",
+      "title": "Bhadra",
+      "year": 2005,
+      "difficulty": "hard",
+      "emojis": "🛡️ 👨‍👩‍👦 ⚔️",
+      "aliases": []
+    },
+    {
+      "id": "te-stalin",
+      "title": "Stalin",
+      "year": 2006,
+      "difficulty": "hard",
+      "emojis": "🤝 3️⃣ ➡️",
+      "aliases": []
+    },
+    {
+      "id": "te-chirutha",
+      "title": "Chirutha",
+      "year": 2007,
+      "difficulty": "hard",
+      "emojis": "🐆 🔫 💘",
+      "aliases": []
+    },
+    {
+      "id": "te-king",
+      "title": "King",
+      "year": 2008,
+      "difficulty": "hard",
+      "emojis": "👑 🎭 😂",
+      "aliases": []
+    },
+    {
+      "id": "te-maryada-ramanna",
+      "title": "Maryada Ramanna",
+      "year": 2010,
+      "difficulty": "hard",
+      "emojis": "🏡 🚪 😂",
+      "aliases": []
+    },
+    {
+      "id": "te-seethamma",
+      "title": "Seethamma Vakitlo Sirimalle Chettu",
+      "year": 2013,
+      "difficulty": "hard",
+      "emojis": "👨‍👩‍👦‍👦 🌼 🏡",
+      "aliases": [
+        "SVSC"
+      ]
+    },
+    {
+      "id": "te-race-gurram-2",
+      "title": "Rowdy Fellow",
+      "year": 2014,
+      "difficulty": "hard",
+      "emojis": "😠 👮 🚙",
+      "aliases": []
+    },
+    {
+      "id": "te-oh-baby",
+      "title": "Oh Baby",
+      "year": 2019,
+      "difficulty": "hard",
+      "emojis": "👵 ➡️ 👧",
+      "aliases": []
+    },
+    {
+      "id": "te-colour-photo",
+      "title": "Colour Photo",
+      "year": 2020,
+      "difficulty": "hard",
+      "emojis": "📷 🎨 💔",
+      "aliases": []
+    },
+    {
+      "id": "te-vivaha-bhojanambu",
+      "title": "Vivaha Bhojanambu",
+      "year": 2021,
+      "difficulty": "hard",
+      "emojis": "🍽️ 👰 😂",
+      "aliases": []
+    },
+    {
+      "id": "te-tillu-square",
+      "title": "Tillu Square",
+      "year": 2024,
+      "difficulty": "medium",
+      "emojis": "🕺 🤪 💃",
+      "aliases": []
+    },
+    {
+      "id": "te-dj-tillu",
+      "title": "DJ Tillu",
+      "year": 2022,
+      "difficulty": "medium",
+      "emojis": "🎧 😜 🔪",
+      "aliases": []
+    },
+    {
+      "id": "te-mad",
+      "title": "MAD",
+      "year": 2023,
+      "difficulty": "hard",
+      "emojis": "🎓 🏠 🤪",
+      "aliases": []
+    },
+    {
+      "id": "te-baby",
+      "title": "Baby",
+      "year": 2023,
+      "difficulty": "medium",
+      "emojis": "🎓 💔 🔺",
+      "aliases": []
+    },
+    {
+      "id": "te-court-movie",
+      "title": "Court State vs A Nobody",
+      "year": 2025,
+      "difficulty": "hard",
+      "emojis": "⚖️ 👨‍⚖️ 📜",
+      "aliases": [
+        "Court"
+      ]
+    }
+  ]
+}

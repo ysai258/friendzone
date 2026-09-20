@@ -1,57 +1,1331 @@
 {
-  "$comment": "Mind Meld prompts. The good ones have an obvious answer that most people reach for and two or three plausible runners-up — if everybody always agrees the round is boring, and if nobody ever does it is just noise.",
+  "$comment": "Mind Meld prompts. Every one is written so a room can converge: an obvious answer plus two or three plausible runners-up. Obscure trivia and questions nobody could agree on are deliberately absent, because a round where everyone is alone scores nothing and is no fun.",
   "items": [
-    { "id": "mm-sunday",      "prompt": "Name something people do on a Sunday.", "difficulty": "easy" },
-    { "id": "mm-pizza",       "prompt": "Name a pizza topping.", "difficulty": "easy" },
-    { "id": "mm-yellow",      "prompt": "Name something yellow.", "difficulty": "easy" },
-    { "id": "mm-pocket",      "prompt": "Name something you keep in your pocket.", "difficulty": "easy" },
-    { "id": "mm-breakfast",   "prompt": "Name a breakfast food.", "difficulty": "easy" },
-    { "id": "mm-zoo",         "prompt": "Name an animal you would see at a zoo.", "difficulty": "easy" },
-    { "id": "mm-cold",        "prompt": "Name something you do when it is cold.", "difficulty": "easy" },
-    { "id": "mm-fridge",      "prompt": "Name something in everyone's fridge.", "difficulty": "easy" },
-    { "id": "mm-beach",       "prompt": "Name something you take to the beach.", "difficulty": "easy" },
-    { "id": "mm-school",      "prompt": "Name a school subject.", "difficulty": "easy" },
-    { "id": "mm-late",        "prompt": "Name an excuse for being late.", "difficulty": "medium" },
-    { "id": "mm-phone",       "prompt": "Name an app on your phone right now.", "difficulty": "medium" },
-    { "id": "mm-boring",      "prompt": "Name the most boring household chore.", "difficulty": "medium" },
-    { "id": "mm-superpower",  "prompt": "Name a superpower you would actually use daily.", "difficulty": "medium" },
-    { "id": "mm-lose",        "prompt": "Name something people are always losing.", "difficulty": "medium" },
-    { "id": "mm-queue",       "prompt": "Name something worth queuing for.", "difficulty": "medium" },
-    { "id": "mm-smell",       "prompt": "Name a smell everybody likes.", "difficulty": "medium" },
-    { "id": "mm-wedding",     "prompt": "Name something that always happens at a wedding.", "difficulty": "medium" },
-    { "id": "mm-desert",      "prompt": "Name one thing to take to a desert island.", "difficulty": "medium" },
-    { "id": "mm-procrast",    "prompt": "Name what you do instead of the thing you should be doing.", "difficulty": "medium" },
-    { "id": "mm-rain",        "prompt": "Name something that is better in the rain.", "difficulty": "medium" },
-    { "id": "mm-monday",      "prompt": "Name the worst part of a Monday.", "difficulty": "medium" },
-    { "id": "mm-snack",       "prompt": "Name a snack you eat standing at the counter.", "difficulty": "medium" },
-    { "id": "mm-lie",         "prompt": "Name a lie everybody tells.", "difficulty": "medium" },
-    { "id": "mm-overrated",   "prompt": "Name something overrated.", "difficulty": "medium" },
-    { "id": "mm-tea",         "prompt": "Name something people argue about making correctly.", "difficulty": "medium" },
-    { "id": "mm-airport",     "prompt": "Name the worst part of an airport.", "difficulty": "medium" },
-    { "id": "mm-instrument",  "prompt": "Name a musical instrument.", "difficulty": "easy" },
-    { "id": "mm-city",        "prompt": "Name a famous city.", "difficulty": "easy" },
-    { "id": "mm-sport",       "prompt": "Name a sport played with a ball.", "difficulty": "easy" },
-    { "id": "mm-round",       "prompt": "Name something round.", "difficulty": "easy" },
-    { "id": "mm-loud",        "prompt": "Name something loud.", "difficulty": "easy" },
-    { "id": "mm-scary",       "prompt": "Name something scarier than it should be.", "difficulty": "medium" },
-    { "id": "mm-heavy",       "prompt": "Name something heavier than it looks.", "difficulty": "hard" },
-    { "id": "mm-expensive",   "prompt": "Name something that costs far too much.", "difficulty": "medium" },
-    { "id": "mm-wallet",      "prompt": "Name something in your wallet that should not be.", "difficulty": "hard" },
-    { "id": "mm-parent",      "prompt": "Name something a parent always says.", "difficulty": "medium" },
-    { "id": "mm-teacher",     "prompt": "Name something a teacher always says.", "difficulty": "medium" },
-    { "id": "mm-wifi",        "prompt": "Name the first thing you do when the wifi dies.", "difficulty": "medium" },
-    { "id": "mm-3am",         "prompt": "Name something you only think about at 3am.", "difficulty": "hard" },
-    { "id": "mm-group",       "prompt": "Name a type of person in every group chat.", "difficulty": "hard" },
-    { "id": "mm-hotel",       "prompt": "Name something people steal from hotels.", "difficulty": "medium" },
-    { "id": "mm-fear",        "prompt": "Name a common fear.", "difficulty": "easy" },
-    { "id": "mm-drink",       "prompt": "Name a drink that is not water.", "difficulty": "easy" },
-    { "id": "mm-slow",        "prompt": "Name something painfully slow.", "difficulty": "medium" },
-    { "id": "mm-gift",        "prompt": "Name a gift nobody wants.", "difficulty": "hard" },
-    { "id": "mm-holiday",     "prompt": "Name something you forget to pack.", "difficulty": "medium" },
-    { "id": "mm-office",      "prompt": "Name something that annoys everybody in an office.", "difficulty": "hard" },
-    { "id": "mm-cricket",     "prompt": "Name something people shout at a cricket match.", "difficulty": "hard" },
-    { "id": "mm-street",      "prompt": "Name a street food.", "difficulty": "medium" },
-    { "id": "mm-sleep",       "prompt": "Name something that stops you sleeping.", "difficulty": "medium" },
-    { "id": "mm-queueing",    "prompt": "Name a bad habit.", "difficulty": "medium" }
+    {
+      "id": "mm-name-something-people-do-every-morning-without-think",
+      "prompt": "Name something people do every morning without thinking.",
+      "category": "everyday",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-people-always-forget-before-leaving-h",
+      "prompt": "Name something people always forget before leaving home.",
+      "category": "everyday",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-everyone-has-in-their-bag",
+      "prompt": "Name something everyone has in their bag.",
+      "category": "everyday",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-chore-nobody-wants-to-do",
+      "prompt": "Name a chore nobody wants to do.",
+      "category": "everyday",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-people-lose-constantly",
+      "prompt": "Name something people lose constantly.",
+      "category": "everyday",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-you-do-when-you-can-t-sleep",
+      "prompt": "Name something you do when you can't sleep.",
+      "category": "everyday",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-people-do-while-waiting-for-a-bus",
+      "prompt": "Name something people do while waiting for a bus.",
+      "category": "everyday",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-reason-to-be-late-that-everyone-believes",
+      "prompt": "Name a reason to be late that everyone believes.",
+      "category": "everyday",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-people-keep-but-never-use",
+      "prompt": "Name something people keep but never use.",
+      "category": "everyday",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-you-check-before-leaving-the-house",
+      "prompt": "Name something you check before leaving the house.",
+      "category": "everyday",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-people-do-the-moment-they-get-home",
+      "prompt": "Name something people do the moment they get home.",
+      "category": "everyday",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-that-is-always-missing-when-you-need-",
+      "prompt": "Name something that is always missing when you need it.",
+      "category": "everyday",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-thing-people-borrow-and-never-return",
+      "prompt": "Name a thing people borrow and never return.",
+      "category": "everyday",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-everyone-has-too-many-of",
+      "prompt": "Name something everyone has too many of.",
+      "category": "everyday",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-you-do-only-when-guests-are-coming",
+      "prompt": "Name something you do only when guests are coming.",
+      "category": "everyday",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-sound-that-instantly-annoys-you",
+      "prompt": "Name a sound that instantly annoys you.",
+      "category": "everyday",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-people-queue-for-patiently",
+      "prompt": "Name something people queue for patiently.",
+      "category": "everyday",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-you-always-mean-to-clean",
+      "prompt": "Name something you always mean to clean.",
+      "category": "everyday",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-thing-people-do-on-a-sunday-afternoon",
+      "prompt": "Name a thing people do on a Sunday afternoon.",
+      "category": "everyday",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-that-makes-a-house-feel-like-home",
+      "prompt": "Name something that makes a house feel like home.",
+      "category": "everyday",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-food-most-people-order-when-they-can-t-decide",
+      "prompt": "Name a food most people order when they can't decide.",
+      "category": "food",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-street-food-everyone-loves",
+      "prompt": "Name a street food everyone loves.",
+      "category": "food",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-people-eat-late-at-night",
+      "prompt": "Name something people eat late at night.",
+      "category": "food",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-dish-your-mother-makes-better-than-anyone",
+      "prompt": "Name a dish your mother makes better than anyone.",
+      "category": "food",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-snack-that-disappears-fastest-at-a-party",
+      "prompt": "Name a snack that disappears fastest at a party.",
+      "category": "food",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-people-put-on-everything",
+      "prompt": "Name something people put on everything.",
+      "category": "food",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-breakfast-almost-everyone-has-had",
+      "prompt": "Name a breakfast almost everyone has had.",
+      "category": "food",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-food-that-is-better-the-next-day",
+      "prompt": "Name a food that is better the next day.",
+      "category": "food",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-drink-people-order-out-of-habit",
+      "prompt": "Name a drink people order out of habit.",
+      "category": "food",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-sweet-served-at-every-celebration",
+      "prompt": "Name a sweet served at every celebration.",
+      "category": "food",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-food-people-say-they-hate-but-eat-anyway",
+      "prompt": "Name a food people say they hate but eat anyway.",
+      "category": "food",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-you-eat-with-your-hands",
+      "prompt": "Name something you eat with your hands.",
+      "category": "food",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-tiffin-item-everyone-knows",
+      "prompt": "Name a tiffin item everyone knows.",
+      "category": "food",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-people-add-too-much-of-while-cooking",
+      "prompt": "Name something people add too much of while cooking.",
+      "category": "food",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-food-that-always-burns-your-mouth",
+      "prompt": "Name a food that always burns your mouth.",
+      "category": "food",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-people-eat-when-they-re-sad",
+      "prompt": "Name something people eat when they're sad.",
+      "category": "food",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-dish-that-starts-an-argument-about-how-to-mak",
+      "prompt": "Name a dish that starts an argument about how to make it.",
+      "category": "food",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-biryani-side-dish",
+      "prompt": "Name a biryani side dish.",
+      "category": "food",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-people-drink-in-the-morning",
+      "prompt": "Name something people drink in the morning.",
+      "category": "food",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-fruit-people-rarely-buy",
+      "prompt": "Name a fruit people rarely buy.",
+      "category": "food",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-popular-telugu-hero",
+      "prompt": "Name a popular Telugu hero.",
+      "category": "telugu_culture",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-telugu-actress-everyone-knows",
+      "prompt": "Name a Telugu actress everyone knows.",
+      "category": "telugu_culture",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-telugu-film-everyone-has-watched",
+      "prompt": "Name a Telugu film everyone has watched.",
+      "category": "telugu_culture",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-telugu-dialogue-everyone-can-quote",
+      "prompt": "Name a Telugu dialogue everyone can quote.",
+      "category": "telugu_culture",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-telugu-festival",
+      "prompt": "Name a Telugu festival.",
+      "category": "telugu_culture",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-telugu-dish-served-at-weddings",
+      "prompt": "Name a Telugu dish served at weddings.",
+      "category": "telugu_culture",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-telugu-film-director",
+      "prompt": "Name a Telugu film director.",
+      "category": "telugu_culture",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-you-see-at-every-telugu-wedding",
+      "prompt": "Name something you see at every Telugu wedding.",
+      "category": "telugu_culture",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-telugu-song-everyone-dances-to",
+      "prompt": "Name a Telugu song everyone dances to.",
+      "category": "telugu_culture",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-telugu-word-non-telugu-friends-always-learn-f",
+      "prompt": "Name a Telugu word non-Telugu friends always learn first.",
+      "category": "telugu_culture",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-place-in-hyderabad-everyone-visits",
+      "prompt": "Name a place in Hyderabad everyone visits.",
+      "category": "telugu_culture",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-telugu-comedian",
+      "prompt": "Name a Telugu comedian.",
+      "category": "telugu_culture",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-elders-say-in-every-telugu-family",
+      "prompt": "Name something elders say in every Telugu family.",
+      "category": "telugu_culture",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-telugu-movie-villain",
+      "prompt": "Name a Telugu movie villain.",
+      "category": "telugu_culture",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-telugu-sweet",
+      "prompt": "Name a Telugu sweet.",
+      "category": "telugu_culture",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-that-happens-at-every-indian-wedding",
+      "prompt": "Name something that happens at every Indian wedding.",
+      "category": "indian_culture",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-an-indian-festival-everyone-celebrates",
+      "prompt": "Name an Indian festival everyone celebrates.",
+      "category": "indian_culture",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-indian-parents-always-say",
+      "prompt": "Name something Indian parents always say.",
+      "category": "indian_culture",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-reason-relatives-call-you",
+      "prompt": "Name a reason relatives call you.",
+      "category": "indian_culture",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-people-do-during-a-power-cut",
+      "prompt": "Name something people do during a power cut.",
+      "category": "indian_culture",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-an-indian-snack-sold-on-trains",
+      "prompt": "Name an Indian snack sold on trains.",
+      "category": "indian_culture",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-every-indian-household-has-in-the-kit",
+      "prompt": "Name something every Indian household has in the kitchen.",
+      "category": "indian_culture",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-question-every-relative-asks",
+      "prompt": "Name a question every relative asks.",
+      "category": "indian_culture",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-people-bargain-for",
+      "prompt": "Name something people bargain for.",
+      "category": "indian_culture",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-an-indian-city-everyone-wants-to-visit",
+      "prompt": "Name an Indian city everyone wants to visit.",
+      "category": "indian_culture",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-people-do-before-an-exam",
+      "prompt": "Name something people do before an exam.",
+      "category": "indian_culture",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-thing-found-in-every-indian-fridge",
+      "prompt": "Name a thing found in every Indian fridge.",
+      "category": "indian_culture",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-guests-are-always-offered",
+      "prompt": "Name something guests are always offered.",
+      "category": "indian_culture",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-reason-for-a-family-whatsapp-group-argument",
+      "prompt": "Name a reason for a family WhatsApp group argument.",
+      "category": "indian_culture",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-people-say-when-the-food-is-too-spicy",
+      "prompt": "Name something people say when the food is too spicy.",
+      "category": "indian_culture",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-an-actor-everyone-likes",
+      "prompt": "Name an actor everyone likes.",
+      "category": "movies",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-movie-you-have-watched-more-than-three-times",
+      "prompt": "Name a movie you have watched more than three times.",
+      "category": "movies",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-film-that-made-everyone-cry",
+      "prompt": "Name a film that made everyone cry.",
+      "category": "movies",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-movie-villain-everyone-remembers",
+      "prompt": "Name a movie villain everyone remembers.",
+      "category": "movies",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-film-franchise-with-too-many-sequels",
+      "prompt": "Name a film franchise with too many sequels.",
+      "category": "movies",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-that-always-happens-in-an-action-movi",
+      "prompt": "Name something that always happens in an action movie.",
+      "category": "movies",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-movie-everyone-quotes",
+      "prompt": "Name a movie everyone quotes.",
+      "category": "movies",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-film-you-would-watch-again-right-now",
+      "prompt": "Name a film you would watch again right now.",
+      "category": "movies",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-genre-people-say-they-hate",
+      "prompt": "Name a genre people say they hate.",
+      "category": "movies",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-people-do-at-the-cinema",
+      "prompt": "Name something people do at the cinema.",
+      "category": "movies",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-an-actor-who-is-in-too-many-films",
+      "prompt": "Name an actor who is in too many films.",
+      "category": "movies",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-movie-with-a-famous-twist",
+      "prompt": "Name a movie with a famous twist.",
+      "category": "movies",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-in-every-romantic-film",
+      "prompt": "Name something in every romantic film.",
+      "category": "movies",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-film-that-is-better-than-the-book",
+      "prompt": "Name a film that is better than the book.",
+      "category": "movies",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-song-from-a-film-everyone-knows",
+      "prompt": "Name a song from a film everyone knows.",
+      "category": "movies",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-people-always-overpack",
+      "prompt": "Name something people always overpack.",
+      "category": "travel",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-place-everyone-wants-to-visit-once",
+      "prompt": "Name a place everyone wants to visit once.",
+      "category": "travel",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-that-goes-wrong-on-every-trip",
+      "prompt": "Name something that goes wrong on every trip.",
+      "category": "travel",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-thing-people-photograph-too-much",
+      "prompt": "Name a thing people photograph too much.",
+      "category": "travel",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-you-do-on-a-long-train-journey",
+      "prompt": "Name something you do on a long train journey.",
+      "category": "travel",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-reason-a-trip-gets-cancelled",
+      "prompt": "Name a reason a trip gets cancelled.",
+      "category": "travel",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-people-buy-as-a-souvenir",
+      "prompt": "Name something people buy as a souvenir.",
+      "category": "travel",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-the-worst-part-of-an-airport",
+      "prompt": "Name the worst part of an airport.",
+      "category": "travel",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-place-people-go-for-a-weekend-trip",
+      "prompt": "Name a place people go for a weekend trip.",
+      "category": "travel",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-you-forget-on-holiday",
+      "prompt": "Name something you forget on holiday.",
+      "category": "travel",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-hill-station-everyone-knows",
+      "prompt": "Name a hill station everyone knows.",
+      "category": "travel",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-people-argue-about-while-planning-a-t",
+      "prompt": "Name something people argue about while planning a trip.",
+      "category": "travel",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-an-excuse-for-not-doing-homework",
+      "prompt": "Name an excuse for not doing homework.",
+      "category": "school_college",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-subject-nobody-enjoyed",
+      "prompt": "Name a subject nobody enjoyed.",
+      "category": "school_college",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-every-classroom-has",
+      "prompt": "Name something every classroom has.",
+      "category": "school_college",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-teacher-type-every-school-has",
+      "prompt": "Name a teacher type every school has.",
+      "category": "school_college",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-students-do-the-night-before-an-exam",
+      "prompt": "Name something students do the night before an exam.",
+      "category": "school_college",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-people-miss-about-college",
+      "prompt": "Name something people miss about college.",
+      "category": "school_college",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-thing-that-happens-in-every-hostel",
+      "prompt": "Name a thing that happens in every hostel.",
+      "category": "school_college",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-written-on-every-school-bench",
+      "prompt": "Name something written on every school bench.",
+      "category": "school_college",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-reason-to-bunk-a-class",
+      "prompt": "Name a reason to bunk a class.",
+      "category": "school_college",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-in-every-college-canteen",
+      "prompt": "Name something in every college canteen.",
+      "category": "school_college",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-school-event-everyone-remembers",
+      "prompt": "Name a school event everyone remembers.",
+      "category": "school_college",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-you-were-punished-for-at-school",
+      "prompt": "Name something you were punished for at school.",
+      "category": "school_college",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-people-say-in-every-meeting",
+      "prompt": "Name something people say in every meeting.",
+      "category": "work",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-reason-to-leave-work-early",
+      "prompt": "Name a reason to leave work early.",
+      "category": "work",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-every-office-has-too-much-of",
+      "prompt": "Name something every office has too much of.",
+      "category": "work",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-the-worst-part-of-a-monday",
+      "prompt": "Name the worst part of a Monday.",
+      "category": "work",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-people-do-instead-of-working",
+      "prompt": "Name something people do instead of working.",
+      "category": "work",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-type-of-colleague-every-office-has",
+      "prompt": "Name a type of colleague every office has.",
+      "category": "work",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-people-complain-about-at-work",
+      "prompt": "Name something people complain about at work.",
+      "category": "work",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-thing-that-always-breaks-in-an-office",
+      "prompt": "Name a thing that always breaks in an office.",
+      "category": "work",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-an-email-phrase-everyone-uses",
+      "prompt": "Name an email phrase everyone uses.",
+      "category": "work",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-people-do-on-their-last-day-at-a-job",
+      "prompt": "Name something people do on their last day at a job.",
+      "category": "work",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-reason-for-a-long-weekend",
+      "prompt": "Name a reason for a long weekend.",
+      "category": "work",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-that-makes-a-meeting-pointless",
+      "prompt": "Name something that makes a meeting pointless.",
+      "category": "work",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-friends-always-argue-about",
+      "prompt": "Name something friends always argue about.",
+      "category": "friendship",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-friend-everyone-has-in-their-group",
+      "prompt": "Name a friend everyone has in their group.",
+      "category": "friendship",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-friends-do-at-2am",
+      "prompt": "Name something friends do at 2am.",
+      "category": "friendship",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-reason-a-plan-gets-cancelled",
+      "prompt": "Name a reason a plan gets cancelled.",
+      "category": "friendship",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-you-only-tell-your-closest-friend",
+      "prompt": "Name something you only tell your closest friend.",
+      "category": "friendship",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-friends-borrow-and-forget",
+      "prompt": "Name something friends borrow and forget.",
+      "category": "friendship",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-thing-every-group-chat-has",
+      "prompt": "Name a thing every group chat has.",
+      "category": "friendship",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-friends-promise-but-never-do",
+      "prompt": "Name something friends promise but never do.",
+      "category": "friendship",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-place-friends-always-meet",
+      "prompt": "Name a place friends always meet.",
+      "category": "friendship",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-you-do-when-a-friend-is-upset",
+      "prompt": "Name something you do when a friend is upset.",
+      "category": "friendship",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-the-first-person-you-call-with-good-news",
+      "prompt": "Name the first person you call with good news.",
+      "category": "friendship",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-friends-tease-you-about-forever",
+      "prompt": "Name something friends tease you about forever.",
+      "category": "friendship",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-embarrassing-that-happens-to-everyone",
+      "prompt": "Name something embarrassing that happens to everyone.",
+      "category": "funny",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-lie-everyone-tells",
+      "prompt": "Name a lie everyone tells.",
+      "category": "funny",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-people-pretend-to-understand",
+      "prompt": "Name something people pretend to understand.",
+      "category": "funny",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-skill-people-claim-to-have",
+      "prompt": "Name a skill people claim to have.",
+      "category": "funny",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-you-do-when-nobody-is-watching",
+      "prompt": "Name something you do when nobody is watching.",
+      "category": "funny",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-people-say-when-they-re-caught-lying",
+      "prompt": "Name something people say when they're caught lying.",
+      "category": "funny",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-bad-habit-almost-everyone-has",
+      "prompt": "Name a bad habit almost everyone has.",
+      "category": "funny",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-that-is-funnier-than-it-should-be",
+      "prompt": "Name something that is funnier than it should be.",
+      "category": "funny",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-people-do-badly-but-confidently",
+      "prompt": "Name something people do badly but confidently.",
+      "category": "funny",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-thing-people-say-when-they-forget-a-name",
+      "prompt": "Name a thing people say when they forget a name.",
+      "category": "funny",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-you-blame-on-someone-else",
+      "prompt": "Name something you blame on someone else.",
+      "category": "funny",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-an-excuse-for-not-answering-a-call",
+      "prompt": "Name an excuse for not answering a call.",
+      "category": "funny",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-the-first-thing-you-would-buy-if-you-won-a-lott",
+      "prompt": "Name the first thing you would buy if you won a lottery.",
+      "category": "hypothetical",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-superpower-you-would-actually-use-daily",
+      "prompt": "Name a superpower you would actually use daily.",
+      "category": "hypothetical",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-one-thing-to-take-to-a-desert-island",
+      "prompt": "Name one thing to take to a desert island.",
+      "category": "hypothetical",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-job-you-could-never-do",
+      "prompt": "Name a job you could never do.",
+      "category": "hypothetical",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-country-you-would-move-to",
+      "prompt": "Name a country you would move to.",
+      "category": "hypothetical",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-you-would-change-about-yourself",
+      "prompt": "Name something you would change about yourself.",
+      "category": "hypothetical",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-person-from-history-you-would-meet",
+      "prompt": "Name a person from history you would meet.",
+      "category": "hypothetical",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-you-would-do-with-one-extra-hour-ever",
+      "prompt": "Name something you would do with one extra hour every day.",
+      "category": "hypothetical",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-you-would-never-do-for-money",
+      "prompt": "Name something you would never do for money.",
+      "category": "hypothetical",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-an-animal-you-would-keep-as-a-pet",
+      "prompt": "Name an animal you would keep as a pet.",
+      "category": "hypothetical",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-you-would-take-from-a-burning-house",
+      "prompt": "Name something you would take from a burning house.",
+      "category": "hypothetical",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-year-you-would-travel-back-to",
+      "prompt": "Name a year you would travel back to.",
+      "category": "hypothetical",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-better-in-the-rain",
+      "prompt": "Name something better in the rain.",
+      "category": "preferences",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-overrated",
+      "prompt": "Name something overrated.",
+      "category": "preferences",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-underrated",
+      "prompt": "Name something underrated.",
+      "category": "preferences",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-colour-that-suits-everyone",
+      "prompt": "Name a colour that suits everyone.",
+      "category": "preferences",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-season-everyone-prefers",
+      "prompt": "Name a season everyone prefers.",
+      "category": "preferences",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-worth-paying-extra-for",
+      "prompt": "Name something worth paying extra for.",
+      "category": "preferences",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-you-refuse-to-share",
+      "prompt": "Name something you refuse to share.",
+      "category": "preferences",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-small-thing-that-makes-a-bad-day-better",
+      "prompt": "Name a small thing that makes a bad day better.",
+      "category": "preferences",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-everyone-should-try-once",
+      "prompt": "Name something everyone should try once.",
+      "category": "preferences",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-smell-everyone-likes",
+      "prompt": "Name a smell everyone likes.",
+      "category": "preferences",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-sound-that-is-instantly-calming",
+      "prompt": "Name a sound that is instantly calming.",
+      "category": "preferences",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-people-are-unreasonably-loyal-to",
+      "prompt": "Name something people are unreasonably loyal to.",
+      "category": "preferences",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-cricketer-everyone-admires",
+      "prompt": "Name a cricketer everyone admires.",
+      "category": "cricket_sports",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-that-happens-in-every-cricket-match",
+      "prompt": "Name something that happens in every cricket match.",
+      "category": "cricket_sports",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-an-ipl-team",
+      "prompt": "Name an IPL team.",
+      "category": "cricket_sports",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-cricket-shot-everyone-knows",
+      "prompt": "Name a cricket shot everyone knows.",
+      "category": "cricket_sports",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-people-shout-at-a-cricket-match",
+      "prompt": "Name something people shout at a cricket match.",
+      "category": "cricket_sports",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-sport-that-is-boring-to-watch",
+      "prompt": "Name a sport that is boring to watch.",
+      "category": "cricket_sports",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-cricketer-with-a-famous-celebration",
+      "prompt": "Name a cricketer with a famous celebration.",
+      "category": "cricket_sports",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-fans-do-when-their-team-loses",
+      "prompt": "Name something fans do when their team loses.",
+      "category": "cricket_sports",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-stadium-everyone-has-heard-of",
+      "prompt": "Name a stadium everyone has heard of.",
+      "category": "cricket_sports",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-sport-people-play-in-the-street",
+      "prompt": "Name a sport people play in the street.",
+      "category": "cricket_sports",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-an-app-on-your-phone-right-now",
+      "prompt": "Name an app on your phone right now.",
+      "category": "technology",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-the-first-thing-you-do-when-the-wifi-dies",
+      "prompt": "Name the first thing you do when the wifi dies.",
+      "category": "technology",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-people-always-forget-the-password-to",
+      "prompt": "Name something people always forget the password to.",
+      "category": "technology",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-an-app-people-open-without-thinking",
+      "prompt": "Name an app people open without thinking.",
+      "category": "technology",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-everyone-googles",
+      "prompt": "Name something everyone googles.",
+      "category": "technology",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-notification-everyone-ignores",
+      "prompt": "Name a notification everyone ignores.",
+      "category": "technology",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-phones-have-replaced",
+      "prompt": "Name something phones have replaced.",
+      "category": "technology",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-website-everyone-has-visited",
+      "prompt": "Name a website everyone has visited.",
+      "category": "technology",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-people-do-while-charging-their-phone",
+      "prompt": "Name something people do while charging their phone.",
+      "category": "technology",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-tech-habit-that-annoys-everyone",
+      "prompt": "Name a tech habit that annoys everyone.",
+      "category": "technology",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-game-everyone-played-as-a-child",
+      "prompt": "Name a game everyone played as a child.",
+      "category": "childhood",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-cartoon-everyone-watched",
+      "prompt": "Name a cartoon everyone watched.",
+      "category": "childhood",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-children-are-afraid-of",
+      "prompt": "Name something children are afraid of.",
+      "category": "childhood",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-childhood-snack",
+      "prompt": "Name a childhood snack.",
+      "category": "childhood",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-you-did-that-got-you-in-trouble",
+      "prompt": "Name something you did that got you in trouble.",
+      "category": "childhood",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-every-child-wants-to-be-when-they-gro",
+      "prompt": "Name something every child wants to be when they grow up.",
+      "category": "childhood",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-toy-everyone-had",
+      "prompt": "Name a toy everyone had.",
+      "category": "childhood",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-you-believed-as-a-kid",
+      "prompt": "Name something you believed as a kid.",
+      "category": "childhood",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-place-you-went-every-summer-holiday",
+      "prompt": "Name a place you went every summer holiday.",
+      "category": "childhood",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-adults-said-that-made-no-sense",
+      "prompt": "Name something adults said that made no sense.",
+      "category": "childhood",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-that-happens-at-every-family-gatherin",
+      "prompt": "Name something that happens at every family gathering.",
+      "category": "festivals_family",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-festival-food",
+      "prompt": "Name a festival food.",
+      "category": "festivals_family",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-people-buy-for-diwali",
+      "prompt": "Name something people buy for Diwali.",
+      "category": "festivals_family",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-family-member-everyone-has",
+      "prompt": "Name a family member everyone has.",
+      "category": "festivals_family",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-people-do-during-a-festival",
+      "prompt": "Name something people do during a festival.",
+      "category": "festivals_family",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-gift-people-give-when-they-have-no-idea",
+      "prompt": "Name a gift people give when they have no idea.",
+      "category": "festivals_family",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-children-look-forward-to-at-festivals",
+      "prompt": "Name something children look forward to at festivals.",
+      "category": "festivals_family",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-a-reason-a-family-photo-takes-forever",
+      "prompt": "Name a reason a family photo takes forever.",
+      "category": "festivals_family",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-decorated-during-a-festival",
+      "prompt": "Name something decorated during a festival.",
+      "category": "festivals_family",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-families-argue-about-on-holidays",
+      "prompt": "Name something families argue about on holidays.",
+      "category": "festivals_family",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-associated-with-the-colour-red",
+      "prompt": "Name something associated with the colour red.",
+      "category": "association",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-found-in-every-hospital",
+      "prompt": "Name something found in every hospital.",
+      "category": "association",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-you-see-at-a-railway-station",
+      "prompt": "Name something you see at a railway station.",
+      "category": "association",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-round",
+      "prompt": "Name something round.",
+      "category": "association",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-loud",
+      "prompt": "Name something loud.",
+      "category": "association",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-cold",
+      "prompt": "Name something cold.",
+      "category": "association",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-found-in-a-wallet",
+      "prompt": "Name something found in a wallet.",
+      "category": "association",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-heavier-than-it-looks",
+      "prompt": "Name something heavier than it looks.",
+      "category": "association",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-slow",
+      "prompt": "Name something slow.",
+      "category": "association",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-sharp",
+      "prompt": "Name something sharp.",
+      "category": "association",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-that-comes-in-pairs",
+      "prompt": "Name something that comes in pairs.",
+      "category": "association",
+      "difficulty": "easy"
+    },
+    {
+      "id": "mm-name-something-people-count",
+      "prompt": "Name something people count.",
+      "category": "association",
+      "difficulty": "easy"
+    }
   ]
 }

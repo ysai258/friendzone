@@ -9,7 +9,15 @@ import {
   type Result,
   type SettingField,
 } from '@friendzone/shared'
-import { expectItems, type ContentRequest, type EmojiQuestion } from '../content.ts'
+import {
+  expectItems,
+  MOVIE_LANGUAGES,
+  MOVIE_LANGUAGE_LABELS,
+  type ContentRequest,
+  type EmojiQuestion,
+  type MovieLanguage,
+} from '../content.ts'
+import { pickFresh } from '../selection.ts'
 import { placementBonus, speedScore } from '../scoring.ts'
 import {
   defineGame,
@@ -71,10 +79,20 @@ interface EmojiState {
   questionSeconds: number
 }
 
+/** Telugu and Hindi on by default: this is built for a friend group in India,
+ *  and an English-first pool was the thing that made it feel like someone
+ *  else's game. Every language can be switched on. */
+const DEFAULT_LANGUAGES: MovieLanguage[] = ['telugu', 'hindi']
+
 const settingsSchema = z.strictObject({
   questions: z.int().min(3).max(15).default(6),
   seconds: z.int().min(15).max(90).default(30),
   difficulty: z.enum(['easy', 'medium', 'hard', 'mixed']).default('mixed'),
+  languages: z
+    .array(z.enum(MOVIE_LANGUAGES))
+    .default(DEFAULT_LANGUAGES)
+    // An empty selection is a slip, not a request for an empty pool.
+    .transform((values) => (values.length === 0 ? DEFAULT_LANGUAGES : [...new Set(values)])),
 })
 
 type EmojiSettings = z.infer<typeof settingsSchema>
@@ -82,6 +100,14 @@ type EmojiSettings = z.infer<typeof settingsSchema>
 const settingsSpec: SettingField[] = [
   { key: 'questions', label: 'Movies', kind: 'int', min: 3, max: 15, step: 1, default: 6 },
   { key: 'seconds', label: 'Time per movie', kind: 'int', min: 15, max: 90, step: 5, default: 30, unit: 's' },
+  {
+    key: 'languages',
+    label: 'Movie languages',
+    help: 'Pick as many as you like.',
+    kind: 'multi',
+    default: DEFAULT_LANGUAGES,
+    options: MOVIE_LANGUAGES.map((value) => ({ value, label: MOVIE_LANGUAGE_LABELS[value] })),
+  },
   {
     key: 'difficulty',
     label: 'Difficulty',
@@ -158,19 +184,25 @@ export const emojiMovie: ErasedGameDefinition = defineGame<EmojiState, EmojiSett
 
   contentRequest: (settings): ContentRequest => ({
     kind: 'emoji',
-    count: settings.questions,
+    // Ask for far more than one game needs. The pool that comes back is what
+    // the draw avoids repeating from, so a wider pool means fresher rounds.
+    count: Math.max(settings.questions * 8, 60),
     difficulty: settings.difficulty,
     category: null,
+    languages: settings.languages,
   }),
 
   createGame(ctx: CreateContext<EmojiSettings>): EmojiState {
     const pool = expectItems(ctx.content, 'emoji')
     const rng = createRng(ctx.seed, 'emoji-movie', ctx.sessionId)
+    // The room passes what it has already dealt; those go to the back of the
+    // queue rather than being drawn again.
+    const drawn = pickFresh(pool, { count: ctx.settings.questions, recentIds: ctx.recentContentIds, rng })
     return {
       sessionId: ctx.sessionId,
       phase: 'COUNTDOWN',
       roundIndex: 0,
-      questions: rng.sample(pool, ctx.settings.questions),
+      questions: drawn.items,
       phaseStartedAt: ctx.now,
       phaseEndsAt: ctx.now + COUNTDOWN_MS,
       rounds: {},
@@ -182,6 +214,7 @@ export const emojiMovie: ErasedGameDefinition = defineGame<EmojiState, EmojiSett
   getDeadline: (state) => (state.phase === 'FINISHED' ? null : state.phaseEndsAt),
   getPhase: (state) => state.phase,
   isGameOver: (state) => state.phase === 'FINISHED',
+  usedContentIds: (state) => state.questions.map((q) => q.id),
 
   validateAction: (state, playerId, action, ctx) => validate(state, playerId, action, ctx.now),
 
@@ -293,6 +326,11 @@ export const emojiMovie: ErasedGameDefinition = defineGame<EmojiState, EmojiSett
       if (question !== null) {
         view['answer'] = question.title
         view['year'] = question.year
+        view['language'] = question.language
+        // The label travels with the view: the web app depends on `shared`
+        // only, and a reveal that says "Telugu" is how a room sees the
+        // language filter actually working.
+        view['languageLabel'] = MOVIE_LANGUAGE_LABELS[question.language]
       }
       view['results'] = Object.entries(state.rounds)
         .map(([playerId, r]) => ({

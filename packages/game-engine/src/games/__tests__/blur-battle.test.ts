@@ -15,6 +15,7 @@ function newGame(settings: Record<string, unknown> = {}) {
     sessionId: 'sess-1',
     settings: parsed,
     content: imagePack(10),
+    recentContentIds: [],
   })
 }
 
@@ -74,13 +75,13 @@ describe('blur battle / lifecycle', () => {
 
   it('draws the same questions for the same seed and different ones otherwise', () => {
     const a = def.createGame({
-      now: T0, seed: 'alpha', players: roster, sessionId: 's', settings: def.settingsSchema.parse({ questions: 3 }), content: imagePack(10),
+      now: T0, seed: 'alpha', players: roster, sessionId: 's', settings: def.settingsSchema.parse({ questions: 3 }), content: imagePack(10), recentContentIds: [],
     })
     const b = def.createGame({
-      now: T0, seed: 'alpha', players: roster, sessionId: 's', settings: def.settingsSchema.parse({ questions: 3 }), content: imagePack(10),
+      now: T0, seed: 'alpha', players: roster, sessionId: 's', settings: def.settingsSchema.parse({ questions: 3 }), content: imagePack(10), recentContentIds: [],
     })
     const c = def.createGame({
-      now: T0, seed: 'beta', players: roster, sessionId: 's', settings: def.settingsSchema.parse({ questions: 3 }), content: imagePack(10),
+      now: T0, seed: 'beta', players: roster, sessionId: 's', settings: def.settingsSchema.parse({ questions: 3 }), content: imagePack(10), recentContentIds: [],
     })
     const ids = (s: unknown) => (def.getPublicState(s, null, viewCtx(T0, roster)).view)
     expect(JSON.stringify(a)).toBe(JSON.stringify(b))

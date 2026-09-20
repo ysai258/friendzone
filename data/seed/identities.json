@@ -1,127 +1,2129 @@
 {
-  "$comment": "Who Am I? cards. Hints run from vague to nearly giving it away, and are drip-fed one at a time at the cost of a turn. Aliases cover the names people actually type.",
+  "$comment": "Who Am I? people, grouped into the categories a game draws from. One game uses exactly one category, so that 'am I an actor?' actually narrows something down. Names are chosen for recognition inside that category rather than to inflate the count.",
   "items": [
-    { "id": "id-cleopatra", "name": "Cleopatra", "category": "history", "difficulty": "easy", "aliases": ["Cleopatra VII"],
-      "hints": ["I lived a very long time ago.", "I ruled a country along a famous river.", "Rome was extremely interested in my kingdom."] },
-    { "id": "id-gandhi", "name": "Mahatma Gandhi", "category": "history", "difficulty": "easy", "aliases": ["Gandhi", "Mohandas Gandhi"],
-      "hints": ["I am known for what I refused to do.", "I walked a very long way to the sea over a tax.", "I am on every note in India."] },
-    { "id": "id-einstein", "name": "Albert Einstein", "category": "science", "difficulty": "easy", "aliases": ["Einstein"],
-      "hints": ["My hair is as famous as my work.", "I rewrote what people thought about time.", "There is an equation with my name on it."] },
-    { "id": "id-marie-curie", "name": "Marie Curie", "category": "science", "difficulty": "medium", "aliases": ["Curie"],
-      "hints": ["I won more than one Nobel Prize.", "I worked with things that glowed.", "My notebooks are still too dangerous to handle."] },
-    { "id": "id-ada", "name": "Ada Lovelace", "category": "science", "difficulty": "hard", "aliases": ["Ada Byron", "Augusta Ada King"],
-      "hints": ["My father was a famous poet.", "I wrote about a machine that was never built.", "Some call me the first programmer."] },
-    { "id": "id-newton", "name": "Isaac Newton", "category": "science", "difficulty": "easy", "aliases": ["Newton"],
-      "hints": ["There is a story about me and a tree.", "I argued with Leibniz about who was first.", "Forces are measured in my name."] },
-    { "id": "id-darwin", "name": "Charles Darwin", "category": "science", "difficulty": "medium", "aliases": ["Darwin"],
-      "hints": ["I took a very long boat trip.", "Some islands changed my mind about everything.", "I made a lot of people angry about finches."] },
-    { "id": "id-tesla", "name": "Nikola Tesla", "category": "science", "difficulty": "medium", "aliases": ["Tesla"],
-      "hints": ["I had a long argument about electricity.", "A car company borrowed my name.", "I preferred alternating current."] },
-    { "id": "id-frida", "name": "Frida Kahlo", "category": "art", "difficulty": "medium", "aliases": ["Kahlo"],
-      "hints": ["I painted myself more than anything else.", "I am from Mexico.", "My eyebrows are part of my signature."] },
-    { "id": "id-van-gogh", "name": "Vincent van Gogh", "category": "art", "difficulty": "easy", "aliases": ["Van Gogh"],
-      "hints": ["I sold almost nothing while alive.", "I painted a very famous night sky.", "I am missing part of an ear."] },
-    { "id": "id-picasso", "name": "Pablo Picasso", "category": "art", "difficulty": "easy", "aliases": ["Picasso"],
-      "hints": ["I put both eyes on the same side of a face.", "I helped invent a whole movement.", "I painted a town being bombed."] },
-    { "id": "id-shakespeare", "name": "William Shakespeare", "category": "literature", "difficulty": "easy", "aliases": ["Shakespeare"],
-      "hints": ["I wrote a great deal about Danish princes.", "People still argue about whether I existed.", "I invented words you use every day."] },
-    { "id": "id-sherlock", "name": "Sherlock Holmes", "category": "fiction", "difficulty": "easy", "aliases": ["Sherlock"],
-      "hints": ["I am not real, but people write to me.", "I have a doctor for a friend.", "I live on a famous London street."] },
-    { "id": "id-hermione", "name": "Hermione Granger", "category": "fiction", "difficulty": "medium", "aliases": ["Hermione"],
-      "hints": ["I read more than my friends.", "I went to a school with moving staircases.", "I fixed my own teeth with magic."] },
-    { "id": "id-darth", "name": "Darth Vader", "category": "fiction", "difficulty": "easy", "aliases": ["Vader", "Anakin Skywalker"],
-      "hints": ["You can hear me before you see me.", "I have a complicated family situation.", "I wear a lot of black."] },
-    { "id": "id-batman", "name": "Batman", "category": "fiction", "difficulty": "easy", "aliases": ["Bruce Wayne"],
-      "hints": ["I am very rich and very sad.", "I work nights.", "My city has a signal for me."] },
-    { "id": "id-bond", "name": "James Bond", "category": "fiction", "difficulty": "easy", "aliases": ["007", "Bond"],
-      "hints": ["I am particular about my drinks.", "I have a number.", "Several people have played me."] },
-    { "id": "id-gollum", "name": "Gollum", "category": "fiction", "difficulty": "medium", "aliases": ["Smeagol"],
-      "hints": ["I lost something I loved.", "I talk to myself constantly.", "I call it precious."] },
-    { "id": "id-serena", "name": "Serena Williams", "category": "sport", "difficulty": "easy", "aliases": ["Serena"],
-      "hints": ["I play a sport with a net.", "My sister is also very good at it.", "I have more than twenty major titles."] },
-    { "id": "id-tendulkar", "name": "Sachin Tendulkar", "category": "sport", "difficulty": "medium", "aliases": ["Sachin"],
-      "hints": ["I played a sport with a bat for 24 years.", "A whole country stopped to watch me.", "I have a hundred hundreds."] },
-    { "id": "id-messi", "name": "Lionel Messi", "category": "sport", "difficulty": "easy", "aliases": ["Messi"],
-      "hints": ["I am quite short for my job.", "I am from Argentina.", "I finally won the World Cup."] },
-    { "id": "id-ali", "name": "Muhammad Ali", "category": "sport", "difficulty": "medium", "aliases": ["Cassius Clay", "Ali"],
-      "hints": ["I talked as well as I fought.", "I changed my name.", "Float like a butterfly."] },
-    { "id": "id-bolt", "name": "Usain Bolt", "category": "sport", "difficulty": "medium", "aliases": ["Bolt"],
-      "hints": ["My job takes about ten seconds.", "I am from Jamaica.", "I celebrate with a pose like a bow."] },
-    { "id": "id-dhoni", "name": "MS Dhoni", "category": "sport", "difficulty": "hard", "aliases": ["Mahendra Singh Dhoni", "Dhoni"],
-      "hints": ["I kept wickets and captained.", "I am known for staying calm.", "I finished a World Cup with a six."] },
-    { "id": "id-mandela", "name": "Nelson Mandela", "category": "history", "difficulty": "medium", "aliases": ["Mandela"],
-      "hints": ["I spent 27 years somewhere I did not choose.", "I became president afterwards.", "I am from South Africa."] },
-    { "id": "id-lakshmibai", "name": "Rani Lakshmibai", "category": "history", "difficulty": "hard", "aliases": ["Lakshmibai", "Rani of Jhansi"],
-      "hints": ["I fought on horseback.", "I ruled a princely state.", "I refused to give up Jhansi."] },
-    { "id": "id-ambedkar", "name": "B R Ambedkar", "category": "history", "difficulty": "hard", "aliases": ["Ambedkar", "Bhimrao Ambedkar"],
-      "hints": ["I studied a very great deal.", "I helped write a constitution.", "I fought caste all my life."] },
-    { "id": "id-kalam", "name": "APJ Abdul Kalam", "category": "history", "difficulty": "medium", "aliases": ["Abdul Kalam", "Kalam"],
-      "hints": ["I worked with rockets.", "I later took a much more ceremonial job.", "Students loved me."] },
-    { "id": "id-cleo-napoleon", "name": "Napoleon Bonaparte", "category": "history", "difficulty": "medium", "aliases": ["Napoleon"],
-      "hints": ["I was shorter in legend than in life.", "I lost badly in Russia.", "I ended up on an island. Twice."] },
-    { "id": "id-joan", "name": "Joan of Arc", "category": "history", "difficulty": "hard", "aliases": ["Jeanne d'Arc"],
-      "hints": ["I was a teenager with an army.", "I said I heard voices.", "France made me a saint eventually."] },
-    { "id": "id-beyonce", "name": "Beyonce", "category": "music", "difficulty": "easy", "aliases": ["Beyonce Knowles"],
-      "hints": ["I was in a group before I was alone.", "I release albums without warning.", "My fans are a hive."] },
-    { "id": "id-freddie", "name": "Freddie Mercury", "category": "music", "difficulty": "medium", "aliases": ["Freddie"],
-      "hints": ["I had a four-octave range.", "I fronted a band named after royalty.", "I once made a stadium sing back at me."] },
-    { "id": "id-lata", "name": "Lata Mangeshkar", "category": "music", "difficulty": "hard", "aliases": ["Lata"],
-      "hints": ["I sang for other people on screen.", "My career lasted seven decades.", "They called me the nightingale."] },
-    { "id": "id-rahman", "name": "A R Rahman", "category": "music", "difficulty": "medium", "aliases": ["AR Rahman", "Rahman"],
-      "hints": ["I compose more than I sing.", "I won an Oscar for a song about a slum.", "I am from Chennai."] },
-    { "id": "id-bob-marley", "name": "Bob Marley", "category": "music", "difficulty": "medium", "aliases": ["Marley"],
-      "hints": ["I am from Jamaica.", "My music is a genre in itself.", "Everything is going to be alright."] },
-    { "id": "id-oprah", "name": "Oprah Winfrey", "category": "media", "difficulty": "medium", "aliases": ["Oprah"],
-      "hints": ["I ask people questions on television.", "I had a very famous book club.", "You get a car."] },
-    { "id": "id-chaplin", "name": "Charlie Chaplin", "category": "film", "difficulty": "medium", "aliases": ["Chaplin"],
-      "hints": ["I said very little on screen.", "I had a distinctive walk and a cane.", "My moustache became unfortunate later."] },
-    { "id": "id-hitchcock", "name": "Alfred Hitchcock", "category": "film", "difficulty": "hard", "aliases": ["Hitchcock"],
-      "hints": ["I appear briefly in my own work.", "I made people afraid of showers.", "They call me the master of suspense."] },
-    { "id": "id-rajinikanth", "name": "Rajinikanth", "category": "film", "difficulty": "medium", "aliases": ["Rajini", "Thalaivar"],
-      "hints": ["I have a very particular way with a cigarette.", "I was a bus conductor first.", "There are jokes about what I can do."] },
-    { "id": "id-amitabh", "name": "Amitabh Bachchan", "category": "film", "difficulty": "medium", "aliases": ["Amitabh", "Big B", "Bachchan"],
-      "hints": ["My voice is unmistakable.", "I was the angry young man.", "I later hosted a quiz show."] },
-    { "id": "id-marilyn", "name": "Marilyn Monroe", "category": "film", "difficulty": "medium", "aliases": ["Monroe"],
-      "hints": ["There is a very famous photograph of a dress.", "I changed my name.", "I sang happy birthday to a president."] },
-    { "id": "id-jobs", "name": "Steve Jobs", "category": "business", "difficulty": "medium", "aliases": ["Jobs"],
-      "hints": ["I wore the same outfit constantly.", "I was fired from my own company.", "I came back and it worked out."] },
-    { "id": "id-musk", "name": "Elon Musk", "category": "business", "difficulty": "easy", "aliases": ["Musk"],
-      "hints": ["I run more than one company.", "I post a great deal.", "I would like to go to Mars."] },
-    { "id": "id-ratan-tata", "name": "Ratan Tata", "category": "business", "difficulty": "hard", "aliases": ["Ratan", "Tata"],
-      "hints": ["I ran a very large Indian group.", "I wanted to build a very cheap car.", "I was known for being quiet about it."] },
-    { "id": "id-mozart", "name": "Wolfgang Amadeus Mozart", "category": "music", "difficulty": "medium", "aliases": ["Mozart"],
-      "hints": ["I started performing as a small child.", "I wrote a great deal very quickly.", "There is a film about my rival's jealousy."] },
-    { "id": "id-beethoven", "name": "Ludwig van Beethoven", "category": "music", "difficulty": "medium", "aliases": ["Beethoven"],
-      "hints": ["I kept working after a serious problem.", "There are nine of my symphonies.", "I could not hear my own later work."] },
-    { "id": "id-columbus", "name": "Christopher Columbus", "category": "history", "difficulty": "medium", "aliases": ["Columbus"],
-      "hints": ["I sailed west expecting somewhere else.", "I had three ships.", "I was extremely wrong about the size of the Earth."] },
-    { "id": "id-armstrong", "name": "Neil Armstrong", "category": "science", "difficulty": "medium", "aliases": ["Armstrong"],
-      "hints": ["I went somewhere very few people have.", "I said a famous sentence badly.", "I left footprints that are still there."] },
-    { "id": "id-hawking", "name": "Stephen Hawking", "category": "science", "difficulty": "medium", "aliases": ["Hawking"],
-      "hints": ["I wrote a bestseller almost nobody finished.", "I studied very dense objects.", "My voice was synthesised."] },
-    { "id": "id-turing", "name": "Alan Turing", "category": "science", "difficulty": "hard", "aliases": ["Turing"],
-      "hints": ["I broke codes during a war.", "There is a test named after me.", "My country apologised far too late."] },
-    { "id": "id-teresa", "name": "Mother Teresa", "category": "history", "difficulty": "medium", "aliases": ["Teresa"],
-      "hints": ["I worked in Kolkata.", "I wore a white sari with blue edges.", "I was made a saint."] },
-    { "id": "id-frodo", "name": "Frodo Baggins", "category": "fiction", "difficulty": "hard", "aliases": ["Frodo"],
-      "hints": ["I am short and did not want the job.", "I carried something heavy a long way.", "My gardener is the real hero."] },
-    { "id": "id-katniss", "name": "Katniss Everdeen", "category": "fiction", "difficulty": "hard", "aliases": ["Katniss"],
-      "hints": ["I volunteered for something dangerous.", "I am good with a bow.", "I became a symbol I did not ask to be."] },
-    { "id": "id-simba", "name": "Simba", "category": "fiction", "difficulty": "medium", "aliases": [],
-      "hints": ["I ran away from home.", "I have a complicated uncle.", "I eventually went back."] },
-    { "id": "id-santa", "name": "Santa Claus", "category": "fiction", "difficulty": "easy", "aliases": ["Father Christmas", "Saint Nicholas"],
-      "hints": ["I work one night a year.", "I have a list.", "I get in through the chimney."] },
-    { "id": "id-dracula", "name": "Dracula", "category": "fiction", "difficulty": "medium", "aliases": ["Count Dracula"],
-      "hints": ["I keep unusual hours.", "I am from Transylvania.", "Garlic is a problem for me."] },
-    { "id": "id-mickey", "name": "Mickey Mouse", "category": "fiction", "difficulty": "easy", "aliases": ["Mickey"],
-      "hints": ["My ears are two circles.", "I started out on a steamboat.", "A very large company is built on me."] },
-    { "id": "id-pikachu", "name": "Pikachu", "category": "fiction", "difficulty": "easy", "aliases": [],
-      "hints": ["I am yellow.", "I only say one word.", "I am electric."] },
-    { "id": "id-buddha", "name": "Gautama Buddha", "category": "history", "difficulty": "medium", "aliases": ["Buddha", "Siddhartha Gautama"],
-      "hints": ["I was a prince first.", "I sat under a particular tree.", "I taught the middle way."] },
-    { "id": "id-sun-tzu", "name": "Sun Tzu", "category": "history", "difficulty": "hard", "aliases": ["Sunzi"],
-      "hints": ["I wrote a short book about conflict.", "Business people quote me constantly.", "I said the best victory needs no battle."] },
-    { "id": "id-kalpana", "name": "Kalpana Chawla", "category": "science", "difficulty": "hard", "aliases": ["Kalpana"],
-      "hints": ["I left the planet.", "I was the first Indian-born woman to do so.", "My second flight did not come home."] }
+    {
+      "id": "id-prabhas",
+      "name": "Prabhas",
+      "category": "telugu-actors",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I carried a very large lingam up a lot of steps.",
+        "A waterfall features heavily in my most famous work.",
+        "People waited two years to find out why I was killed."
+      ]
+    },
+    {
+      "id": "id-mahesh-babu",
+      "name": "Mahesh Babu",
+      "category": "telugu-actors",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I am known for a particular kind of stillness.",
+        "I played a thug who turned out to be a police officer.",
+        "They call me the prince."
+      ]
+    },
+    {
+      "id": "id-jr-ntr",
+      "name": "Jr NTR",
+      "category": "telugu-actors",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "My grandfather was a legend and a chief minister.",
+        "I danced with fire while my friend handled water.",
+        "I played a man who took on the god of death."
+      ]
+    },
+    {
+      "id": "id-ram-charan",
+      "name": "Ram Charan",
+      "category": "telugu-actors",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "My father is a megastar.",
+        "I played a deaf man in a village election.",
+        "I lifted someone onto my shoulders in a very famous shot."
+      ]
+    },
+    {
+      "id": "id-allu-arjun",
+      "name": "Allu Arjun",
+      "category": "telugu-actors",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "My walk is imitated constantly.",
+        "I played a red sandalwood smuggler who would not lower his shoulder.",
+        "They call me stylish."
+      ]
+    },
+    {
+      "id": "id-chiranjeevi",
+      "name": "Chiranjeevi",
+      "category": "telugu-actors",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I danced before most of the current heroes were born.",
+        "I later went into politics and came back.",
+        "They call me megastar."
+      ]
+    },
+    {
+      "id": "id-nagarjuna",
+      "name": "Nagarjuna",
+      "category": "telugu-actors",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I am from a famous film family and married into another.",
+        "I played a devotional singer in one of my best-known roles.",
+        "My sons are also actors."
+      ]
+    },
+    {
+      "id": "id-venkatesh",
+      "name": "Venkatesh",
+      "category": "telugu-actors",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I am known for comedy as much as action.",
+        "I have worked steadily for over three decades.",
+        "They call me Victory."
+      ]
+    },
+    {
+      "id": "id-balakrishna",
+      "name": "Balakrishna",
+      "category": "telugu-actors",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "My father was a legend of Telugu cinema.",
+        "My dialogue delivery is famously loud.",
+        "I am also a politician."
+      ]
+    },
+    {
+      "id": "id-pawan-kalyan",
+      "name": "Pawan Kalyan",
+      "category": "telugu-actors",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I have an enormous and very loud fan base.",
+        "I started a political party.",
+        "They call me power star."
+      ]
+    },
+    {
+      "id": "id-vijay-deverakonda",
+      "name": "Vijay Deverakonda",
+      "category": "telugu-actors",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I played a self-destructive surgeon.",
+        "I am known for speaking bluntly in interviews.",
+        "I became famous almost overnight."
+      ]
+    },
+    {
+      "id": "id-nani",
+      "name": "Nani",
+      "category": "telugu-actors",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "They call me the natural star.",
+        "I started as an assistant director.",
+        "I played a cricketer attempting a comeback for his son."
+      ]
+    },
+    {
+      "id": "id-ravi-teja",
+      "name": "Ravi Teja",
+      "category": "telugu-actors",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "My comic timing is my trademark.",
+        "They call me mass maharaja.",
+        "I have played a lot of energetic policemen."
+      ]
+    },
+    {
+      "id": "id-rana-daggubati",
+      "name": "Rana Daggubati",
+      "category": "telugu-actors",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I played the villain in the biggest Telugu film ever made.",
+        "I am very tall.",
+        "My family runs a famous studio."
+      ]
+    },
+    {
+      "id": "id-nithiin",
+      "name": "Nithiin",
+      "category": "telugu-actors",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I debuted in a college film in the early 2000s.",
+        "I am known for romantic roles.",
+        "My family is in film distribution."
+      ]
+    },
+    {
+      "id": "id-sharwanand",
+      "name": "Sharwanand",
+      "category": "telugu-actors",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I took years to become a lead.",
+        "I am known for choosing unusual scripts.",
+        "I played a man who fell in love on a train."
+      ]
+    },
+    {
+      "id": "id-adivi-sesh",
+      "name": "Adivi Sesh",
+      "category": "telugu-actors",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I write the films I star in.",
+        "I played a spy.",
+        "I am known for thrillers."
+      ]
+    },
+    {
+      "id": "id-naga-chaitanya",
+      "name": "Naga Chaitanya",
+      "category": "telugu-actors",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "My father and grandfather are both famous actors.",
+        "I played a cricketer who lost his way.",
+        "I was married to an actress from Tamil cinema."
+      ]
+    },
+    {
+      "id": "id-akkineni-nageswara-rao",
+      "name": "Akkineni Nageswara Rao",
+      "category": "telugu-actors",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I am from the earliest era of Telugu cinema.",
+        "A studio in Hyderabad carries my name.",
+        "My son and grandsons are all actors."
+      ]
+    },
+    {
+      "id": "id-ntr-senior",
+      "name": "NTR Senior",
+      "category": "telugu-actors",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I played gods on screen more than anyone.",
+        "I became a chief minister.",
+        "My grandson is now a star."
+      ]
+    },
+    {
+      "id": "id-sobhan-babu",
+      "name": "Sobhan Babu",
+      "category": "telugu-actors",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I worked mostly in the 1970s and 80s.",
+        "I was known for family dramas.",
+        "I was one of the biggest stars of my time."
+      ]
+    },
+    {
+      "id": "id-krishna",
+      "name": "Krishna",
+      "category": "telugu-actors",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I was known as the superstar of my era.",
+        "I made the first Telugu cowboy film.",
+        "My son is one of the biggest stars today."
+      ]
+    },
+    {
+      "id": "id-sunil",
+      "name": "Sunil",
+      "category": "telugu-actors",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I was a comedian before I was a hero.",
+        "I am short and I made jokes about it.",
+        "I appeared alongside almost every major star."
+      ]
+    },
+    {
+      "id": "id-brahmanandam",
+      "name": "Brahmanandam",
+      "category": "telugu-actors",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I hold a record for the number of films.",
+        "I am in almost every comedy scene you remember.",
+        "I am a comedian, not a hero."
+      ]
+    },
+    {
+      "id": "id-rajendra-prasad",
+      "name": "Rajendra Prasad",
+      "category": "telugu-actors",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I was the comedy hero of the 1980s and 90s.",
+        "I later played fathers and grandfathers.",
+        "I am known for a particular kind of innocence on screen."
+      ]
+    },
+    {
+      "id": "id-siddhu-jonnalagadda",
+      "name": "Siddhu Jonnalagadda",
+      "category": "telugu-actors",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I became famous playing a DJ.",
+        "I also write.",
+        "My character had a very distinctive way of speaking."
+      ]
+    },
+    {
+      "id": "id-teja-sajja",
+      "name": "Teja Sajja",
+      "category": "telugu-actors",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I started as a child actor.",
+        "I played a superhero from a village.",
+        "My film involved a monkey god."
+      ]
+    },
+    {
+      "id": "id-vishwak-sen",
+      "name": "Vishwak Sen",
+      "category": "telugu-actors",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I direct as well as act.",
+        "I am known for playing rough characters.",
+        "I made a film about a Hyderabad neighbourhood."
+      ]
+    },
+    {
+      "id": "id-naveen-polishetty",
+      "name": "Naveen Polishetty",
+      "category": "telugu-actors",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I came from comedy sketches on the internet.",
+        "I played a detective who was mostly useless.",
+        "I am known for fast, funny dialogue."
+      ]
+    },
+    {
+      "id": "id-nikhil-siddhartha",
+      "name": "Nikhil Siddhartha",
+      "category": "telugu-actors",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I played a man searching for a temple's secret.",
+        "I started with a horror film.",
+        "My films often involve mythology."
+      ]
+    },
+    {
+      "id": "id-sudheer-babu",
+      "name": "Sudheer Babu",
+      "category": "telugu-actors",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I was a badminton player before acting.",
+        "I am related by marriage to a very famous star family.",
+        "I play a lot of action roles."
+      ]
+    },
+    {
+      "id": "id-kalyan-ram",
+      "name": "Kalyan Ram",
+      "category": "telugu-actors",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "My brother is a bigger star than I am.",
+        "I produce as well as act.",
+        "Our grandfather was a legend."
+      ]
+    },
+    {
+      "id": "id-samantha",
+      "name": "Samantha",
+      "category": "telugu-actresses",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I started in Telugu and moved between industries.",
+        "I danced in a very talked-about item song.",
+        "I played a wife who was actually a spy."
+      ]
+    },
+    {
+      "id": "id-anushka-shetty",
+      "name": "Anushka Shetty",
+      "category": "telugu-actresses",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I played a queen who was imprisoned for decades.",
+        "I was a yoga instructor before films.",
+        "They call me lady superstar."
+      ]
+    },
+    {
+      "id": "id-kajal-aggarwal",
+      "name": "Kajal Aggarwal",
+      "category": "telugu-actresses",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I played opposite almost every major Telugu hero.",
+        "I was in a film about a police officer and a little girl.",
+        "I am from Mumbai."
+      ]
+    },
+    {
+      "id": "id-rashmika-mandanna",
+      "name": "Rashmika Mandanna",
+      "category": "telugu-actresses",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I am from Karnataka.",
+        "I played the lead in a film about red sandalwood.",
+        "They call me national crush."
+      ]
+    },
+    {
+      "id": "id-sai-pallavi",
+      "name": "Sai Pallavi",
+      "category": "telugu-actresses",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I am a doctor by training.",
+        "My dancing is the thing people talk about most.",
+        "I do not wear makeup on screen."
+      ]
+    },
+    {
+      "id": "id-tamannaah",
+      "name": "Tamannaah",
+      "category": "telugu-actresses",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I played a princess in a huge two-part epic.",
+        "They call me milky beauty.",
+        "I have worked in Telugu, Tamil and Hindi."
+      ]
+    },
+    {
+      "id": "id-pooja-hegde",
+      "name": "Pooja Hegde",
+      "category": "telugu-actresses",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I was a beauty pageant contestant first.",
+        "I appeared in a film about swapped babies.",
+        "I am very tall."
+      ]
+    },
+    {
+      "id": "id-keerthy-suresh",
+      "name": "Keerthy Suresh",
+      "category": "telugu-actresses",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I played a legendary actress in a biopic.",
+        "I won a national award for that role.",
+        "My mother was also an actress."
+      ]
+    },
+    {
+      "id": "id-nithya-menen",
+      "name": "Nithya Menen",
+      "category": "telugu-actresses",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I sing as well as act.",
+        "I am known for choosing unusual films.",
+        "I played a woman on a houseboat on the Godavari."
+      ]
+    },
+    {
+      "id": "id-rakul-preet-singh",
+      "name": "Rakul Preet Singh",
+      "category": "telugu-actresses",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I was a model before acting.",
+        "I am from Delhi.",
+        "I have worked across Telugu, Tamil and Hindi films."
+      ]
+    },
+    {
+      "id": "id-sridevi",
+      "name": "Sridevi",
+      "category": "telugu-actresses",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I started as a child actress.",
+        "I worked in Telugu, Tamil and Hindi.",
+        "I am considered the first female superstar of India."
+      ]
+    },
+    {
+      "id": "id-savitri",
+      "name": "Savitri",
+      "category": "telugu-actresses",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I worked in the 1950s and 60s.",
+        "A biopic was made about my life.",
+        "I was called the great actress."
+      ]
+    },
+    {
+      "id": "id-jayasudha",
+      "name": "Jayasudha",
+      "category": "telugu-actresses",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I worked mainly in the 1970s and 80s.",
+        "I later played mothers.",
+        "I also went into politics."
+      ]
+    },
+    {
+      "id": "id-soundarya",
+      "name": "Soundarya",
+      "category": "telugu-actresses",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I was a major star in the 1990s.",
+        "I died young in an accident.",
+        "I acted opposite almost every star of my time."
+      ]
+    },
+    {
+      "id": "id-trisha",
+      "name": "Trisha",
+      "category": "telugu-actresses",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I have worked for over twenty years.",
+        "I appeared in a big Chola-era epic.",
+        "I am from Chennai."
+      ]
+    },
+    {
+      "id": "id-shruti-haasan",
+      "name": "Shruti Haasan",
+      "category": "telugu-actresses",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "My father is a legendary actor.",
+        "I am also a musician.",
+        "I have worked in several languages."
+      ]
+    },
+    {
+      "id": "id-krithi-shetty",
+      "name": "Krithi Shetty",
+      "category": "telugu-actresses",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I debuted in a film about a fisherman's son.",
+        "I was very young when I started.",
+        "I am from Mumbai."
+      ]
+    },
+    {
+      "id": "id-mrunal-thakur",
+      "name": "Mrunal Thakur",
+      "category": "telugu-actresses",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I came from Hindi television.",
+        "I played a woman in a letters-and-war love story.",
+        "I work in both Hindi and Telugu."
+      ]
+    },
+    {
+      "id": "id-sreeleela",
+      "name": "Sreeleela",
+      "category": "telugu-actresses",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I am a medical student as well as an actress.",
+        "I became very busy very quickly.",
+        "I am known for dancing."
+      ]
+    },
+    {
+      "id": "id-raashii-khanna",
+      "name": "Raashii Khanna",
+      "category": "telugu-actresses",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I have worked in Telugu, Tamil and Hindi.",
+        "I am from Delhi.",
+        "I appeared in a film about a man with memory problems."
+      ]
+    },
+    {
+      "id": "id-ileana",
+      "name": "Ileana",
+      "category": "telugu-actresses",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I debuted in Telugu and later moved to Hindi.",
+        "I am of Goan origin.",
+        "I was in a famous college film."
+      ]
+    },
+    {
+      "id": "id-genelia",
+      "name": "Genelia",
+      "category": "telugu-actresses",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I played a girl whose father disapproved of nothing.",
+        "I later married an actor.",
+        "I was in a famous Telugu romance about an architect."
+      ]
+    },
+    {
+      "id": "id-charmy-kaur",
+      "name": "Charmy Kaur",
+      "category": "telugu-actresses",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I act and produce.",
+        "I have been in the industry a long time.",
+        "I produced a film about red sandalwood."
+      ]
+    },
+    {
+      "id": "id-lavanya-tripathi",
+      "name": "Lavanya Tripathi",
+      "category": "telugu-actresses",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I came from television.",
+        "I am known for light comedies.",
+        "I married an actor."
+      ]
+    },
+    {
+      "id": "id-anupama-parameswaran",
+      "name": "Anupama Parameswaran",
+      "category": "telugu-actresses",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I am from Kerala.",
+        "I debuted in Malayalam.",
+        "I played a girl in a film about a village and America."
+      ]
+    },
+    {
+      "id": "id-shah-rukh-khan",
+      "name": "Shah Rukh Khan",
+      "category": "indian-actors",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I am known for a particular pose with my arms.",
+        "I came from television.",
+        "They call me king of Bollywood."
+      ]
+    },
+    {
+      "id": "id-amitabh-bachchan",
+      "name": "Amitabh Bachchan",
+      "category": "indian-actors",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "My voice is unmistakable.",
+        "I was the angry young man.",
+        "I later hosted a quiz show."
+      ]
+    },
+    {
+      "id": "id-aamir-khan",
+      "name": "Aamir Khan",
+      "category": "indian-actors",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I am known for taking years between films.",
+        "I played a wrestler's father.",
+        "They call me Mr Perfectionist."
+      ]
+    },
+    {
+      "id": "id-salman-khan",
+      "name": "Salman Khan",
+      "category": "indian-actors",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I am known for taking my shirt off.",
+        "I run a reality show.",
+        "I took a mute girl back to Pakistan in one film."
+      ]
+    },
+    {
+      "id": "id-rajinikanth",
+      "name": "Rajinikanth",
+      "category": "indian-actors",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I have a very particular way with a cigarette.",
+        "I was a bus conductor first.",
+        "There are jokes about what I can do."
+      ]
+    },
+    {
+      "id": "id-kamal-haasan",
+      "name": "Kamal Haasan",
+      "category": "indian-actors",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I have played many characters in a single film more than once.",
+        "I write and direct as well.",
+        "I started as a child actor."
+      ]
+    },
+    {
+      "id": "id-ranbir-kapoor",
+      "name": "Ranbir Kapoor",
+      "category": "indian-actors",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I come from the most famous film family in India.",
+        "I played a deaf and mute man.",
+        "I played a violent, obsessive son."
+      ]
+    },
+    {
+      "id": "id-ranveer-singh",
+      "name": "Ranveer Singh",
+      "category": "indian-actors",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I am known for my clothes as much as my acting.",
+        "I played a rapper from a Mumbai slum.",
+        "I married my co-star."
+      ]
+    },
+    {
+      "id": "id-hrithik-roshan",
+      "name": "Hrithik Roshan",
+      "category": "indian-actors",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "My father directed my debut.",
+        "I have an extra thumb.",
+        "I played a superhero with a mask."
+      ]
+    },
+    {
+      "id": "id-akshay-kumar",
+      "name": "Akshay Kumar",
+      "category": "indian-actors",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I make more films per year than almost anyone.",
+        "I was a martial arts instructor.",
+        "I am known for patriotic roles."
+      ]
+    },
+    {
+      "id": "id-ajay-devgn",
+      "name": "Ajay Devgn",
+      "category": "indian-actors",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I made my entrance standing on two motorcycles.",
+        "I played a cable operator who outwitted the police.",
+        "I direct as well."
+      ]
+    },
+    {
+      "id": "id-irrfan-khan",
+      "name": "Irrfan Khan",
+      "category": "indian-actors",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I worked in Hollywood as well as India.",
+        "I played a father on a road trip in one famous film.",
+        "I died in 2020."
+      ]
+    },
+    {
+      "id": "id-nawazuddin-siddiqui",
+      "name": "Nawazuddin Siddiqui",
+      "category": "indian-actors",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I worked as a watchman before acting.",
+        "I played a gangster across three generations.",
+        "I am known for playing unglamorous roles."
+      ]
+    },
+    {
+      "id": "id-vijay",
+      "name": "Vijay",
+      "category": "indian-actors",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "They call me Thalapathy.",
+        "I played a teacher sent to a juvenile home.",
+        "I recently entered politics."
+      ]
+    },
+    {
+      "id": "id-suriya",
+      "name": "Suriya",
+      "category": "indian-actors",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I played a man who started an airline for the poor.",
+        "My brother is also an actor.",
+        "I played twins in a famous film."
+      ]
+    },
+    {
+      "id": "id-dhanush",
+      "name": "Dhanush",
+      "category": "indian-actors",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I sang a song that became a global internet hit.",
+        "I am also a producer and director.",
+        "I acted in a Hollywood film."
+      ]
+    },
+    {
+      "id": "id-mohanlal",
+      "name": "Mohanlal",
+      "category": "indian-actors",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I am from Kerala.",
+        "People call me Lalettan.",
+        "I played a man who built an alibi out of films."
+      ]
+    },
+    {
+      "id": "id-mammootty",
+      "name": "Mammootty",
+      "category": "indian-actors",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I am from Kerala.",
+        "I have won three national awards.",
+        "I am known for an enormous range of roles."
+      ]
+    },
+    {
+      "id": "id-fahadh-faasil",
+      "name": "Fahadh Faasil",
+      "category": "indian-actors",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I am from Kerala.",
+        "My first film failed badly and I came back years later.",
+        "I played a villain in a huge Tamil film."
+      ]
+    },
+    {
+      "id": "id-yash",
+      "name": "Yash",
+      "category": "indian-actors",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I am from Karnataka.",
+        "I played a man who rose through a gold mine.",
+        "My film had two parts."
+      ]
+    },
+    {
+      "id": "id-rishab-shetty",
+      "name": "Rishab Shetty",
+      "category": "indian-actors",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I direct and act.",
+        "My film involved a forest deity.",
+        "I am from Karnataka."
+      ]
+    },
+    {
+      "id": "id-pankaj-tripathi",
+      "name": "Pankaj Tripathi",
+      "category": "indian-actors",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I played a memorable gangster patriarch.",
+        "I am known for a very calm delivery.",
+        "I came up slowly over many years."
+      ]
+    },
+    {
+      "id": "id-manoj-bajpayee",
+      "name": "Manoj Bajpayee",
+      "category": "indian-actors",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I played a gangster in a famous 1998 film.",
+        "I later led a spy series.",
+        "I am from Bihar."
+      ]
+    },
+    {
+      "id": "id-ayushmann-khurrana",
+      "name": "Ayushmann Khurrana",
+      "category": "indian-actors",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I was a radio jockey and television host.",
+        "I play ordinary men in unusual situations.",
+        "I played a pianist pretending to be blind."
+      ]
+    },
+    {
+      "id": "id-rajkummar-rao",
+      "name": "Rajkummar Rao",
+      "category": "indian-actors",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I am known for transforming physically for roles.",
+        "I played a man in a town where men disappear.",
+        "I came from the drama school in Pune."
+      ]
+    },
+    {
+      "id": "id-vicky-kaushal",
+      "name": "Vicky Kaushal",
+      "category": "indian-actors",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I played a soldier leading a cross-border raid.",
+        "I asked a question about josh.",
+        "My father is a stunt director."
+      ]
+    },
+    {
+      "id": "id-siddharth",
+      "name": "Siddharth",
+      "category": "indian-actors",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I worked in Telugu, Tamil and Hindi.",
+        "I was in a famous film about engineering students.",
+        "I was in a college film about friends."
+      ]
+    },
+    {
+      "id": "id-madhavan",
+      "name": "Madhavan",
+      "category": "indian-actors",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I came from television.",
+        "I played an engineering student in a famous film.",
+        "I also played a rocket scientist."
+      ]
+    },
+    {
+      "id": "id-vikram",
+      "name": "Vikram",
+      "category": "indian-actors",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I am known for extreme physical transformations.",
+        "I played a man with the mind of a child.",
+        "I led a film about a black squad."
+      ]
+    },
+    {
+      "id": "id-prithviraj-sukumaran",
+      "name": "Prithviraj Sukumaran",
+      "category": "indian-actors",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I am from Kerala.",
+        "I direct as well as act.",
+        "I directed a film about a party leader's adopted son."
+      ]
+    },
+    {
+      "id": "id-deepika-padukone",
+      "name": "Deepika Padukone",
+      "category": "indian-actresses",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "My father was a badminton champion.",
+        "I debuted opposite a superstar in a reincarnation film.",
+        "I played a queen who walked into fire."
+      ]
+    },
+    {
+      "id": "id-alia-bhatt",
+      "name": "Alia Bhatt",
+      "category": "indian-actresses",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "My father is a director.",
+        "I played a spy who married into an enemy family.",
+        "I was in a film about a rapper."
+      ]
+    },
+    {
+      "id": "id-priyanka-chopra",
+      "name": "Priyanka Chopra",
+      "category": "indian-actresses",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I won a global beauty pageant.",
+        "I moved to American television.",
+        "I played a boxer in a biopic."
+      ]
+    },
+    {
+      "id": "id-kareena-kapoor",
+      "name": "Kareena Kapoor",
+      "category": "indian-actresses",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I come from a famous film family.",
+        "I played a talkative girl on a train.",
+        "They call me Bebo."
+      ]
+    },
+    {
+      "id": "id-madhuri-dixit",
+      "name": "Madhuri Dixit",
+      "category": "indian-actresses",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I was the biggest female star of the 1990s.",
+        "My dancing is legendary.",
+        "I returned to films after a long break."
+      ]
+    },
+    {
+      "id": "id-kajol",
+      "name": "Kajol",
+      "category": "indian-actresses",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I am known for a mustard field scene.",
+        "My mother and grandmother were actresses.",
+        "I married my co-star."
+      ]
+    },
+    {
+      "id": "id-vidya-balan",
+      "name": "Vidya Balan",
+      "category": "indian-actresses",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I played a pregnant woman searching Kolkata.",
+        "I am known for carrying films alone.",
+        "I played a famous singer in a biopic."
+      ]
+    },
+    {
+      "id": "id-nayanthara",
+      "name": "Nayanthara",
+      "category": "indian-actresses",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "They call me lady superstar of the south.",
+        "I have worked in Tamil, Telugu and Malayalam.",
+        "I married a director."
+      ]
+    },
+    {
+      "id": "id-aishwarya-rai",
+      "name": "Aishwarya Rai",
+      "category": "indian-actresses",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I won a global beauty pageant.",
+        "I played a courtesan in a famous period film.",
+        "I married into a legendary film family."
+      ]
+    },
+    {
+      "id": "id-katrina-kaif",
+      "name": "Katrina Kaif",
+      "category": "indian-actresses",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I was born in Hong Kong.",
+        "I struggled with the language at first.",
+        "I am known for dance numbers."
+      ]
+    },
+    {
+      "id": "id-anushka-sharma",
+      "name": "Anushka Sharma",
+      "category": "indian-actresses",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I produce as well as act.",
+        "I married a cricketer.",
+        "I played a wrestler's coach in one film."
+      ]
+    },
+    {
+      "id": "id-taapsee-pannu",
+      "name": "Taapsee Pannu",
+      "category": "indian-actresses",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I started in Telugu films.",
+        "I played a badminton player in a biopic.",
+        "I am known for speaking her mind."
+      ]
+    },
+    {
+      "id": "id-konkona-sen-sharma",
+      "name": "Konkona Sen Sharma",
+      "category": "indian-actresses",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "My mother is a famous director.",
+        "I direct as well as act.",
+        "I am known for independent cinema."
+      ]
+    },
+    {
+      "id": "id-tabu",
+      "name": "Tabu",
+      "category": "indian-actresses",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I have worked for over thirty years.",
+        "I played a police officer in a famous thriller.",
+        "I have worked in Telugu and Hindi."
+      ]
+    },
+    {
+      "id": "id-rani-mukerji",
+      "name": "Rani Mukerji",
+      "category": "indian-actresses",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I coached a women's hockey team on screen.",
+        "I am from a film family.",
+        "I played a deaf and blind student."
+      ]
+    },
+    {
+      "id": "id-sonam-kapoor",
+      "name": "Sonam Kapoor",
+      "category": "indian-actresses",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "My father is an actor.",
+        "I am known for fashion.",
+        "I played an air hostess in a biopic."
+      ]
+    },
+    {
+      "id": "id-parineeti-chopra",
+      "name": "Parineeti Chopra",
+      "category": "indian-actresses",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "My cousin is a global star.",
+        "I sing as well.",
+        "I debuted in a romantic comedy."
+      ]
+    },
+    {
+      "id": "id-kriti-sanon",
+      "name": "Kriti Sanon",
+      "category": "indian-actresses",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I started in Telugu films.",
+        "I am an engineer by education.",
+        "I played a surrogate mother in one film."
+      ]
+    },
+    {
+      "id": "id-bhumi-pednekar",
+      "name": "Bhumi Pednekar",
+      "category": "indian-actresses",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I worked in casting before acting.",
+        "I debuted in a film about weight.",
+        "I often choose social subjects."
+      ]
+    },
+    {
+      "id": "id-radhika-apte",
+      "name": "Radhika Apte",
+      "category": "indian-actresses",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I am known for independent films and streaming shows.",
+        "I trained as a dancer.",
+        "I appear in a lot of anthology films."
+      ]
+    },
+    {
+      "id": "id-sachin-tendulkar",
+      "name": "Sachin Tendulkar",
+      "category": "indian-cricketers",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I played for 24 years.",
+        "A whole country stopped to watch me.",
+        "I have a hundred hundreds."
+      ]
+    },
+    {
+      "id": "id-virat-kohli",
+      "name": "Virat Kohli",
+      "category": "indian-cricketers",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I am known for chasing targets.",
+        "I married an actress.",
+        "I captained India across formats."
+      ]
+    },
+    {
+      "id": "id-ms-dhoni",
+      "name": "MS Dhoni",
+      "category": "indian-cricketers",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I kept wickets and captained.",
+        "I am known for staying calm.",
+        "I finished a World Cup with a six."
+      ]
+    },
+    {
+      "id": "id-rohit-sharma",
+      "name": "Rohit Sharma",
+      "category": "indian-cricketers",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I have scored three double centuries in one-day cricket.",
+        "I captain Mumbai's IPL team.",
+        "They call me hitman."
+      ]
+    },
+    {
+      "id": "id-rahul-dravid",
+      "name": "Rahul Dravid",
+      "category": "indian-cricketers",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "They called me the wall.",
+        "I later coached the national team.",
+        "I batted for hours without scoring quickly."
+      ]
+    },
+    {
+      "id": "id-sourav-ganguly",
+      "name": "Sourav Ganguly",
+      "category": "indian-cricketers",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I took my shirt off at Lord's.",
+        "I later ran the cricket board.",
+        "They called me dada."
+      ]
+    },
+    {
+      "id": "id-anil-kumble",
+      "name": "Anil Kumble",
+      "category": "indian-cricketers",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I took ten wickets in an innings.",
+        "I bowled with a broken jaw.",
+        "I am a leg spinner who did not turn it much."
+      ]
+    },
+    {
+      "id": "id-kapil-dev",
+      "name": "Kapil Dev",
+      "category": "indian-cricketers",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I lifted India's first World Cup.",
+        "I was an all-rounder.",
+        "I scored 175 not out against Zimbabwe."
+      ]
+    },
+    {
+      "id": "id-yuvraj-singh",
+      "name": "Yuvraj Singh",
+      "category": "indian-cricketers",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I hit six sixes in an over.",
+        "I was man of the tournament in a World Cup while ill.",
+        "I am a left-hander."
+      ]
+    },
+    {
+      "id": "id-jasprit-bumrah",
+      "name": "Jasprit Bumrah",
+      "category": "indian-cricketers",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "My bowling action is unusual.",
+        "I am known for yorkers.",
+        "I did not play age-group cricket."
+      ]
+    },
+    {
+      "id": "id-ravindra-jadeja",
+      "name": "Ravindra Jadeja",
+      "category": "indian-cricketers",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I celebrate with my bat like a sword.",
+        "I bowl left-arm spin.",
+        "I am one of the best fielders in the world."
+      ]
+    },
+    {
+      "id": "id-ravichandran-ashwin",
+      "name": "Ravichandran Ashwin",
+      "category": "indian-cricketers",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I am an off spinner who keeps inventing deliveries.",
+        "I am an engineer by education.",
+        "I take a lot of wickets at home."
+      ]
+    },
+    {
+      "id": "id-vvs-laxman",
+      "name": "VVS Laxman",
+      "category": "indian-cricketers",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I scored 281 against Australia.",
+        "I was known for wristy elegance.",
+        "They called me very very special."
+      ]
+    },
+    {
+      "id": "id-harbhajan-singh",
+      "name": "Harbhajan Singh",
+      "category": "indian-cricketers",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I took a hat-trick against Australia.",
+        "I bowl off spin.",
+        "They call me bhajji."
+      ]
+    },
+    {
+      "id": "id-zaheer-khan",
+      "name": "Zaheer Khan",
+      "category": "indian-cricketers",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I was a left-arm fast bowler.",
+        "I was known for reverse swing.",
+        "I led the attack in the 2011 World Cup."
+      ]
+    },
+    {
+      "id": "id-shikhar-dhawan",
+      "name": "Shikhar Dhawan",
+      "category": "indian-cricketers",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I twirl my moustache after fifties.",
+        "I am a left-handed opener.",
+        "They call me gabbar."
+      ]
+    },
+    {
+      "id": "id-kl-rahul",
+      "name": "KL Rahul",
+      "category": "indian-cricketers",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I have opened, kept wicket and batted in the middle order.",
+        "I am from Karnataka.",
+        "I am known for elegant drives."
+      ]
+    },
+    {
+      "id": "id-hardik-pandya",
+      "name": "Hardik Pandya",
+      "category": "indian-cricketers",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I am an all-rounder.",
+        "My brother also plays.",
+        "I am known for finishing games quickly."
+      ]
+    },
+    {
+      "id": "id-suryakumar-yadav",
+      "name": "Suryakumar Yadav",
+      "category": "indian-cricketers",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I am known for shots behind the wicket.",
+        "I became famous late in my career.",
+        "They call me Mr 360."
+      ]
+    },
+    {
+      "id": "id-smriti-mandhana",
+      "name": "Smriti Mandhana",
+      "category": "indian-cricketers",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I am a left-handed opener.",
+        "I captain the Indian women's team.",
+        "I am from Maharashtra."
+      ]
+    },
+    {
+      "id": "id-mithali-raj",
+      "name": "Mithali Raj",
+      "category": "indian-cricketers",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I captained India's women for many years.",
+        "I was reading a book before batting once.",
+        "I scored more runs than anyone in women's one-day cricket."
+      ]
+    },
+    {
+      "id": "id-jhulan-goswami",
+      "name": "Jhulan Goswami",
+      "category": "indian-cricketers",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I was the fastest bowler in women's cricket.",
+        "I took more wickets than anyone in women's one-day cricket.",
+        "I am from Bengal."
+      ]
+    },
+    {
+      "id": "id-rishabh-pant",
+      "name": "Rishabh Pant",
+      "category": "indian-cricketers",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I am a wicketkeeper batter.",
+        "I survived a serious car accident.",
+        "I am known for reverse sweeps against fast bowlers."
+      ]
+    },
+    {
+      "id": "id-shubman-gill",
+      "name": "Shubman Gill",
+      "category": "indian-cricketers",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I am a young opener from Punjab.",
+        "I scored a double century in one-day cricket.",
+        "I am seen as the next big batter."
+      ]
+    },
+    {
+      "id": "id-mohammed-shami",
+      "name": "Mohammed Shami",
+      "category": "indian-cricketers",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I am a fast bowler known for seam position.",
+        "I took a five-wicket haul in a World Cup semi-final.",
+        "I am from Uttar Pradesh."
+      ]
+    },
+    {
+      "id": "id-lata-mangeshkar",
+      "name": "Lata Mangeshkar",
+      "category": "indian-singers",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I sang for other people on screen.",
+        "My career lasted seven decades.",
+        "They called me the nightingale."
+      ]
+    },
+    {
+      "id": "id-asha-bhosle",
+      "name": "Asha Bhosle",
+      "category": "indian-singers",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "My sister was also a legendary singer.",
+        "I sang a huge range of styles.",
+        "I have sung in many languages."
+      ]
+    },
+    {
+      "id": "id-kishore-kumar",
+      "name": "Kishore Kumar",
+      "category": "indian-singers",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I acted as well as sang.",
+        "I never had formal training.",
+        "I was known for yodelling."
+      ]
+    },
+    {
+      "id": "id-mohammed-rafi",
+      "name": "Mohammed Rafi",
+      "category": "indian-singers",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I sang for almost every leading man of my era.",
+        "I worked mainly in the 1950s to 70s.",
+        "My voice was extremely versatile."
+      ]
+    },
+    {
+      "id": "id-ar-rahman",
+      "name": "AR Rahman",
+      "category": "indian-singers",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I compose more than I sing.",
+        "I won an Oscar for a song about a slum.",
+        "I am from Chennai."
+      ]
+    },
+    {
+      "id": "id-sp-balasubrahmanyam",
+      "name": "SP Balasubrahmanyam",
+      "category": "indian-singers",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I sang in many languages.",
+        "I hold a record for the number of songs.",
+        "I also dubbed for actors."
+      ]
+    },
+    {
+      "id": "id-arijit-singh",
+      "name": "Arijit Singh",
+      "category": "indian-singers",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I came from a reality show.",
+        "I sing most of the big Hindi romantic songs now.",
+        "I am known for a very plain stage presence."
+      ]
+    },
+    {
+      "id": "id-shreya-ghoshal",
+      "name": "Shreya Ghoshal",
+      "category": "indian-singers",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I was discovered on a talent show as a teenager.",
+        "I sing in many languages.",
+        "I am known for classical training."
+      ]
+    },
+    {
+      "id": "id-sonu-nigam",
+      "name": "Sonu Nigam",
+      "category": "indian-singers",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I started by imitating an older legend.",
+        "I hosted a television singing show.",
+        "I sang a very famous song about friendship."
+      ]
+    },
+    {
+      "id": "id-ilaiyaraaja",
+      "name": "Ilaiyaraaja",
+      "category": "indian-singers",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I composed for over a thousand films.",
+        "I am from Tamil Nadu.",
+        "They call me the maestro."
+      ]
+    },
+    {
+      "id": "id-sunidhi-chauhan",
+      "name": "Sunidhi Chauhan",
+      "category": "indian-singers",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I won a talent show as a child.",
+        "I am known for energetic songs.",
+        "I sing a lot of dance numbers."
+      ]
+    },
+    {
+      "id": "id-udit-narayan",
+      "name": "Udit Narayan",
+      "category": "indian-singers",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I sang for many 1990s romantic films.",
+        "I am originally from Nepal.",
+        "My son is also a singer."
+      ]
+    },
+    {
+      "id": "id-kumar-sanu",
+      "name": "Kumar Sanu",
+      "category": "indian-singers",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I dominated the 1990s.",
+        "I have a very distinctive nasal tone.",
+        "I recorded an enormous number of songs in a single year."
+      ]
+    },
+    {
+      "id": "id-jagjit-singh",
+      "name": "Jagjit Singh",
+      "category": "indian-singers",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I sang ghazals.",
+        "I made a difficult form popular.",
+        "My voice was very deep and calm."
+      ]
+    },
+    {
+      "id": "id-kailash-kher",
+      "name": "Kailash Kher",
+      "category": "indian-singers",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "My voice is instantly recognisable.",
+        "I sing folk-influenced songs.",
+        "I have my own band."
+      ]
+    },
+    {
+      "id": "id-sid-sriram",
+      "name": "Sid Sriram",
+      "category": "indian-singers",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I grew up in America.",
+        "I sing in Telugu and Tamil.",
+        "I am also trained in Carnatic music."
+      ]
+    },
+    {
+      "id": "id-armaan-malik",
+      "name": "Armaan Malik",
+      "category": "indian-singers",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "My family is full of musicians.",
+        "I sing in several languages.",
+        "I started very young."
+      ]
+    },
+    {
+      "id": "id-neha-kakkar",
+      "name": "Neha Kakkar",
+      "category": "indian-singers",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I came from a reality show.",
+        "I judge singing competitions.",
+        "I sing a lot of party songs."
+      ]
+    },
+    {
+      "id": "id-hariharan",
+      "name": "Hariharan",
+      "category": "indian-singers",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I sing ghazals and film songs.",
+        "I was part of a fusion project.",
+        "I have worked with a famous composer from Chennai."
+      ]
+    },
+    {
+      "id": "id-chitra",
+      "name": "Chitra",
+      "category": "indian-singers",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I sing in many south Indian languages.",
+        "I have won several national awards.",
+        "They call me the nightingale of the south."
+      ]
+    },
+    {
+      "id": "id-albert-einstein",
+      "name": "Albert Einstein",
+      "category": "world-figures",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "My hair is as famous as my work.",
+        "I rewrote what people thought about time.",
+        "There is an equation with my name on it."
+      ]
+    },
+    {
+      "id": "id-mahatma-gandhi",
+      "name": "Mahatma Gandhi",
+      "category": "world-figures",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I am known for what I refused to do.",
+        "I walked a long way to the sea over a tax.",
+        "I am on every note in India."
+      ]
+    },
+    {
+      "id": "id-apj-abdul-kalam",
+      "name": "APJ Abdul Kalam",
+      "category": "world-figures",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I worked with rockets.",
+        "I later took a ceremonial job.",
+        "Students loved me."
+      ]
+    },
+    {
+      "id": "id-nelson-mandela",
+      "name": "Nelson Mandela",
+      "category": "world-figures",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I spent 27 years somewhere I did not choose.",
+        "I became president afterwards.",
+        "I am from South Africa."
+      ]
+    },
+    {
+      "id": "id-marie-curie",
+      "name": "Marie Curie",
+      "category": "world-figures",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I won more than one Nobel Prize.",
+        "I worked with things that glowed.",
+        "My notebooks are still dangerous."
+      ]
+    },
+    {
+      "id": "id-cleopatra",
+      "name": "Cleopatra",
+      "category": "world-figures",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I lived a very long time ago.",
+        "I ruled a country along a famous river.",
+        "Rome was extremely interested in my kingdom."
+      ]
+    },
+    {
+      "id": "id-isaac-newton",
+      "name": "Isaac Newton",
+      "category": "world-figures",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "There is a story about me and a tree.",
+        "I argued about who was first.",
+        "Forces are measured in my name."
+      ]
+    },
+    {
+      "id": "id-charles-darwin",
+      "name": "Charles Darwin",
+      "category": "world-figures",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I took a very long boat trip.",
+        "Some islands changed my mind.",
+        "I made people angry about finches."
+      ]
+    },
+    {
+      "id": "id-nikola-tesla",
+      "name": "Nikola Tesla",
+      "category": "world-figures",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I had a long argument about electricity.",
+        "A car company borrowed my name.",
+        "I preferred alternating current."
+      ]
+    },
+    {
+      "id": "id-leonardo-da-vinci",
+      "name": "Leonardo da Vinci",
+      "category": "world-figures",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I painted and invented.",
+        "My notebooks are written backwards.",
+        "My most famous painting is very small."
+      ]
+    },
+    {
+      "id": "id-william-shakespeare",
+      "name": "William Shakespeare",
+      "category": "world-figures",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I wrote about Danish princes.",
+        "People argue about whether I existed.",
+        "I invented words you use daily."
+      ]
+    },
+    {
+      "id": "id-elon-musk",
+      "name": "Elon Musk",
+      "category": "world-figures",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I run more than one company.",
+        "I post a great deal.",
+        "I would like to go to Mars."
+      ]
+    },
+    {
+      "id": "id-steve-jobs",
+      "name": "Steve Jobs",
+      "category": "world-figures",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I wore the same outfit constantly.",
+        "I was fired from my own company.",
+        "I came back and it worked out."
+      ]
+    },
+    {
+      "id": "id-bill-gates",
+      "name": "Bill Gates",
+      "category": "world-figures",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I dropped out of university.",
+        "I now give most of my money away.",
+        "I founded a very large software company."
+      ]
+    },
+    {
+      "id": "id-barack-obama",
+      "name": "Barack Obama",
+      "category": "world-figures",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I was the first of my kind in that office.",
+        "I am known for my speaking.",
+        "I wrote several books."
+      ]
+    },
+    {
+      "id": "id-mother-teresa",
+      "name": "Mother Teresa",
+      "category": "world-figures",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I worked in Kolkata.",
+        "I wore a white sari with blue edges.",
+        "I was made a saint."
+      ]
+    },
+    {
+      "id": "id-ratan-tata",
+      "name": "Ratan Tata",
+      "category": "world-figures",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I ran a very large Indian group.",
+        "I wanted to build a very cheap car.",
+        "I was known for being quiet."
+      ]
+    },
+    {
+      "id": "id-serena-williams",
+      "name": "Serena Williams",
+      "category": "world-figures",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I play a sport with a net.",
+        "My sister is also very good at it.",
+        "I have more than twenty major titles."
+      ]
+    },
+    {
+      "id": "id-lionel-messi",
+      "name": "Lionel Messi",
+      "category": "world-figures",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I am quite short for my job.",
+        "I am from Argentina.",
+        "I finally won the World Cup."
+      ]
+    },
+    {
+      "id": "id-cristiano-ronaldo",
+      "name": "Cristiano Ronaldo",
+      "category": "world-figures",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I celebrate with a jump and a shout.",
+        "I am from Portugal.",
+        "I am extremely disciplined about fitness."
+      ]
+    },
+    {
+      "id": "id-usain-bolt",
+      "name": "Usain Bolt",
+      "category": "world-figures",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "My job takes about ten seconds.",
+        "I am from Jamaica.",
+        "I celebrate with a pose like a bow."
+      ]
+    },
+    {
+      "id": "id-muhammad-ali",
+      "name": "Muhammad Ali",
+      "category": "world-figures",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I talked as well as I fought.",
+        "I changed my name.",
+        "Float like a butterfly."
+      ]
+    },
+    {
+      "id": "id-stephen-hawking",
+      "name": "Stephen Hawking",
+      "category": "world-figures",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I wrote a bestseller almost nobody finished.",
+        "I studied very dense objects.",
+        "My voice was synthesised."
+      ]
+    },
+    {
+      "id": "id-ada-lovelace",
+      "name": "Ada Lovelace",
+      "category": "world-figures",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "My father was a famous poet.",
+        "I wrote about a machine never built.",
+        "Some call me the first programmer."
+      ]
+    },
+    {
+      "id": "id-alan-turing",
+      "name": "Alan Turing",
+      "category": "world-figures",
+      "difficulty": "medium",
+      "aliases": [],
+      "hints": [
+        "I broke codes during a war.",
+        "There is a test named after me.",
+        "My country apologised far too late."
+      ]
+    }
   ]
 }

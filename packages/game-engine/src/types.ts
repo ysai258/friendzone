@@ -66,6 +66,27 @@ export interface GameDefinition<S, Cfg extends Record<string, unknown>> {
 
   getPhase(state: S): string
   isGameOver(state: S): boolean
+
+  /**
+   * Content ids this session drew, so the room can remember them and avoid
+   * dealing the same films or prompts again next game.
+   *
+   * Optional: a game with no pool has nothing to report.
+   */
+  usedContentIds?(state: S): string[]
+
+  /**
+   * Advance because a person asked, not because a clock ran out.
+   *
+   * Mind Meld's results screen has no timer — the point is for the table to
+   * argue about the answers — so the host moves it on. Returning null means
+   * "not something to skip right now", which is what makes a double-tap
+   * harmless.
+   *
+   * The room service checks that the caller is the host before calling this;
+   * a definition only decides whether the current phase can be advanced.
+   */
+  hostAdvance?(state: S, ctx: TurnContext): Transition<S> | null
 }
 
 export interface GameMeta {
@@ -107,6 +128,14 @@ export interface CreateContext<Cfg> extends BaseContext {
   sessionId: string
   settings: Cfg
   content: ContentPack
+  /**
+   * Content this room has already played, newest last.
+   *
+   * Held by the room rather than the game, so it survives a game ending and a
+   * new one starting — which is the case that matters, since the complaint is
+   * about the same films coming back on consecutive evenings.
+   */
+  recentContentIds: readonly string[]
 }
 
 export interface ViewContext extends BaseContext {

@@ -13,6 +13,7 @@ function boot(def: ErasedGameDefinition, count: number, settings: Record<string,
     sessionId: 'sess',
     settings: def.settingsSchema.parse(settings),
     content: packOf(kind, 30),
+    recentContentIds: [],
   })
   return { roster, state }
 }
@@ -230,7 +231,15 @@ describe('every game', () => {
       let now = T0
       for (let i = 0; i < 2_000 && !def.isGameOver(current); i++) {
         const deadline = def.getDeadline(current)
-        if (deadline === null) break
+        if (deadline === null) {
+          // No clock means the game is waiting on a person. Drive it the way
+          // the room service does when the host presses the button.
+          const pushed = def.hostAdvance?.(current, turnCtx(now + 1, roster))
+          if (pushed === undefined || pushed === null) break
+          now += 1
+          current = pushed.state
+          continue
+        }
         now = Math.max(now + 1, deadline)
         current = def.advance(current, turnCtx(now, roster)).state
       }
