@@ -243,6 +243,59 @@ test.describe('the host can join answers the machine kept apart', () => {
   })
 })
 
+test.describe('Who Am I? remembers what was asked', () => {
+  test('a hint keeps your turn, and the log keeps your questions', async ({ browser }) => {
+    const hostContext = await browser.newContext()
+    const rahulContext = await browser.newContext()
+    const saiContext = await browser.newContext()
+    const hostPage = await hostContext.newPage()
+    const code = await createRoom(hostPage, 'Yashwanth', 'Who Am I')
+    const pages = [hostPage, await joinRoom(rahulContext, code, 'Rahul'), await joinRoom(saiContext, code, 'Sai')]
+
+    await hostPage.getByRole('button', { name: 'Start game' }).click()
+
+    // Wait for the first turn to open, then find whoever has the floor: the
+    // one page showing the turn controls rather than "is thinking".
+    await expect(hostPage.getByText(/Your turn|is thinking of a question/)).toBeVisible({ timeout: 30_000 })
+    let asker: Page | undefined
+    for (const page of pages) {
+      if ((await page.getByPlaceholder('Am I a real person?').count()) > 0) {
+        asker = page
+        break
+      }
+    }
+    expect(asker).toBeDefined()
+    const table = pages.filter((page) => page !== asker)
+
+    // Taking a hint used to spend the turn. Now it only costs points.
+    await asker!.getByRole('button', { name: /Take a hint \(3 left\)/ }).click()
+    await expect(asker!.getByText('Your hints')).toBeVisible()
+    await expect(asker!.getByText(/your turn is still yours/)).toBeVisible()
+    await expect(asker!.getByRole('button', { name: /Take a hint \(2 left\)/ })).toBeVisible()
+    // Still the asker's turn, and the question box is still there.
+    await expect(asker!.getByPlaceholder('Am I a real person?')).toBeVisible()
+
+    await asker!.getByPlaceholder('Am I a real person?').fill('Am I alive?')
+    await asker!.getByRole('button', { name: 'Send' }).click()
+
+    for (const page of table) {
+      await expect(page.getByText('Am I alive?')).toBeVisible({ timeout: 20_000 })
+      await page.getByRole('button', { name: 'Yes', exact: true }).click()
+    }
+
+    // The log keeps it, on every screen, long after the result screen is gone.
+    const log = (page: Page) => page.getByRole('list', { name: 'Questions asked so far' })
+    for (const page of pages) {
+      await expect(log(page).getByText('Am I alive?')).toBeVisible({ timeout: 25_000 })
+      await expect(log(page).getByText('Yes 2–0')).toBeVisible()
+    }
+    // And the asker's own row is marked as theirs.
+    await expect(log(asker!).getByText('You', { exact: true })).toBeVisible()
+
+    await Promise.all([hostContext.close(), rahulContext.close(), saiContext.close()])
+  })
+})
+
 test.describe('Who Am I? is one category', () => {
   test('everyone at the table is from the category the host chose', async ({ browser }) => {
     const hostContext = await browser.newContext()

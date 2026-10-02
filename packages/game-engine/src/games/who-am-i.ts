@@ -50,11 +50,35 @@ const ASSIGN_MS = 4_000
 const RESULT_MS = 5_000
 const MAX_POINTS = 1_000
 const TURN_COST = 60
+/**
+ * What a hint costs.
+ *
+ * It used to cost a turn, which was the wrong price twice over: it ate the
+ * question you were about to ask, and it pushed you towards the turn limit
+ * that ends your game. A hint is help, not a move — so it is paid for in
+ * points and nothing else.
+ */
+const HINT_COST = 120
 const MIN_POINTS = 250
 const SOLVE_BONUS = [200, 100, 50]
+/** Questions kept per game. Long enough to outlast any real table — ten
+ *  players at twenty turns each — and bounded so a room's state cannot grow
+ *  without limit. */
+const HISTORY_LIMIT = 220
 
 type Phase = 'ASSIGN' | 'ASK' | 'VOTE' | 'RESULT' | 'FINISHED'
 type Vote = 'yes' | 'no'
+
+/** One finished turn: a question and how the table answered, or a guess and
+ *  whether it was right. */
+interface TurnRecord {
+  asker: PlayerId
+  question: string
+  yes: number
+  no: number
+  guess: string | null
+  correct: boolean
+}
 
 interface Solved {
   turnsUsed: number
@@ -79,7 +103,17 @@ interface WhoAmIState {
   hintsShown: Record<PlayerId, number>
   question: string | null
   votes: Record<PlayerId, Vote>
-  lastResult: { asker: PlayerId; question: string; yes: number; no: number; guess: string | null; correct: boolean } | null
+  lastResult: TurnRecord | null
+  /**
+   * Every question and guess the table has heard, oldest first.
+   *
+   * Kept because the game is unplayable without it: a player who cannot
+   * remember what they have already asked wastes turns re-asking it, and the
+   * old UI showed each answer for five seconds and then threw it away. It
+   * carries nothing private — these are the questions everybody heard and the
+   * votes everybody saw.
+   */
+  history: TurnRecord[]
   phaseStartedAt: number
   phaseEndsAt: number
   askSeconds: number
@@ -187,9 +221,15 @@ function finish(state: WhoAmIState, now: number): WhoAmIState {
   return { ...state, phase: 'FINISHED', phaseStartedAt: now, phaseEndsAt: now }
 }
 
-function scoreFor(turnsUsed: number, place: number): number {
-  const base = clamp(MAX_POINTS - turnsUsed * TURN_COST, MIN_POINTS, MAX_POINTS)
+function scoreFor(turnsUsed: number, place: number, hintsTaken: number): number {
+  const base = clamp(MAX_POINTS - turnsUsed * TURN_COST - hintsTaken * HINT_COST, MIN_POINTS, MAX_POINTS)
   return base + (SOLVE_BONUS[place - 1] ?? 0)
+}
+
+/** Append a finished turn to the log, keeping it bounded. */
+function remember(state: WhoAmIState, record: TurnRecord): TurnRecord[] {
+  const next = [...state.history, record]
+  return next.length > HISTORY_LIMIT ? next.slice(next.length - HISTORY_LIMIT) : next
 }
 
 // ---------------------------------------------------------------------------
@@ -266,6 +306,7 @@ export const whoAmI: ErasedGameDefinition = defineGame<WhoAmIState, WhoAmISettin
       question: null,
       votes: {},
       lastResult: null,
+      history: [],
       phaseStartedAt: ctx.now,
       phaseEndsAt: ctx.now + ASSIGN_MS,
       askSeconds: ctx.settings.askSeconds,
@@ -337,11 +378,12 @@ export const whoAmI: ErasedGameDefinition = defineGame<WhoAmIState, WhoAmISettin
         const shown = state.hintsShown[playerId] ?? 0
         const card = state.identities[playerId]
         if (card === undefined || shown >= card.hints.length) return noChange(state)
-        // A hint costs a turn; that is the whole price of taking one.
+        // Deliberately leaves turnsUsed and the clock alone: you asked for
+        // help, not for your turn to end. The price is taken off the score
+        // when you solve it.
         return transition({
           ...state,
           hintsShown: { ...state.hintsShown, [playerId]: shown + 1 },
-          turnsUsed: { ...state.turnsUsed, [playerId]: (state.turnsUsed[playerId] ?? 0) + 1 },
         })
       }
 
@@ -353,11 +395,20 @@ export const whoAmI: ErasedGameDefinition = defineGame<WhoAmIState, WhoAmISettin
         const withTurn = { ...state.turnsUsed, [playerId]: turns }
 
         if (!match.correct) {
+          const record: TurnRecord = {
+            asker: playerId,
+            question: 'Guess',
+            yes: 0,
+            no: 0,
+            guess: parsed.payload.guess,
+            correct: false,
+          }
           return transition(
             {
               ...state,
               turnsUsed: withTurn,
-              lastResult: { asker: playerId, question: 'Guess', yes: 0, no: 0, guess: parsed.payload.guess, correct: false },
+              lastResult: record,
+              history: remember(state, record),
               phase: 'RESULT',
               phaseStartedAt: ctx.now,
               phaseEndsAt: ctx.now + RESULT_MS,
@@ -367,13 +418,22 @@ export const whoAmI: ErasedGameDefinition = defineGame<WhoAmIState, WhoAmISettin
         }
 
         const place = Object.keys(state.solved).length + 1
-        const points = scoreFor(turns, place)
+        const points = scoreFor(turns, place, state.hintsShown[playerId] ?? 0)
+        const record: TurnRecord = {
+          asker: playerId,
+          question: 'Guess',
+          yes: 0,
+          no: 0,
+          guess: parsed.payload.guess,
+          correct: true,
+        }
         return transition(
           {
             ...state,
             turnsUsed: withTurn,
             solved: { ...state.solved, [playerId]: { turnsUsed: turns, points, place } },
-            lastResult: { asker: playerId, question: 'Guess', yes: 0, no: 0, guess: parsed.payload.guess, correct: true },
+            lastResult: record,
+            history: remember(state, record),
             phase: 'RESULT',
             phaseStartedAt: ctx.now,
             phaseEndsAt: ctx.now + RESULT_MS,
@@ -418,13 +478,22 @@ export const whoAmI: ErasedGameDefinition = defineGame<WhoAmIState, WhoAmISettin
         const tally = Object.values(state.votes)
         const yes = tally.filter((v) => v === 'yes').length
         const no = tally.length - yes
+        const record: TurnRecord = {
+          asker: asker ?? '',
+          question: state.question ?? '',
+          yes,
+          no,
+          guess: null,
+          correct: false,
+        }
         return transition(
           {
             ...state,
             phase: 'RESULT',
             phaseStartedAt: state.phaseEndsAt,
             phaseEndsAt: state.phaseEndsAt + RESULT_MS,
-            lastResult: { asker: asker ?? '', question: state.question ?? '', yes, no, guess: null, correct: false },
+            lastResult: record,
+            history: remember(state, record),
           },
           [{ type: 'ROUND_ENDED', data: { yes, no } }],
         )
@@ -480,12 +549,18 @@ export const whoAmI: ErasedGameDefinition = defineGame<WhoAmIState, WhoAmISettin
       ),
       maxTurns: state.maxTurns,
       remaining: unsolvedOrder(state, activeIdSet(ctx)).length,
+      // Everything the table has already heard, so nobody has to remember it.
+      // Public by construction: these questions were asked out loud and the
+      // votes were shown to the room when they were cast.
+      history: state.history,
+      hintCost: HINT_COST,
     }
 
     // Hints describe the viewer's own identity without naming it, so they are
     // safe to send to exactly one person: the one who paid a turn for them.
     if (myCard !== undefined) view['yourHints'] = myCard.hints.slice(0, myHints)
     if (myCard !== undefined) view['yourHintsLeft'] = myCard.hints.length - myHints
+    if (myCard !== undefined) view['yourHintsTaken'] = myHints
 
     if (state.phase === 'RESULT' && state.lastResult !== null) view['result'] = state.lastResult
 

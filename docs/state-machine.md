@@ -162,6 +162,20 @@ the key folder, and taking it back. Both are host-only and both re-score the
 round in place, which is safe precisely because the phase has no clock racing
 them.
 
+## Who Am I?
+
+`ASK` belongs to one player and ends in one of three ways: they ask a question
+(→ `VOTE`), they guess (→ `RESULT`), or the clock runs out (the turn is spent
+and play moves on). Taking a hint is none of those — it changes the asker's own
+hint count and nothing else, leaving the phase, the clock and the turn exactly
+where they were.
+
+Every question that reaches a vote, and every guess, is appended to a log in
+session state. It carries only what the table heard out loud, so it goes to
+every viewer unchanged, and it is what the results panel reads: before, an
+answer was on screen for five seconds and then gone, which made players
+re-ask questions they had already paid a turn for.
+
 ## Movie Mafia
 
 ```mermaid

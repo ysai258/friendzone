@@ -226,6 +226,59 @@ describe('who am i / one category per game', () => {
     expect(pack.items.every((item) => item.category === 'indian-singers')).toBe(true)
   }, 30_000)
 
+  it('a hint costs points but not the turn, and the question still lands', async () => {
+    const s = await server()
+    const { host, others } = await room(s, 'who-am-i', ['Host', 'B', 'C'])
+    host.send(ROOM_ACTIONS.START_GAME)
+
+    const everyone = [host, ...others]
+    await Promise.all(everyone.map((c) => c.waitForPhase('ASK', 25_000)))
+    const askerId = host.view['asker'] as string
+    const asker = everyone.find((c) => c.playerId === askerId)!
+    const turnsBefore = (host.view['turnsUsed'] as Record<string, number>)[askerId] ?? 0
+
+    asker.send('whoami/hint', {})
+    await asker.waitForRoom(() => ((asker.view['yourHints'] as string[] | undefined) ?? []).length === 1, 15_000)
+    expect(asker.errors).toHaveLength(0)
+    // Still their turn, still the ASK phase, and no turn spent.
+    expect(asker.room?.game?.phase).toBe('ASK')
+    expect((host.view['turnsUsed'] as Record<string, number>)[askerId] ?? 0).toBe(turnsBefore)
+    expect(host.view['asker']).toBe(askerId)
+
+    // The question that taking a hint used to swallow.
+    asker.send('whoami/ask', { question: 'Am I alive?' })
+    await Promise.all(everyone.map((c) => c.waitForPhase('VOTE', 15_000)))
+    expect(host.view['question']).toBe('Am I alive?')
+  }, 60_000)
+
+  it('keeps the questions and answers on screen for the whole game', async () => {
+    const s = await server()
+    const { host, others } = await room(s, 'who-am-i', ['Host', 'B', 'C'])
+    host.send(ROOM_ACTIONS.START_GAME)
+
+    const everyone = [host, ...others]
+    await Promise.all(everyone.map((c) => c.waitForPhase('ASK', 25_000)))
+    const askerId = host.view['asker'] as string
+    const asker = everyone.find((c) => c.playerId === askerId)!
+    expect(host.view['history']).toEqual([])
+
+    asker.send('whoami/ask', { question: 'Am I a cricketer?' })
+    await Promise.all(everyone.map((c) => c.waitForPhase('VOTE', 15_000)))
+    for (const client of everyone.filter((c) => c !== asker)) client.send('whoami/vote', { vote: 'yes' })
+
+    type Entry = { asker: string; question: string; yes: number; no: number; guess: string | null }
+    const log = (client: TestClient) => (client.view['history'] ?? []) as Entry[]
+
+    // Everyone keeps it, not just the player who asked, and it outlives the
+    // five-second result screen that used to be the only place it appeared.
+    await Promise.all(everyone.map((c) => c.waitForRoom(() => log(c).length === 1, 20_000)))
+    for (const client of everyone) {
+      expect(log(client)[0]).toMatchObject({ asker: askerId, question: 'Am I a cricketer?', yes: 2, no: 0, guess: null })
+    }
+    await Promise.all(everyone.map((c) => c.waitForPhase('ASK', 20_000)))
+    expect(log(host)).toHaveLength(1)
+  }, 60_000)
+
   it('still hides a player their own identity', async () => {
     const s = await server()
     const { host, others } = await room(s, 'who-am-i', ['Host', 'B', 'C'])

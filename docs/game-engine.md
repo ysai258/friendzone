@@ -213,7 +213,7 @@ so no screen shows a countdown parked at zero.
 | Blur Battle | COUNTDOWN → QUESTION → REVEAL → … | Progressive disclosure, speed scoring, one-shot commitment |
 | Emoji Movie | COUNTDOWN → QUESTION → REVEAL → … | Open racing with per-player cooldowns and attempt caps |
 | Mind Meld | COUNTDOWN → PROMPT → REVEAL → … | Simultaneous submission, answer clustering, host-ended phases |
-| Who Am I? | ASSIGN → ASK → VOTE → RESULT → … | Turn order, per-player secrets, voting, hint economy |
+| Who Am I? | ASSIGN → ASK → VOTE → RESULT → … | Turn order, per-player secrets, voting, a public log beside private hints |
 | Movie Mafia | ROLES → DISCUSSION → VOTE → RESULT → … | Asymmetric secrets, elimination, team scoring |
 
 They are deliberately different shapes. Blur Battle and Emoji Movie look
@@ -242,6 +242,12 @@ visible, so risk and reward are literally the same number and there is no
 separate "blur bonus" to keep in sync. A small placement bonus (150 / 75 / 25)
 rewards being first without letting the fastest typist dominate a lobby of
 eight.
+
+Who Am I? prices a solve on turns and hints: `clamp(1000 − 60×turns − 120×hints,
+250, 1000)` plus a placement bonus of 200 / 100 / 50. A hint deliberately costs
+points and nothing else — charging it a turn meant asking for help also ate the
+question you were about to ask and pushed you towards the turn limit that ends
+your game, which is two punishments for one decision.
 
 Mind Meld scores agreement instead: a group of *n* out of *t* answers earns
 `1000 × (0.35 + 0.65 × n/t)`, and a unique answer earns nothing.
