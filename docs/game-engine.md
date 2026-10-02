@@ -247,7 +247,9 @@ Who Am I? prices a solve on turns and hints: `clamp(1000 − 60×turns − 120×
 250, 1000)` plus a placement bonus of 200 / 100 / 50. A hint deliberately costs
 points and nothing else — charging it a turn meant asking for help also ate the
 question you were about to ask and pushed you towards the turn limit that ends
-your game, which is two punishments for one decision.
+your game, which is two punishments for one decision. A room can switch hints
+off entirely in the lobby, which makes it a pure questions game; the server
+then refuses the action and the view carries nothing for the button to draw.
 
 Mind Meld scores agreement instead: a group of *n* out of *t* answers earns
 `1000 × (0.35 + 0.65 × n/t)`, and a unique answer earns nothing.

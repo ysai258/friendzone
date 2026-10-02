@@ -163,14 +163,14 @@ describe('who am i / turns', () => {
     expect(withHint.scoreDeltas![asker]!).toBeLessThan(without.scoreDeltas![asker]!)
   })
 
-  it('keeps every question and its answer, with the vote that settled it', () => {
+  it('keeps your own questions and answers, and nobody else\'s', () => {
     const { roster, state } = boot(def, 4)
     const { state: live, now } = reach(def, state, roster, 'ASK')
     const asker = def.getPublicState(live, null, viewCtx(now, roster)).view['asker'] as string
     const others = roster.map((p) => p.id).filter((id) => id !== asker)
 
-    const log = (s: unknown, viewer: string | null = null) =>
-      def.getPublicState(s, viewer, viewCtx(now + 9_000, roster)).view['history'] as {
+    const log = (s: unknown, viewer: string | null) =>
+      (def.getPublicState(s, viewer, viewCtx(now + 9_000, roster)).view['yourHistory'] ?? []) as {
         asker: string
         question: string
         yes: number
@@ -179,7 +179,7 @@ describe('who am i / turns', () => {
         correct: boolean
       }[]
 
-    expect(log(live)).toEqual([])
+    expect(log(live, asker)).toEqual([])
 
     let s: unknown = def.applyAction(live, asker, { type: 'whoami/ask', payload: { question: 'Am I alive?' } }, turnCtx(now, roster)).state
     others.forEach((id, i) => {
@@ -187,12 +187,17 @@ describe('who am i / turns', () => {
     })
     s = def.advance(s, turnCtx(def.getDeadline(s) ?? now + 1_000, roster)).state
 
-    const entries = log(s)
-    expect(entries).toHaveLength(1)
-    expect(entries[0]).toMatchObject({ asker, question: 'Am I alive?', yes: 2, no: 1, guess: null })
+    // The asker keeps their question and how the table answered it.
+    const mine = log(s, asker)
+    expect(mine).toHaveLength(1)
+    expect(mine[0]).toMatchObject({ asker, question: 'Am I alive?', yes: 2, no: 1, guess: null })
 
-    // A wrong guess is in the log too, as a guess rather than a question.
-    // The result screen has to run out first, which hands the turn on.
+    // Everybody else's screen stays about their own game.
+    for (const id of others) expect(log(s, id)).toEqual([])
+    expect(log(s, null)).toEqual([])
+
+    // A wrong guess is kept too, as a guess rather than a question — and it
+    // only reaches the player who made it.
     s = def.advance(s, turnCtx(def.getDeadline(s) ?? now + 2_000, roster)).state
     expect(def.getPhase(s)).toBe('ASK')
     const nextAsker = def.getPublicState(s, null, viewCtx(now + 9_000, roster)).view['asker'] as string
@@ -202,12 +207,125 @@ describe('who am i / turns', () => {
       { type: 'whoami/guess', payload: { guess: 'Somebody Else' } },
       turnCtx(now + 3_000, roster),
     )
-    const afterGuess = log(guessing.state)
-    expect(afterGuess).toHaveLength(2)
-    expect(afterGuess[1]).toMatchObject({ asker: nextAsker, guess: 'Somebody Else', correct: false })
+    expect(log(guessing.state, nextAsker)).toMatchObject([{ guess: 'Somebody Else', correct: false }])
+    expect(log(guessing.state, asker)).toHaveLength(1)
+  })
 
-    // Everyone sees the same log; it is what the table heard out loud.
-    expect(log(guessing.state, others[0] ?? null)).toEqual(afterGuess)
+  it('counts a question that says your own name as getting it', () => {
+    const { roster, state } = boot(def, 4)
+    const { state: live, now } = reach(def, state, roster, 'ASK')
+    const asker = def.getPublicState(live, null, viewCtx(now, roster)).view['asker'] as string
+    const own = (live as { identities: Record<string, { name: string }> }).identities[asker]!.name
+
+    // Nobody types this on purpose — they are asking about someone they think
+    // is a different person, and it turns out to be them.
+    const slip = def.applyAction(
+      live,
+      asker,
+      { type: 'whoami/ask', payload: { question: `Did I act with ${own}?` } },
+      turnCtx(now + 1_000, roster),
+    )
+
+    expect(def.getPhase(slip.state)).toBe('RESULT')
+    expect((slip.state as { solved: Record<string, unknown> }).solved[asker]).toBeDefined()
+    expect(slip.scoreDeltas?.[asker]).toBeGreaterThan(0)
+    // The result screen can say why it ended, rather than looking like a bug.
+    expect(def.getPublicState(slip.state, asker, viewCtx(now + 1_100, roster)).view['stumbled']).toBe(true)
+  })
+
+  it('does not solve on a name that is merely close to yours', () => {
+    const { roster, state } = boot(def, 4)
+    const { state: live, now } = reach(def, state, roster, 'ASK')
+    const asker = def.getPublicState(live, null, viewCtx(now, roster)).view['asker'] as string
+    const own = (live as { identities: Record<string, { name: string }> }).identities[asker]!.name
+
+    // One edit away is usually a different person — Kajal and Kajol, Siddharth
+    // and Siddhartha are all real people — so a sentence match is exact only.
+    const nearly = `${own.slice(0, -1)}x`
+    const asked = def.applyAction(
+      live,
+      asker,
+      { type: 'whoami/ask', payload: { question: `Did I act with ${nearly}?` } },
+      turnCtx(now + 1_000, roster),
+    )
+    expect(def.getPhase(asked.state)).toBe('VOTE')
+    expect((asked.state as { solved: Record<string, unknown> }).solved[asker]).toBeUndefined()
+  })
+
+  it('leaves a question that names somebody else alone', () => {
+    const { roster, state } = boot(def, 4)
+    const { state: live, now } = reach(def, state, roster, 'ASK')
+    const asker = def.getPublicState(live, null, viewCtx(now, roster)).view['asker'] as string
+    const someoneElse = Object.entries((live as { identities: Record<string, { name: string }> }).identities)
+      .find(([id]) => id !== asker)![1].name
+
+    const asked = def.applyAction(
+      live,
+      asker,
+      { type: 'whoami/ask', payload: { question: `Am I more famous than ${someoneElse}?` } },
+      turnCtx(now + 1_000, roster),
+    )
+    expect(def.getPhase(asked.state)).toBe('VOTE')
+    expect((asked.state as { solved: Record<string, unknown> }).solved[asker]).toBeUndefined()
+  })
+
+  it('accepts a guess phrased as a sentence', () => {
+    const { roster, state } = boot(def, 4)
+    const { state: live, now } = reach(def, state, roster, 'ASK')
+    const asker = def.getPublicState(live, null, viewCtx(now, roster)).view['asker'] as string
+    const own = (live as { identities: Record<string, { name: string }> }).identities[asker]!.name
+
+    // The box says "I am…", so this is what people type into it.
+    const guess = def.applyAction(live, asker, { type: 'whoami/guess', payload: { guess: `I am ${own}` } }, turnCtx(now + 1_000, roster))
+    expect((guess.state as { solved: Record<string, unknown> }).solved[asker]).toBeDefined()
+    expect(def.getPublicState(guess.state, asker, viewCtx(now + 1_100, roster)).view['stumbled']).toBe(false)
+  })
+
+  it('still lets you vote once you have solved yours', () => {
+    const { roster, state } = boot(def, 4)
+    const { state: live, now } = reach(def, state, roster, 'ASK')
+    const asker = def.getPublicState(live, null, viewCtx(now, roster)).view['asker'] as string
+    const own = (live as { identities: Record<string, { name: string }> }).identities[asker]!.name
+
+    // Solve, then let the turn pass to somebody else.
+    let s: unknown = def.applyAction(live, asker, { type: 'whoami/guess', payload: { guess: own } }, turnCtx(now + 1_000, roster)).state
+    s = def.advance(s, turnCtx(def.getDeadline(s) ?? now + 6_000, roster)).state
+    expect(def.getPhase(s)).toBe('ASK')
+    const nextAsker = def.getPublicState(s, null, viewCtx(now + 7_000, roster)).view['asker'] as string
+    expect(nextAsker).not.toBe(asker)
+
+    s = def.applyAction(s, nextAsker, { type: 'whoami/ask', payload: { question: 'Am I alive?' } }, turnCtx(now + 7_100, roster)).state
+    // The solved player answers for the rest of the table.
+    expect(def.validateAction(s, asker, { type: 'whoami/vote', payload: { vote: 'yes' } }, turnCtx(now + 7_200, roster)).ok).toBe(true)
+    const voted = def.applyAction(s, asker, { type: 'whoami/vote', payload: { vote: 'yes' } }, turnCtx(now + 7_200, roster)).state
+    expect((voted as { votes: Record<string, string> }).votes[asker]).toBe('yes')
+
+    // But their own game is over: no more turns, questions or guesses.
+    expect(def.validateAction(s, asker, { type: 'whoami/guess', payload: { guess: 'anyone' } }, turnCtx(now + 7_300, roster)).ok).toBe(false)
+  })
+
+  it('plays without hints when the room turned them off', () => {
+    const roster = players(4)
+    const state = def.createGame({
+      now: T0,
+      seed: 'no-hints',
+      players: roster,
+      sessionId: 'sess',
+      settings: def.settingsSchema.parse({ hints: false }),
+      content: packOf('identity', 30),
+      recentContentIds: [],
+      hostId: 'p1',
+    })
+    const { state: live, now } = reach(def, state, roster, 'ASK')
+    const asker = def.getPublicState(live, null, viewCtx(now, roster)).view['asker'] as string
+
+    const check = def.validateAction(live, asker, { type: 'whoami/hint', payload: {} }, turnCtx(now + 500, roster))
+    expect(check.ok).toBe(false)
+    // And the button never appears, because the view carries nothing to draw.
+    const view = def.getPublicState(live, asker, viewCtx(now + 500, roster)).view
+    expect(view['hintsEnabled']).toBe(false)
+    expect(view['yourHints']).toBeUndefined()
+    expect(view['yourHintsLeft']).toBeUndefined()
   })
 
 })

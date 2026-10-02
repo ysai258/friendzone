@@ -168,13 +168,33 @@ them.
 (→ `VOTE`), they guess (→ `RESULT`), or the clock runs out (the turn is spent
 and play moves on). Taking a hint is none of those — it changes the asker's own
 hint count and nothing else, leaving the phase, the clock and the turn exactly
-where they were.
+where they were. A room that turned hints off refuses the action outright.
+
+A question that contains the asker's own name goes straight to `RESULT` as a
+solve instead of out to a vote. Nobody types that deliberately — they are
+asking about someone they believe is a different person — but having said it,
+they have the answer, exactly as they would at a table. The same name-within-
+text match makes "I am Prabhas" a valid guess, which the guess box invites by
+putting "I am…" in its placeholder.
+
+That match is **exact** on word windows, with none of the typo tolerance the
+guess box applies to a whole string. Inside a sentence a near-miss is usually a
+different person: Kajal Aggarwal is one edit from Kajol and Nikhil Siddhartha
+one from Siddharth, and ending somebody's game on one of those is indefensible.
+Missing a typed name costs nothing; inventing one costs the game. The one case
+that remains is a name that is a whole word inside a longer name — a player
+holding "Vijay" who asks about "Vijay Deverakonda" has said their own name and
+is treated as having solved it.
+
+`VOTE` accepts a vote from everyone except the asker, including players who
+have already solved their own name. They can see every forehead that still
+matters, and excluding them only made the table quieter.
 
 Every question that reaches a vote, and every guess, is appended to a log in
-session state. It carries only what the table heard out loud, so it goes to
-every viewer unchanged, and it is what the results panel reads: before, an
-answer was on screen for five seconds and then gone, which made players
-re-ask questions they had already paid a turn for.
+session state, and `getPublicState` gives each viewer **only their own**
+entries. The log exists to answer "what have I already tried?", so another
+player's questions are noise on your screen — and a shared log would have
+handed you a wrong guess that happened to name your own identity.
 
 ## Movie Mafia
 

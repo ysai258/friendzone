@@ -283,14 +283,42 @@ test.describe('Who Am I? remembers what was asked', () => {
       await page.getByRole('button', { name: 'Yes', exact: true }).click()
     }
 
-    // The log keeps it, on every screen, long after the result screen is gone.
-    const log = (page: Page) => page.getByRole('list', { name: 'Questions asked so far' })
-    for (const page of pages) {
-      await expect(log(page).getByText('Am I alive?')).toBeVisible({ timeout: 25_000 })
-      await expect(log(page).getByText('Yes 2–0')).toBeVisible()
+    // The asker keeps it, long after the result screen is gone.
+    const log = (page: Page) => page.getByRole('list', { name: 'Your questions so far' })
+    await expect(log(asker!).getByText('Am I alive?')).toBeVisible({ timeout: 25_000 })
+    await expect(log(asker!).getByText('Yes 2–0')).toBeVisible()
+
+    // Nobody else does: the panel is about your own game, not the table's.
+    for (const page of table) {
+      await expect(page.getByText('Nothing yet. What you ask turns up here.')).toBeVisible()
+      await expect(log(page)).toHaveCount(0)
     }
-    // And the asker's own row is marked as theirs.
-    await expect(log(asker!).getByText('You', { exact: true })).toBeVisible()
+
+    await Promise.all([hostContext.close(), rahulContext.close(), saiContext.close()])
+  })
+})
+
+test.describe('Who Am I? without hints', () => {
+  test('the host can turn hints off before starting', async ({ browser }) => {
+    const hostContext = await browser.newContext()
+    const rahulContext = await browser.newContext()
+    const saiContext = await browser.newContext()
+    const hostPage = await hostContext.newPage()
+    const code = await createRoom(hostPage, 'Yashwanth', 'Who Am I')
+    const pages = [hostPage, await joinRoom(rahulContext, code, 'Rahul'), await joinRoom(saiContext, code, 'Sai')]
+
+    const hints = hostPage.getByRole('switch', { name: 'Hints' })
+    await expect(hints).toHaveAttribute('aria-checked', 'true')
+    await hints.click()
+    await expect(hints).toHaveAttribute('aria-checked', 'false')
+
+    await hostPage.getByRole('button', { name: 'Start game' }).click()
+    await expect(hostPage.getByText(/Your turn|is thinking of a question/)).toBeVisible({ timeout: 30_000 })
+
+    // No hint button anywhere, for whoever has the floor.
+    for (const page of pages) {
+      await expect(page.getByRole('button', { name: /Take a hint/ })).toHaveCount(0)
+    }
 
     await Promise.all([hostContext.close(), rahulContext.close(), saiContext.close()])
   })

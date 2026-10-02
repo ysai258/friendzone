@@ -230,7 +230,10 @@ describe('two server instances', () => {
     // A game started on A runs for the player on B, advanced by whichever
     // scheduler claims the room.
     host.send(ROOM_ACTIONS.START_GAME)
-    await rahul.waitForPhase('QUESTION', 25_000)
+    // Both sockets, not just the one on B: waiting for only Rahul left the
+    // host holding the countdown snapshot, and the two deadlines then differed
+    // by exactly one question span — a flake, not a bug in the fan-out.
+    await Promise.all([host.waitForPhase('QUESTION', 25_000), rahul.waitForPhase('QUESTION', 25_000)])
     expect(rahul.room!.status).toBe('PLAYING')
     expect(rahul.room!.deadlineAt).toBe(host.room!.deadlineAt)
   }, 60_000)

@@ -3,6 +3,7 @@ import {
   accept,
   createRng,
   matchAnswer,
+  normalizeAnswer,
   reject,
   type GamePublicState,
   type PlayerId,
@@ -104,6 +105,9 @@ interface WhoAmIState {
   question: string | null
   votes: Record<PlayerId, Vote>
   lastResult: TurnRecord | null
+  /** True when the last solve came from saying the name in a question rather
+   *  than from the guess box, so the result screen can explain itself. */
+  stumbled: boolean
   /**
    * Every question and guess the table has heard, oldest first.
    *
@@ -119,10 +123,13 @@ interface WhoAmIState {
   askSeconds: number
   voteSeconds: number
   maxTurns: number
+  /** Whether this room plays with hints at all. */
+  hintsEnabled: boolean
 }
 
 const settingsSchema = z.strictObject({
   category: z.enum(IDENTITY_CATEGORIES).default('telugu-actors'),
+  hints: z.boolean().default(true),
   askSeconds: z.int().min(15).max(120).default(45),
   voteSeconds: z.int().min(5).max(45).default(15),
   maxTurns: z.int().min(3).max(20).default(10),
@@ -139,6 +146,13 @@ const settingsSpec: SettingField[] = [
     kind: 'choice',
     default: 'telugu-actors',
     options: IDENTITY_CATEGORIES.map((value) => ({ value, label: IDENTITY_CATEGORY_LABELS[value] })),
+  },
+  {
+    key: 'hints',
+    label: 'Hints',
+    help: 'Three clues about your own person, 120 points each. Off makes it a pure questions game.',
+    kind: 'bool',
+    default: true,
   },
   { key: 'askSeconds', label: 'Time to ask', kind: 'int', min: 15, max: 120, step: 5, default: 45, unit: 's' },
   { key: 'voteSeconds', label: 'Time to vote', kind: 'int', min: 5, max: 45, step: 5, default: 15, unit: 's' },
@@ -176,6 +190,14 @@ function parse(action: GameAction): WhoAmIAction | null {
 
 function unsolvedOrder(state: WhoAmIState, activeIds: Set<PlayerId>): PlayerId[] {
   return state.order.filter((id) => state.solved[id] === undefined && activeIds.has(id))
+}
+
+/** The checks every turn action shares: your turn, your phase, still playing. */
+function holdsTheTurn(state: WhoAmIState, playerId: PlayerId): Result<void> {
+  if (state.solved[playerId] !== undefined) return reject('INVALID_ACTION', 'You already guessed yours.')
+  if (state.phase !== 'ASK') return reject('ROUND_CLOSED')
+  if (playerId !== currentAsker(state)) return reject('NOT_YOUR_TURN')
+  return accept
 }
 
 function currentAsker(state: WhoAmIState): PlayerId | null {
@@ -219,6 +241,77 @@ function nextTurn(state: WhoAmIState, ctx: TurnContext): WhoAmIState | null {
 
 function finish(state: WhoAmIState, now: number): WhoAmIState {
   return { ...state, phase: 'FINISHED', phaseStartedAt: now, phaseEndsAt: now }
+}
+
+/**
+ * Find an identity's name inside a longer piece of text.
+ *
+ * Two things need this. A player typing "I am Prabhas" into the guess box
+ * means the same as typing "Prabhas", and judging the whole string against the
+ * name would call it wrong. And a player who writes "Did I act with Prabhas?"
+ * when they *are* Prabhas has stumbled onto their own answer out loud, which
+ * at a real table ends their game — so it should here too.
+ *
+ * Matching is per word window rather than per substring, so a name cannot be
+ * found inside an unrelated longer word.
+ *
+ * Exact windows only, with no typo allowance. The guess box forgives typos on
+ * the whole string, where "close" can only mean the one name it is judged
+ * against — but inside a sentence a near-miss is usually a *different person*:
+ * "Am I Kajal Aggarwal?" is one edit from Kajol, "Nikhil Siddhartha" one from
+ * Siddharth, and ending somebody's game on one of those would be indefensible.
+ * Missing a typed name costs nothing; inventing one costs the game.
+ */
+function nameWithin(text: string, accepted: readonly string[]): string | null {
+  const words = normalizeAnswer(text).split(' ').filter((w) => w.length > 0)
+  if (words.length === 0) return null
+
+  // Longest first, so "Vijay Deverakonda" is preferred over "Vijay" when a
+  // card carries both as names it answers to.
+  const names = accepted
+    .map((candidate) => ({ candidate, name: normalizeAnswer(candidate) }))
+    // A one to three letter alias would match half the questions ever asked.
+    .filter((entry) => entry.name.length >= 4)
+    .sort((a, b) => b.name.length - a.name.length)
+
+  for (const { candidate, name } of names) {
+    const nameWords = name.split(' ')
+    for (let start = 0; start + nameWords.length <= words.length; start++) {
+      if (words.slice(start, start + nameWords.length).join(' ') === name) return candidate
+    }
+  }
+  return null
+}
+
+/** Everything that happens when a player lands on their own name, however
+ *  they got there. */
+function solve(
+  state: WhoAmIState,
+  playerId: PlayerId,
+  card: IdentityCard,
+  said: string,
+  now: number,
+  stumbled: boolean,
+) {
+  const turns = (state.turnsUsed[playerId] ?? 0) + 1
+  const place = Object.keys(state.solved).length + 1
+  const points = scoreFor(turns, place, state.hintsShown[playerId] ?? 0)
+  const record: TurnRecord = { asker: playerId, question: 'Guess', yes: 0, no: 0, guess: said, correct: true }
+  return transition(
+    {
+      ...state,
+      turnsUsed: { ...state.turnsUsed, [playerId]: turns },
+      solved: { ...state.solved, [playerId]: { turnsUsed: turns, points, place } },
+      lastResult: record,
+      stumbled,
+      history: remember(state, record),
+      phase: 'RESULT' as const,
+      phaseStartedAt: now,
+      phaseEndsAt: now + RESULT_MS,
+    },
+    [{ type: 'PLAYER_SCORED' as const, data: { playerId, points, identity: card.name } }],
+    { [playerId]: points },
+  )
 }
 
 function scoreFor(turnsUsed: number, place: number, hintsTaken: number): number {
@@ -306,12 +399,14 @@ export const whoAmI: ErasedGameDefinition = defineGame<WhoAmIState, WhoAmISettin
       question: null,
       votes: {},
       lastResult: null,
+      stumbled: false,
       history: [],
       phaseStartedAt: ctx.now,
       phaseEndsAt: ctx.now + ASSIGN_MS,
       askSeconds: ctx.settings.askSeconds,
       voteSeconds: ctx.settings.voteSeconds,
       maxTurns: ctx.settings.maxTurns,
+      hintsEnabled: ctx.settings.hints,
     }
   },
 
@@ -323,21 +418,22 @@ export const whoAmI: ErasedGameDefinition = defineGame<WhoAmIState, WhoAmISettin
   validateAction(state, playerId, action): Result<void> {
     const parsed = parse(action)
     if (parsed === null) return reject('INVALID_ACTION')
-    if (state.solved[playerId] !== undefined) return reject('INVALID_ACTION', 'You already guessed yours.')
 
     switch (parsed.type) {
       case 'whoami/vote':
+        // Deliberately reachable once you have solved yours: answering for the
+        // rest of the table is most of what is left to do.
         if (state.phase !== 'VOTE') return reject('ROUND_CLOSED')
         if (playerId === currentAsker(state)) return reject('INVALID_ACTION', 'You asked the question.')
         if (state.votes[playerId] !== undefined) return reject('ALREADY_ANSWERED')
         return accept
+      case 'whoami/hint':
+        if (!state.hintsEnabled) return reject('INVALID_ACTION', 'This room is playing without hints.')
+        return holdsTheTurn(state, playerId)
       case 'whoami/ask':
       case 'whoami/guess':
-      case 'whoami/hint':
       case 'whoami/pass':
-        if (state.phase !== 'ASK') return reject('ROUND_CLOSED')
-        if (playerId !== currentAsker(state)) return reject('NOT_YOUR_TURN')
-        return accept
+        return holdsTheTurn(state, playerId)
     }
   },
 
@@ -348,25 +444,35 @@ export const whoAmI: ErasedGameDefinition = defineGame<WhoAmIState, WhoAmISettin
 
     switch (parsed.type) {
       case 'whoami/ask': {
+        const question = parsed.payload.question
+        const card = state.identities[playerId]
+        // Said their own name in the question. At a table that ends your game
+        // whether you meant it or not, so it counts as a guess rather than
+        // going out to a vote nobody could answer honestly.
+        if (card !== undefined && nameWithin(question, [card.name, ...card.aliases]) !== null) {
+          return solve(state, playerId, card, question, ctx.now, true)
+        }
         return transition(
           {
             ...state,
             phase: 'VOTE',
-            question: parsed.payload.question,
+            question,
             votes: {},
+            stumbled: false,
             phaseStartedAt: ctx.now,
             phaseEndsAt: ctx.now + state.voteSeconds * 1000,
             turnsUsed: { ...state.turnsUsed, [playerId]: (state.turnsUsed[playerId] ?? 0) + 1 },
           },
-          [{ type: 'ROUND_STARTED', data: { asker: playerId, question: parsed.payload.question } }],
+          [{ type: 'ROUND_STARTED', data: { asker: playerId, question } }],
         )
       }
 
       case 'whoami/vote': {
         const votes = { ...state.votes, [playerId]: parsed.payload.vote }
-        const eligible = ctx.players.filter(
-          (p) => p.presence !== 'INACTIVE' && p.id !== currentAsker(state) && state.solved[p.id] === undefined,
-        )
+        // Players who have already worked out their own name keep answering
+        // for everybody else — they can see every forehead but the one they no
+        // longer need, so excluding them only made the table quieter.
+        const eligible = ctx.players.filter((p) => p.presence !== 'INACTIVE' && p.id !== currentAsker(state))
         const everyoneVoted = eligible.length > 0 && eligible.every((p) => votes[p.id] !== undefined)
         const next: WhoAmIState = everyoneVoted
           ? { ...state, votes, phaseEndsAt: Math.min(state.phaseEndsAt, ctx.now) }
@@ -390,56 +496,28 @@ export const whoAmI: ErasedGameDefinition = defineGame<WhoAmIState, WhoAmISettin
       case 'whoami/guess': {
         const card = state.identities[playerId]
         if (card === undefined) return noChange(state)
-        const match = matchAnswer(parsed.payload.guess, [card.name, ...card.aliases])
+        const accepted = [card.name, ...card.aliases]
+        const guess = parsed.payload.guess
+        // "I am Prabhas" is the same guess as "Prabhas". The box invites a
+        // sentence — its placeholder is "I am…" — so judging only the whole
+        // string against the name marked the obvious phrasing wrong.
+        const correct = matchAnswer(guess, accepted).correct || nameWithin(guess, accepted) !== null
+        if (correct) return solve(state, playerId, card, guess, ctx.now, false)
+
         const turns = (state.turnsUsed[playerId] ?? 0) + 1
-        const withTurn = { ...state.turnsUsed, [playerId]: turns }
-
-        if (!match.correct) {
-          const record: TurnRecord = {
-            asker: playerId,
-            question: 'Guess',
-            yes: 0,
-            no: 0,
-            guess: parsed.payload.guess,
-            correct: false,
-          }
-          return transition(
-            {
-              ...state,
-              turnsUsed: withTurn,
-              lastResult: record,
-              history: remember(state, record),
-              phase: 'RESULT',
-              phaseStartedAt: ctx.now,
-              phaseEndsAt: ctx.now + RESULT_MS,
-            },
-            [{ type: 'PLAYER_ANSWERED', data: { playerId, correct: false } }],
-          )
-        }
-
-        const place = Object.keys(state.solved).length + 1
-        const points = scoreFor(turns, place, state.hintsShown[playerId] ?? 0)
-        const record: TurnRecord = {
-          asker: playerId,
-          question: 'Guess',
-          yes: 0,
-          no: 0,
-          guess: parsed.payload.guess,
-          correct: true,
-        }
+        const record: TurnRecord = { asker: playerId, question: 'Guess', yes: 0, no: 0, guess, correct: false }
         return transition(
           {
             ...state,
-            turnsUsed: withTurn,
-            solved: { ...state.solved, [playerId]: { turnsUsed: turns, points, place } },
+            turnsUsed: { ...state.turnsUsed, [playerId]: turns },
             lastResult: record,
+            stumbled: false,
             history: remember(state, record),
             phase: 'RESULT',
             phaseStartedAt: ctx.now,
             phaseEndsAt: ctx.now + RESULT_MS,
           },
-          [{ type: 'PLAYER_SCORED', data: { playerId, points, identity: card.name } }],
-          { [playerId]: points },
+          [{ type: 'PLAYER_ANSWERED', data: { playerId, correct: false } }],
         )
       }
 
@@ -549,20 +627,29 @@ export const whoAmI: ErasedGameDefinition = defineGame<WhoAmIState, WhoAmISettin
       ),
       maxTurns: state.maxTurns,
       remaining: unsolvedOrder(state, activeIdSet(ctx)).length,
-      // Everything the table has already heard, so nobody has to remember it.
-      // Public by construction: these questions were asked out loud and the
-      // votes were shown to the room when they were cast.
-      history: state.history,
+      // Your own turns and nobody else's.
+      //
+      // The log is for working out what to ask next, and somebody else's
+      // questions are about somebody else's person — they are noise on your
+      // screen. It also keeps a wrong guess that happens to name *your*
+      // identity off your screen, which a shared log would have handed you.
+      yourHistory: viewerId === null ? [] : state.history.filter((entry) => entry.asker === viewerId),
+      hintsEnabled: state.hintsEnabled,
       hintCost: HINT_COST,
     }
 
     // Hints describe the viewer's own identity without naming it, so they are
     // safe to send to exactly one person: the one who paid a turn for them.
-    if (myCard !== undefined) view['yourHints'] = myCard.hints.slice(0, myHints)
-    if (myCard !== undefined) view['yourHintsLeft'] = myCard.hints.length - myHints
-    if (myCard !== undefined) view['yourHintsTaken'] = myHints
+    if (myCard !== undefined && state.hintsEnabled) {
+      view['yourHints'] = myCard.hints.slice(0, myHints)
+      view['yourHintsLeft'] = myCard.hints.length - myHints
+      view['yourHintsTaken'] = myHints
+    }
 
-    if (state.phase === 'RESULT' && state.lastResult !== null) view['result'] = state.lastResult
+    if (state.phase === 'RESULT' && state.lastResult !== null) {
+      view['result'] = state.lastResult
+      view['stumbled'] = state.stumbled
+    }
 
     if (state.phase === 'FINISHED') {
       // Only now does everyone learn what they were wearing.
@@ -586,20 +673,19 @@ export const whoAmI: ErasedGameDefinition = defineGame<WhoAmIState, WhoAmISettin
 /** Local mirror of validateAction so applyAction does not round-trip through
  *  the erased definition just to re-check itself. */
 function whoAmIValidate(state: WhoAmIState, playerId: PlayerId, parsed: WhoAmIAction): Result<void> {
-  if (state.solved[playerId] !== undefined) return reject('INVALID_ACTION')
   switch (parsed.type) {
     case 'whoami/vote':
       if (state.phase !== 'VOTE') return reject('ROUND_CLOSED')
       if (playerId === currentAsker(state)) return reject('INVALID_ACTION')
       if (state.votes[playerId] !== undefined) return reject('ALREADY_ANSWERED')
       return accept
+    case 'whoami/hint':
+      if (!state.hintsEnabled) return reject('INVALID_ACTION')
+      return holdsTheTurn(state, playerId)
     case 'whoami/ask':
     case 'whoami/guess':
-    case 'whoami/hint':
     case 'whoami/pass':
-      if (state.phase !== 'ASK') return reject('ROUND_CLOSED')
-      if (playerId !== currentAsker(state)) return reject('NOT_YOUR_TURN')
-      return accept
+      return holdsTheTurn(state, playerId)
   }
 }
 
