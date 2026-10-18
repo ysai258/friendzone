@@ -39,11 +39,26 @@ import {
  * group — and then folds a curated list of equivalents, so "phone", "mobile"
  * and "cell phone" do too. Agreeing is the whole game; losing points because
  * two people picked different words for one thing is the software's fault.
+ *
+ * Two things keep a regular table from seeing the same prompts night after
+ * night. The host can skip a prompt they have played before, which swaps in a
+ * fresh one from a reserve drawn at the start. And with custom questions on,
+ * the game opens with a minute in which everyone writes a prompt of their own,
+ * and those are shuffled in among the built-in ones.
  */
 
 const COUNTDOWN_MS = 3_000
+const COLLECT_MS = 60_000
+/** Spare prompts kept back for the host's skips. */
+const RESERVE_SIZE = 20
+/** Custom prompts never touch the content tables, so their ids must not
+ *  either: usedContentIds filters on this prefix. */
+const CUSTOM_PREFIX = 'custom:'
 
-type Phase = 'COUNTDOWN' | 'PROMPT' | 'REVEAL' | 'FINISHED'
+type Phase = 'COLLECT' | 'COUNTDOWN' | 'PROMPT' | 'REVEAL' | 'FINISHED'
+
+/** A prompt as it is played. A custom one remembers who wrote it. */
+type RoundPrompt = MeldPrompt & { authorId?: PlayerId }
 
 interface MeldAnswer {
   text: string
@@ -55,7 +70,12 @@ interface MeldState {
   sessionId: string
   phase: Phase
   roundIndex: number
-  prompts: MeldPrompt[]
+  prompts: RoundPrompt[]
+  /** Drawn but not dealt: what a skipped prompt is replaced with. */
+  reserve: MeldPrompt[]
+  /** Custom prompts written during COLLECT, one per player. Hidden from
+   *  everyone but their author until they come up as a round. */
+  submissions: Record<PlayerId, string>
   phaseStartedAt: number
   phaseEndsAt: number
   answers: Record<PlayerId, MeldAnswer>
@@ -78,6 +98,7 @@ const settingsSchema = z.strictObject({
   rounds: z.int().min(3).max(12).default(5),
   seconds: z.int().min(10).max(60).default(20),
   allowEdits: z.boolean().default(true),
+  customQuestions: z.boolean().default(false),
 })
 
 type MeldSettings = z.infer<typeof settingsSchema>
@@ -91,6 +112,13 @@ const settingsSpec: SettingField[] = [
     help: 'Until the clock runs out. Nobody can see what you wrote either way.',
     kind: 'bool',
     default: true,
+  },
+  {
+    key: 'customQuestions',
+    label: 'Custom questions',
+    help: 'Before the first prompt, everyone gets 60 seconds to write a question of their own. They are mixed in with the built-in ones.',
+    kind: 'bool',
+    default: false,
   },
 ]
 
@@ -112,7 +140,39 @@ const resetSchema = z.strictObject({
   payload: z.strictObject({}).default({}),
 })
 
-const actionSchema = z.discriminatedUnion('type', [submitSchema, mergeSchema, resetSchema])
+/** Host only. Replaces the prompt on screen with a fresh one — for the
+ *  question the table has already played. */
+const skipSchema = z.strictObject({
+  type: z.literal('meld/skip'),
+  payload: z.strictObject({}).default({}),
+})
+
+/** A player's own prompt, written before the game proper starts. */
+const questionSchema = z.strictObject({
+  type: z.literal('meld/question'),
+  payload: z.strictObject({ question: z.string().trim().min(5).max(140) }),
+})
+
+/**
+ * Host only. Stops waiting for questions and deals the game.
+ *
+ * A game action rather than room/continue: the room settles a continue as of
+ * the phase's own deadline, which for a minute-long collection would start the
+ * first countdown up to a minute in the future.
+ */
+const closeQuestionsSchema = z.strictObject({
+  type: z.literal('meld/close-questions'),
+  payload: z.strictObject({}).default({}),
+})
+
+const actionSchema = z.discriminatedUnion('type', [
+  submitSchema,
+  mergeSchema,
+  resetSchema,
+  skipSchema,
+  questionSchema,
+  closeQuestionsSchema,
+])
 
 function parseAnswer(action: GameAction): string | null {
   const parsed = submitSchema.safeParse(action)
@@ -124,7 +184,12 @@ function parseMerge(action: GameAction): string[] | null {
   return parsed.success ? parsed.data.payload.keys : null
 }
 
-function currentPrompt(state: MeldState): MeldPrompt | null {
+function parseQuestion(action: GameAction): string | null {
+  const parsed = questionSchema.safeParse(action)
+  return parsed.success ? parsed.data.payload.question : null
+}
+
+function currentPrompt(state: MeldState): RoundPrompt | null {
   return state.prompts[state.roundIndex] ?? null
 }
 
@@ -139,6 +204,24 @@ function validate(
   ctx: { hostId: PlayerId },
   allowEdits: boolean,
 ): Result<void> {
+  if (action.type === 'meld/question') {
+    if (state.phase !== 'COLLECT') return reject('ROUND_CLOSED', 'Questions are closed.')
+    return parseQuestion(action) === null ? reject('INVALID_ACTION', 'Write between 5 and 140 characters.') : accept
+  }
+
+  if (action.type === 'meld/close-questions') {
+    if (playerId !== ctx.hostId) return reject('NOT_HOST')
+    return state.phase === 'COLLECT' ? accept : reject('ROUND_CLOSED', 'Questions are already closed.')
+  }
+
+  if (action.type === 'meld/skip') {
+    if (playerId !== ctx.hostId) return reject('NOT_HOST')
+    if (state.phase !== 'COUNTDOWN' && state.phase !== 'PROMPT') {
+      return reject('INVALID_ACTION', 'There is no prompt to skip right now.')
+    }
+    return state.reserve.length === 0 ? reject('INVALID_ACTION', 'There are no more prompts to swap in.') : accept
+  }
+
   if (action.type === 'meld/merge' || action.type === 'meld/unmerge') {
     // Regrouping is a host call, and only while the results are on screen.
     if (playerId !== ctx.hostId) return reject('NOT_HOST')
@@ -257,6 +340,63 @@ function mergeKeys(mergedInto: Record<string, string>, keys: string[]): Record<s
   return next
 }
 
+/**
+ * Swap the prompt on screen for the next one in reserve and count down to it
+ * again. Answers already typed belonged to the old prompt, so they go too.
+ */
+function skipPrompt(state: MeldState, now: number): MeldState {
+  const [fresh, ...reserve] = state.reserve
+  if (fresh === undefined) return state
+  const prompts = state.prompts.map((p, i) => (i === state.roundIndex ? fresh : p))
+  return {
+    ...state,
+    prompts,
+    reserve,
+    phase: 'COUNTDOWN',
+    phaseStartedAt: now,
+    phaseEndsAt: now + COUNTDOWN_MS,
+    answers: {},
+    groups: [],
+    mergedInto: {},
+  }
+}
+
+/**
+ * Close question collection and deal the game.
+ *
+ * Every custom question is played. They take the place of built-in prompts so
+ * the game stays the length the host chose — unless more people wrote one than
+ * there are rounds, in which case the game grows rather than drop anyone's.
+ * The built-in prompts that make way go to the front of the reserve.
+ */
+function dealWithCustom(state: MeldState, ctx: { now: number; seed: string; players: { id: PlayerId }[] }): MeldState {
+  const seen = new Set<string>()
+  const custom: RoundPrompt[] = []
+  // Seat order, so the result does not depend on the order answers arrived in.
+  for (const { id } of ctx.players) {
+    const text = state.submissions[id]
+    if (text === undefined) continue
+    const key = text.toLocaleLowerCase().replace(/\s+/g, ' ')
+    if (seen.has(key)) continue
+    seen.add(key)
+    custom.push({ kind: 'prompt', id: `${CUSTOM_PREFIX}${id}`, prompt: text, category: 'custom', difficulty: 'medium', authorId: id })
+  }
+
+  const builtIn = Math.max(0, state.prompts.length - custom.length)
+  const rng = createRng(ctx.seed, 'mind-meld-mix', state.sessionId)
+  const prompts = rng.shuffle([...custom, ...state.prompts.slice(0, builtIn)])
+
+  return {
+    ...state,
+    phase: 'COUNTDOWN',
+    phaseStartedAt: ctx.now,
+    phaseEndsAt: ctx.now + COUNTDOWN_MS,
+    prompts,
+    reserve: [...state.prompts.slice(builtIn), ...state.reserve],
+    submissions: {},
+  }
+}
+
 /** Where the game goes when the host leaves the results screen. */
 function nextAfterReveal(state: MeldState, now: number): MeldState {
   if (state.roundIndex + 1 >= state.prompts.length) {
@@ -312,14 +452,20 @@ export const mindMeld: ErasedGameDefinition = defineGame<MeldState, MeldSettings
   createGame(ctx: CreateContext<MeldSettings>): MeldState {
     const pool = expectItems(ctx.content, 'prompt')
     const rng = createRng(ctx.seed, 'mind-meld', ctx.sessionId)
-    const drawn = pickFresh(pool, { count: ctx.settings.rounds, recentIds: ctx.recentContentIds, rng })
+    const { rounds } = ctx.settings
+    const drawn = pickFresh(pool, { count: rounds + RESERVE_SIZE, recentIds: ctx.recentContentIds, rng })
+    // Collecting questions comes first and has its own clock; the first
+    // countdown starts when it closes.
+    const collect = ctx.settings.customQuestions
     return {
       sessionId: ctx.sessionId,
-      phase: 'COUNTDOWN',
+      phase: collect ? 'COLLECT' : 'COUNTDOWN',
       roundIndex: 0,
-      prompts: drawn.items,
+      prompts: drawn.items.slice(0, rounds),
+      reserve: drawn.items.slice(rounds),
+      submissions: {},
       phaseStartedAt: ctx.now,
-      phaseEndsAt: ctx.now + COUNTDOWN_MS,
+      phaseEndsAt: ctx.now + (collect ? COLLECT_MS : COUNTDOWN_MS),
       answers: {},
       groups: [],
       mergedInto: {},
@@ -338,7 +484,9 @@ export const mindMeld: ErasedGameDefinition = defineGame<MeldState, MeldSettings
     state.phase === 'FINISHED' || state.phase === 'REVEAL' ? null : state.phaseEndsAt,
   getPhase: (state) => state.phase,
   isGameOver: (state) => state.phase === 'FINISHED',
-  usedContentIds: (state) => state.prompts.map((p) => p.id),
+  // Only the dealt prompts, and only built-in ones: the reserve may never be
+  // shown, and a custom prompt has no row to remember.
+  usedContentIds: (state) => state.prompts.map((p) => p.id).filter((id) => !id.startsWith(CUSTOM_PREFIX)),
 
   /**
    * Host pressed Next Question.
@@ -362,6 +510,21 @@ export const mindMeld: ErasedGameDefinition = defineGame<MeldState, MeldSettings
     const merging = parseMerge(action)
     if (merging !== null) return regroup(state, mergeKeys(state.mergedInto, merging))
 
+    if (action.type === 'meld/skip') return transition(skipPrompt(state, ctx.now))
+    // Due now, so the settle that follows this action deals the game.
+    if (action.type === 'meld/close-questions') return transition({ ...state, phaseEndsAt: Math.min(state.phaseEndsAt, ctx.now) })
+
+    const question = parseQuestion(action)
+    if (question !== null) {
+      const submissions = { ...state.submissions, [playerId]: question }
+      const everyone = activeIds(ctx)
+      const done = everyone.length > 0 && everyone.every((id) => submissions[id] !== undefined)
+      return transition(
+        { ...state, submissions, phaseEndsAt: done ? Math.min(state.phaseEndsAt, ctx.now) : state.phaseEndsAt },
+        [{ type: 'PLAYER_ANSWERED', data: { playerId } }],
+      )
+    }
+
     const text = parseAnswer(action)
     if (text === null) return noChange(state)
 
@@ -380,6 +543,11 @@ export const mindMeld: ErasedGameDefinition = defineGame<MeldState, MeldSettings
 
   advance(state, ctx) {
     switch (state.phase) {
+      case 'COLLECT': {
+        if (ctx.now < state.phaseEndsAt) return noChange(state)
+        return transition(dealWithCustom(state, ctx))
+      }
+
       case 'COUNTDOWN': {
         if (ctx.now < state.phaseEndsAt) return noChange(state)
         return transition(
@@ -420,6 +588,13 @@ export const mindMeld: ErasedGameDefinition = defineGame<MeldState, MeldSettings
   },
 
   onPlayerInactive(state, playerId, ctx) {
+    if (state.phase === 'COLLECT') {
+      // Their question stays — it was written for the table, not for them —
+      // but nobody waits on someone who has gone.
+      const everyone = activeIds(ctx)
+      const done = everyone.length > 0 && everyone.every((id) => state.submissions[id] !== undefined)
+      return done ? transition({ ...state, phaseEndsAt: Math.min(state.phaseEndsAt, ctx.now) }) : noChange(state)
+    }
     if (state.phase !== 'PROMPT') return noChange(state)
     // Drop a departed player's answer so it cannot pad a group they are no
     // longer part of, then see whether the rest have all finished.
@@ -438,8 +613,31 @@ export const mindMeld: ErasedGameDefinition = defineGame<MeldState, MeldSettings
     const prompt = currentPrompt(state)
     const mine = viewerId === null ? undefined : state.answers[viewerId]
 
+    if (state.phase === 'COLLECT') {
+      // Nobody sees anybody's question until it comes up as a round.
+      const view: Record<string, unknown> = {
+        collecting: true,
+        submittedPlayerIds: Object.keys(state.submissions),
+        activeCount: activeIds(ctx).length,
+      }
+      const own = viewerId === null ? undefined : state.submissions[viewerId]
+      if (own !== undefined) view['yourQuestion'] = own
+      return {
+        gameId: 'mind-meld',
+        sessionId: state.sessionId,
+        phase: state.phase,
+        roundNumber: 0,
+        // Not known until the questions are in, and zero hides the round pill.
+        totalRounds: 0,
+        view,
+      }
+    }
+
     const view: Record<string, unknown> = {
       prompt: prompt?.prompt ?? '',
+      // Only set for a custom prompt; the screen credits whoever wrote it.
+      ...(prompt?.authorId === undefined ? {} : { authorId: prompt.authorId }),
+      canSkip: state.reserve.length > 0,
       // Who has locked in. Not what they wrote, not how long it is.
       answeredPlayerIds: Object.keys(state.answers),
       activeCount: activeIds(ctx).length,

@@ -136,8 +136,11 @@ image URL.
 ```mermaid
 stateDiagram-v2
   [*] --> COUNTDOWN
+  [*] --> COLLECT: custom questions on
+  COLLECT --> COUNTDOWN: 60s, everybody wrote one, or host presses Start now
   COUNTDOWN --> PROMPT: countdown ends
   PROMPT --> REVEAL: timer, or everybody answered
+  PROMPT --> COUNTDOWN: host skips the prompt
   REVEAL --> COUNTDOWN: host presses Next question
   REVEAL --> FINISHED: host presses See final results
 ```
@@ -161,6 +164,20 @@ the host joining two answers that meant the same thing to the table but not to
 the key folder, and taking it back. Both are host-only and both re-score the
 round in place, which is safe precisely because the phase has no clock racing
 them.
+
+`COLLECT` only exists when the host turns on custom questions. Each player
+sends one `meld/question`; nobody else sees it until it comes up as a round.
+When the phase closes, every custom question is dealt, taking the place of
+built-in prompts so the game keeps the length the host chose — or growing it,
+if more people wrote one than there are rounds. The host closes it early with
+`meld/close-questions` rather than `room/continue`: a continue settles the room
+as of the phase's deadline, which here is up to a minute away, and the first
+countdown would start from there.
+
+`meld/skip` is host-only and accepted in `COUNTDOWN` and `PROMPT`. It swaps the
+current prompt for the next one in a reserve drawn at the start, clears any
+answers, and counts down again, so a prompt the table has played before costs
+nothing and the round count does not change.
 
 ## Who Am I?
 

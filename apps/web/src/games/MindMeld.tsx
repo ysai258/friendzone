@@ -15,11 +15,21 @@ interface MeldView {
   awaitingHost?: boolean
   isLastRound?: boolean
   merged?: boolean
+  /** Set on a custom prompt: who wrote it. */
+  authorId?: string
+  canSkip?: boolean
+  // While questions are being collected.
+  collecting?: boolean
+  submittedPlayerIds?: string[]
+  yourQuestion?: string
 }
 
 export function MindMeld({ connection, room }: GameProps) {
   const view = readView<MeldView>(room)
   const phase = room.game?.phase
+  const isHost = room.viewerId === room.hostId
+
+  if (phase === 'COLLECT') return <Collecting connection={connection} view={view} room={room} />
 
   if (phase === 'COUNTDOWN') {
     return (
@@ -36,14 +46,84 @@ export function MindMeld({ connection, room }: GameProps) {
     <div className="flex flex-col gap-4">
       <GameHeader connection={connection} room={room} label="🧠 Mind Meld" accent="bg-emerald-400" />
 
-      <Card className="py-7 text-center">
+      <Card className="flex flex-col gap-2 py-7 text-center">
         <p className="text-2xl font-bold leading-snug">{view.prompt}</p>
+        {view.authorId !== undefined && (
+          <p className="text-xs text-muted">
+            ✍️ Asked by <PlayerName room={room} playerId={view.authorId} />
+          </p>
+        )}
       </Card>
 
       {phase === 'PROMPT' ? (
-        <Answering connection={connection} view={view} room={room} />
+        <>
+          <Answering connection={connection} view={view} room={room} />
+          {/* For the prompt the table has already played: a fresh one takes
+              its place, so the game stays the same length. */}
+          {isHost && view.canSkip === true && (
+            <Button variant="ghost" onClick={() => connection.send('meld/skip')}>
+              Skip this question ⏭
+            </Button>
+          )}
+        </>
       ) : (
         <Groups connection={connection} view={view} room={room} />
+      )}
+    </div>
+  )
+}
+
+/** Before the first prompt: everyone writes one of their own. */
+function Collecting({ connection, view, room }: { connection: GameProps['connection']; view: MeldView; room: PublicRoomView }) {
+  const [question, setQuestion] = useState('')
+  const sent = view.yourQuestion
+  const isHost = room.viewerId === room.hostId
+  const ready = question.trim().length >= 5
+
+  const submit = () => {
+    if (!ready) return
+    connection.send('meld/question', { question: question.trim() })
+    setQuestion('')
+  }
+
+  return (
+    <div className="flex flex-col gap-4">
+      <GameHeader connection={connection} room={room} label="🧠 Mind Meld" accent="bg-emerald-400" />
+
+      <Card className="flex flex-col gap-1 py-6 text-center">
+        <p className="text-xl font-bold">Write a question for the table</p>
+        <p className="text-sm text-muted">
+          One with an obvious answer — &ldquo;Name a fruit that&rsquo;s yellow&rdquo;. It gets mixed in with the rest.
+        </p>
+      </Card>
+
+      <div className="flex gap-2">
+        <TextInput
+          autoFocus
+          value={question}
+          maxLength={140}
+          enterKeyHint="send"
+          placeholder={sent === undefined ? 'Your question' : 'Change your question'}
+          onChange={(e) => setQuestion(e.target.value)}
+          onKeyDown={(e) => { if (e.key === 'Enter') submit() }}
+        />
+        <Button onClick={submit} disabled={!ready}>
+          {sent === undefined ? 'Send' : 'Change'}
+        </Button>
+      </div>
+
+      {sent !== undefined && (
+        <p className="animate-pop text-center text-sm">
+          You asked <span className="font-bold text-emerald-300">{sent}</span>
+        </p>
+      )}
+      <p className="text-center text-xs text-muted">Nobody sees your question until it comes up.</p>
+      <AnsweredRow players={room.players} answeredIds={view.submittedPlayerIds ?? []} />
+
+      {isHost && (
+        <Button size="lg" onClick={() => connection.send('meld/close-questions')}>
+          Start now →
+        </Button>
       )}
     </div>
   )
