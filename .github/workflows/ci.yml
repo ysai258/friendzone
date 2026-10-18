@@ -55,8 +55,10 @@ jobs:
 
       # Placeholder art rather than a network fetch: CI should not depend on
       # Wikimedia being reachable, and the mechanics are identical either way.
+      # The service database starts empty, so the schema has to exist before
+      # anything is seeded into it.
       - name: Build content
-        run: npm run dataset:sample && npm run seed
+        run: npm run migrate && npm run dataset:sample && npm run seed
 
       - name: Integration tests
         run: npm run test:integration
