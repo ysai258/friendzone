@@ -82,7 +82,9 @@ test.describe('a game of Blur Battle', () => {
 
     // The reveal names the answer and credits the photographer.
     await expect(hostPage.getByText('It was')).toBeVisible({ timeout: 30_000 })
-    await expect(hostPage.getByRole('link', { name: 'Wikimedia Commons' })).toBeVisible()
+    // CI seeds placeholder art rather than fetching from Commons, so the
+    // credit names whichever source the content actually came from.
+    await expect(hostPage.getByRole('link', { name: /^(Wikimedia Commons|Generated placeholder)$/ })).toBeVisible()
 
     // Play the rest out.
     await expect(hostPage.getByText('Final results')).toBeVisible({ timeout: 120_000 })
