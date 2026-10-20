@@ -91,7 +91,7 @@ CREATE TABLE datasets (
 CREATE TABLE questions (
   id          TEXT     PRIMARY KEY,
   dataset_id  TEXT     NOT NULL REFERENCES datasets(id) ON DELETE CASCADE,
-  -- Matches ContentItem['kind'] in the engine: image, emoji, identity, prompt, mafia.
+  -- Matches ContentItem['kind'] in the engine: image, emoji, identity, prompt, mafia, song.
   kind        TEXT     NOT NULL,
   category    TEXT     NOT NULL,
   difficulty  TEXT     NOT NULL,

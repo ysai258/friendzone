@@ -139,7 +139,7 @@ test.describe('the landing page', () => {
   test('lists every game with its player range', async ({ page }) => {
     await page.goto('/')
     await expect(page.getByRole('heading', { name: 'FRIENDZONE' })).toBeVisible()
-    for (const name of ['Blur Battle', 'Emoji Movie', 'Mind Meld', 'Who Am I?', 'Movie Mafia']) {
+    for (const name of ['Blur Battle', 'Emoji Movie', 'Mind Meld', 'Who Am I?', 'Movie Mafia', 'Paata Pattu']) {
       await expect(page.getByText(name, { exact: true })).toBeVisible()
     }
     await expect(page.getByText('No signup. No downloads. Just friends.')).toBeVisible()

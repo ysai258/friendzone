@@ -24,6 +24,7 @@ No signup. No downloads. Just friends.
 | 🧠 **Mind Meld** | One prompt, everyone answers at once, points for agreeing. Being clever is a trap. | 2–16 |
 | 🕵️ **Who Am I?** | A secret identity on your forehead that everyone but you can see. One category per game: Telugu actors, cricketers, singers… | 3–10 |
 | 🎭 **Movie Mafia** | Everyone gets a clue about the same film. One clue is wrong, and its holder does not know. Same language picker as Emoji Movie. | 4–12 |
+| 📼 **Paata Pattu** | Name the Telugu song from its opening seconds. Two seconds, then four, seven, ten, fifteen — each wrong guess or skip buys a longer listen, and the table watches everyone's ladder fill up. | 1–12 |
 
 ## Running it
 
@@ -33,7 +34,7 @@ npm install
 cp .env.example .env
 docker compose up -d          # PostgreSQL and Redis
 npm run dataset:sample        # generated placeholder art, no network needed
-npm run seed                  # loads all five games' content (~900 items)
+npm run seed                  # loads all six games' content (~1,000 items)
 npm run dev                   # http://localhost:5174
 ```
 
@@ -157,7 +158,7 @@ apps/
   web/             React + Vite. One screen per game.
 packages/
   shared/          Wire protocol, error codes, types both sides agree on.
-  game-engine/     The GameDefinition contract and all five games. Pure.
+  game-engine/     The GameDefinition contract and all six games. Pure.
 scripts/
   dataset/         Content pipeline: fetch, validate, dedupe, derive.
   load/            Load generator.
@@ -174,7 +175,9 @@ Blur Battle images come from Wikimedia Commons under CC0, public domain, CC BY
 or CC BY-SA. NonCommercial and NoDerivatives files are filtered out at fetch
 time, because this project generates derivatives and cannot promise
 non-commercial use on a deployer's behalf. Every image carries its author,
-source and licence through to the reveal screen. The other four games' content is
+source and licence through to the reveal screen. Paata Pattu streams 76 Telugu
+songs from their labels' own YouTube uploads; the list of which songs is ours,
+the audio is not. The other four games' content is
 original to this project: 351 films across five languages, 90 Movie Mafia
 subjects, 221 Mind Meld prompts and 177 identities across seven categories, all
 hand-written and checked at seed time for answers a player could not tell

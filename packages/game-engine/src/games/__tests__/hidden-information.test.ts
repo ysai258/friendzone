@@ -19,6 +19,7 @@ const CONTENT_FOR: Record<string, Parameters<typeof packOf>[0]> = {
   'who-am-i': 'identity',
   'mind-meld': 'prompt',
   'movie-mafia': 'mafia',
+  'paata-pattu': 'song',
 }
 
 function boot(def: ErasedGameDefinition, playerCount: number) {

@@ -6,6 +6,7 @@ import { EmojiMovie } from './EmojiMovie.tsx'
 import { MindMeld } from './MindMeld.tsx'
 import { WhoAmI, WhoAmIEpilogue } from './WhoAmI.tsx'
 import { MovieMafia, MovieMafiaEpilogue } from './MovieMafia.tsx'
+import { PaataPattu, PaataPattuEpilogue } from './PaataPattu.tsx'
 
 export interface GameProps {
   connection: RoomConnection
@@ -22,12 +23,14 @@ const SCREENS: Record<string, (props: GameProps) => React.ReactElement> = {
   'mind-meld': MindMeld,
   'who-am-i': WhoAmI,
   'movie-mafia': MovieMafia,
+  'paata-pattu': PaataPattu,
 }
 
 const EPILOGUES: Record<string, (props: { room: PublicRoomView }) => React.ReactElement | null> = {
   'blur-battle': BlurBattleEpilogue,
   'who-am-i': WhoAmIEpilogue,
   'movie-mafia': MovieMafiaEpilogue,
+  'paata-pattu': PaataPattuEpilogue,
 }
 
 export function GameScreen({ connection, room }: GameProps) {

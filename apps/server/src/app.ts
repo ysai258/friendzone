@@ -136,12 +136,16 @@ export async function buildApp(options: BuildOptions = {}): Promise<BuiltApp> {
     contentSecurityPolicy: {
       // Serving only JSON and a socket upgrade: nothing may load, nothing may
       // frame it. Serving the app too: it needs to load its own bundle, talk to
-      // its own origin over HTTP and WebSocket, and show its own images. Both
-      // policies deny everything else, including any third-party script.
+      // its own origin over HTTP and WebSocket, and show its own images, plus
+      // YouTube's player for song clips. Both policies deny everything else.
       directives: willServeWeb
         ? {
             defaultSrc: ["'self'"],
-            scriptSrc: ["'self'"],
+            // YouTube is the one third party: Paata Pattu plays its clips
+            // through the IFrame Player API, which is a script plus an iframe,
+            // both served from www.youtube.com. Nothing else is allowed in.
+            scriptSrc: ["'self'", 'https://www.youtube.com'],
+            frameSrc: ['https://www.youtube.com'],
             // Tailwind ships a stylesheet, but the app also sets inline styles
             // for timer widths, which cannot be hashed ahead of time.
             styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],

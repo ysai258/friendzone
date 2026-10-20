@@ -1,6 +1,6 @@
 # Content
 
-Four of the five games play from hand-written datasets in `data/seed/`; Blur
+Five of the six games play from hand-written datasets in `data/seed/`; Blur
 Battle plays from images the pipeline fetches and derives. This is what is in
 them, the rules they were written to, and how to change them.
 
@@ -17,6 +17,7 @@ data/seed/
   prompts.json            221   Mind Meld, 17 themes
   identities.json         177   Who Am I?, 7 categories
   image-subjects.json      79   Blur Battle subjects; the pipeline does the rest
+  songs.json               76   Paata Pattu — Telugu songs and their YouTube clips
 ```
 
 Each file is `{ "$comment": …, "items": [ … ] }`, and the movie files also
@@ -191,3 +192,34 @@ so the image count can be lower than the subject count.
 Derivation is the one genuinely batch workload in the system, and is therefore
 the one thing that runs through BullMQ; see
 [architecture.md](architecture.md).
+
+## Paata Pattu songs
+
+`songs.json` lists Telugu songs and where each one's audio lives on YouTube.
+The game never stores audio; it plays the clip through YouTube's own embedded
+player, hidden off-screen so the video's title and thumbnail stay out of sight.
+
+```jsonc
+{ "id": "song-srivalli", "title": "Srivalli", "movie": "Pushpa", "year": 2021,
+  "difficulty": "easy", "videoId": "5IEbR79kBPY", "startOffsetMs": 0,
+  "aliases": [] }
+```
+
+- **Use the label's own upload** (Aditya Music, Lahari, T-Series Telugu, Sony
+  Music South, Saregama…). Fan re-uploads vanish and often disable embedding.
+  Prefer a lyrical or audio video: it starts on the music, not on a scene.
+- **Check it embeds.** A video that cannot be embedded fails silently in the
+  game. `https://www.youtube.com/oembed?format=json&url=https://www.youtube.com/watch?v=<id>`
+  returns 401 or 404 for those.
+- **`startOffsetMs`** is where the song itself begins in that upload. Leave it
+  at 0 unless the video opens with a label sting or a spoken intro, which
+  would otherwise eat the whole two-second clue. Most entries are 0 and have
+  not been checked by ear.
+- **`aliases`** are other spellings the guess box should find, such as
+  "Yentha Sakkagunnave" for "Entha Sakkagunnave". Guesses are picked from the
+  list, so aliases only help a player find the song; they are not typo rules.
+- **Difficulty** is how widely known the song is: `easy` is a recent
+  chartbuster, `hard` is a classic or a deep cut.
+
+The whole file is the guess box's catalog in every game, whatever difficulty
+the host picks, so the list of choices never narrows the answer.

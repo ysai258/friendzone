@@ -1,0 +1,806 @@
+{
+  "$comment": "Telugu songs for Paata Pattu. Each clip is the official label upload on YouTube (Aditya, Lahari, T-Series, Sony, Saregama, ...), checked embeddable through oEmbed when added. startOffsetMs skips a label sting or spoken intro where a video has one; 0 means the song starts at the top.",
+  "language": "telugu",
+  "items": [
+    {
+      "id": "song-srivalli",
+      "title": "Srivalli",
+      "movie": "Pushpa",
+      "year": 2021,
+      "difficulty": "easy",
+      "videoId": "5IEbR79kBPY",
+      "startOffsetMs": 0,
+      "aliases": []
+    },
+    {
+      "id": "song-oo-antava",
+      "title": "Oo Antava",
+      "movie": "Pushpa",
+      "year": 2021,
+      "difficulty": "easy",
+      "videoId": "u6BoyOceiPE",
+      "startOffsetMs": 0,
+      "aliases": [
+        "Oo Antava Mava",
+        "O Antava"
+      ]
+    },
+    {
+      "id": "song-saami-saami",
+      "title": "Saami Saami",
+      "movie": "Pushpa",
+      "year": 2021,
+      "difficulty": "easy",
+      "videoId": "C70GJYVoZ4Y",
+      "startOffsetMs": 0,
+      "aliases": []
+    },
+    {
+      "id": "song-samajavaragamana",
+      "title": "Samajavaragamana",
+      "movie": "Ala Vaikunthapurramuloo",
+      "year": 2020,
+      "difficulty": "easy",
+      "videoId": "tflQ33g6I8I",
+      "startOffsetMs": 0,
+      "aliases": [
+        "Samajavaragamana Ninnu"
+      ]
+    },
+    {
+      "id": "song-ramuloo-ramulaa",
+      "title": "Ramuloo Ramulaa",
+      "movie": "Ala Vaikunthapurramuloo",
+      "year": 2020,
+      "difficulty": "easy",
+      "videoId": "wFAj0pW6xX0",
+      "startOffsetMs": 0,
+      "aliases": []
+    },
+    {
+      "id": "song-butta-bomma",
+      "title": "Butta Bomma",
+      "movie": "Ala Vaikunthapurramuloo",
+      "year": 2020,
+      "difficulty": "easy",
+      "videoId": "aRGaUZm1_Zg",
+      "startOffsetMs": 0,
+      "aliases": []
+    },
+    {
+      "id": "song-naatu-naatu",
+      "title": "Naatu Naatu",
+      "movie": "RRR",
+      "year": 2022,
+      "difficulty": "easy",
+      "videoId": "pBVtSwb5G7M",
+      "startOffsetMs": 0,
+      "aliases": []
+    },
+    {
+      "id": "song-dosti",
+      "title": "Dosti",
+      "movie": "RRR",
+      "year": 2022,
+      "difficulty": "medium",
+      "videoId": "Fkxjy9qq_lo",
+      "startOffsetMs": 0,
+      "aliases": []
+    },
+    {
+      "id": "song-dheevara",
+      "title": "Dheevara",
+      "movie": "Baahubali",
+      "year": 2015,
+      "difficulty": "medium",
+      "videoId": "ql-cPskAthI",
+      "startOffsetMs": 0,
+      "aliases": [
+        "Dhivara"
+      ]
+    },
+    {
+      "id": "song-saahore-baahubali",
+      "title": "Saahore Baahubali",
+      "movie": "Baahubali 2",
+      "year": 2017,
+      "difficulty": "easy",
+      "videoId": "XAW915UjfZg",
+      "startOffsetMs": 0,
+      "aliases": [
+        "Saahore Bahubali"
+      ]
+    },
+    {
+      "id": "song-inkem-inkem-inkem-kaavaale",
+      "title": "Inkem Inkem Inkem Kaavaale",
+      "movie": "Geetha Govindam",
+      "year": 2018,
+      "difficulty": "easy",
+      "videoId": "rQA5YM9UDrg",
+      "startOffsetMs": 0,
+      "aliases": [
+        "Inkem Inkem"
+      ]
+    },
+    {
+      "id": "song-rangamma-mangamma",
+      "title": "Rangamma Mangamma",
+      "movie": "Rangasthalam",
+      "year": 2018,
+      "difficulty": "easy",
+      "videoId": "RQduyJZ4yNE",
+      "startOffsetMs": 0,
+      "aliases": []
+    },
+    {
+      "id": "song-entha-sakkagunnave",
+      "title": "Entha Sakkagunnave",
+      "movie": "Rangasthalam",
+      "year": 2018,
+      "difficulty": "medium",
+      "videoId": "-xgy9rTzUnw",
+      "startOffsetMs": 0,
+      "aliases": [
+        "Yentha Sakkagunnave"
+      ]
+    },
+    {
+      "id": "song-jigelu-rani",
+      "title": "Jigelu Rani",
+      "movie": "Rangasthalam",
+      "year": 2018,
+      "difficulty": "medium",
+      "videoId": "1sBUkUEzY40",
+      "startOffsetMs": 0,
+      "aliases": []
+    },
+    {
+      "id": "song-mind-block",
+      "title": "Mind Block",
+      "movie": "Sarileru Neekevvaru",
+      "year": 2020,
+      "difficulty": "medium",
+      "videoId": "9ub504V9Hg8",
+      "startOffsetMs": 0,
+      "aliases": []
+    },
+    {
+      "id": "song-kalaavathi",
+      "title": "Kalaavathi",
+      "movie": "Sarkaru Vaari Paata",
+      "year": 2022,
+      "difficulty": "easy",
+      "videoId": "82JAEZRIPn0",
+      "startOffsetMs": 0,
+      "aliases": []
+    },
+    {
+      "id": "song-kadalalle",
+      "title": "Kadalalle",
+      "movie": "Dear Comrade",
+      "year": 2019,
+      "difficulty": "medium",
+      "videoId": "ykFuwxhns6o",
+      "startOffsetMs": 0,
+      "aliases": []
+    },
+    {
+      "id": "song-nee-kannu-neeli-samudram",
+      "title": "Nee Kannu Neeli Samudram",
+      "movie": "Uppena",
+      "year": 2021,
+      "difficulty": "easy",
+      "videoId": "mrqgz4_a4PU",
+      "startOffsetMs": 0,
+      "aliases": []
+    },
+    {
+      "id": "song-vachinde",
+      "title": "Vachinde",
+      "movie": "Fidaa",
+      "year": 2017,
+      "difficulty": "easy",
+      "videoId": "z3ZNX_2gPD8",
+      "startOffsetMs": 0,
+      "aliases": []
+    },
+    {
+      "id": "song-mooga-manasulu",
+      "title": "Mooga Manasulu",
+      "movie": "Mahanati",
+      "year": 2018,
+      "difficulty": "medium",
+      "videoId": "JBYejnluuCk",
+      "startOffsetMs": 0,
+      "aliases": []
+    },
+    {
+      "id": "song-adhento-gaani-vunnapaatuga",
+      "title": "Adhento Gaani Vunnapaatuga",
+      "movie": "Jersey",
+      "year": 2019,
+      "difficulty": "medium",
+      "videoId": "U7uYYwHOcmA",
+      "startOffsetMs": 0,
+      "aliases": []
+    },
+    {
+      "id": "song-priyathama-priyathama",
+      "title": "Priyathama Priyathama",
+      "movie": "Majili",
+      "year": 2019,
+      "difficulty": "medium",
+      "videoId": "7TgSCEQYUpI",
+      "startOffsetMs": 0,
+      "aliases": []
+    },
+    {
+      "id": "song-saranga-dariya",
+      "title": "Saranga Dariya",
+      "movie": "Love Story",
+      "year": 2021,
+      "difficulty": "easy",
+      "videoId": "HqXG0IBaTr8",
+      "startOffsetMs": 0,
+      "aliases": []
+    },
+    {
+      "id": "song-boss-party",
+      "title": "Boss Party",
+      "movie": "Waltair Veerayya",
+      "year": 2023,
+      "difficulty": "medium",
+      "videoId": "Er8D49RPLCs",
+      "startOffsetMs": 0,
+      "aliases": []
+    },
+    {
+      "id": "song-jinthaak",
+      "title": "Jinthaak",
+      "movie": "Dhamaka",
+      "year": 2022,
+      "difficulty": "medium",
+      "videoId": "Lrh-bIgi2Ws",
+      "startOffsetMs": 0,
+      "aliases": []
+    },
+    {
+      "id": "song-inthandham",
+      "title": "Inthandham",
+      "movie": "Sita Ramam",
+      "year": 2022,
+      "difficulty": "medium",
+      "videoId": "9g2tgsYDUnE",
+      "startOffsetMs": 0,
+      "aliases": []
+    },
+    {
+      "id": "song-oh-sita-hey-rama",
+      "title": "Oh Sita Hey Rama",
+      "movie": "Sita Ramam",
+      "year": 2022,
+      "difficulty": "medium",
+      "videoId": "VHDKxkiyai8",
+      "startOffsetMs": 0,
+      "aliases": []
+    },
+    {
+      "id": "song-na-roja-nuvve",
+      "title": "Na Roja Nuvve",
+      "movie": "Kushi",
+      "year": 2023,
+      "difficulty": "medium",
+      "videoId": "0n7AWxYCj9I",
+      "startOffsetMs": 0,
+      "aliases": []
+    },
+    {
+      "id": "song-kurchi-madathapetti",
+      "title": "Kurchi Madathapetti",
+      "movie": "Guntur Kaaram",
+      "year": 2024,
+      "difficulty": "easy",
+      "videoId": "Ldn11dMHTJ8",
+      "startOffsetMs": 0,
+      "aliases": [
+        "Kurchi Madatha Petti"
+      ]
+    },
+    {
+      "id": "song-chuttamalle",
+      "title": "Chuttamalle",
+      "movie": "Devara",
+      "year": 2024,
+      "difficulty": "easy",
+      "videoId": "5vsOv_bcnhs",
+      "startOffsetMs": 0,
+      "aliases": []
+    },
+    {
+      "id": "song-samayama",
+      "title": "Samayama",
+      "movie": "Hi Nanna",
+      "year": 2023,
+      "difficulty": "medium",
+      "videoId": "8I9v8yaaknM",
+      "startOffsetMs": 0,
+      "aliases": []
+    },
+    {
+      "id": "song-o-rendu-prema-meghaalila",
+      "title": "O Rendu Prema Meghaalila",
+      "movie": "Baby",
+      "year": 2023,
+      "difficulty": "medium",
+      "videoId": "7BGTwvgxYtU",
+      "startOffsetMs": 0,
+      "aliases": []
+    },
+    {
+      "id": "song-tillu-anna-dj-pedithe",
+      "title": "Tillu Anna DJ Pedithe",
+      "movie": "DJ Tillu",
+      "year": 2022,
+      "difficulty": "medium",
+      "videoId": "I8c0-NEBqL0",
+      "startOffsetMs": 0,
+      "aliases": []
+    },
+    {
+      "id": "song-dheera-dheera",
+      "title": "Dheera Dheera",
+      "movie": "Magadheera",
+      "year": 2009,
+      "difficulty": "easy",
+      "videoId": "HY6K6MTkzlE",
+      "startOffsetMs": 0,
+      "aliases": []
+    },
+    {
+      "id": "song-panchadara-bomma",
+      "title": "Panchadara Bomma",
+      "movie": "Magadheera",
+      "year": 2009,
+      "difficulty": "medium",
+      "videoId": "7hrcwpu5m08",
+      "startOffsetMs": 0,
+      "aliases": [
+        "Panchadaara Bomma"
+      ]
+    },
+    {
+      "id": "song-pilichina-ranantava",
+      "title": "Pilichina Ranantava",
+      "movie": "Athadu",
+      "year": 2005,
+      "difficulty": "hard",
+      "videoId": "r5iIFngHSEk",
+      "startOffsetMs": 0,
+      "aliases": [
+        "Pilichina Raanantava"
+      ]
+    },
+    {
+      "id": "song-dole-dole",
+      "title": "Dole Dole",
+      "movie": "Pokiri",
+      "year": 2006,
+      "difficulty": "medium",
+      "videoId": "G1fghycpJqE",
+      "startOffsetMs": 0,
+      "aliases": []
+    },
+    {
+      "id": "song-aa-ante-amalapuram",
+      "title": "Aa Ante Amalapuram",
+      "movie": "Arya",
+      "year": 2004,
+      "difficulty": "easy",
+      "videoId": "rwpQ_pXqjZo",
+      "startOffsetMs": 0,
+      "aliases": []
+    },
+    {
+      "id": "song-ringa-ringa",
+      "title": "Ringa Ringa",
+      "movie": "Arya 2",
+      "year": 2009,
+      "difficulty": "easy",
+      "videoId": "4GOWJyMNz8E",
+      "startOffsetMs": 0,
+      "aliases": []
+    },
+    {
+      "id": "song-aaradugula-bullet",
+      "title": "Aaradugula Bullet",
+      "movie": "Attarintiki Daredi",
+      "year": 2013,
+      "difficulty": "medium",
+      "videoId": "ZmPXTRr5-Y0",
+      "startOffsetMs": 0,
+      "aliases": [
+        "Aradugula Bullet",
+        "Veedu Aradugula Bullettu"
+      ]
+    },
+    {
+      "id": "song-kevvu-keka",
+      "title": "Kevvu Keka",
+      "movie": "Gabbar Singh",
+      "year": 2012,
+      "difficulty": "easy",
+      "videoId": "wjtkVWi7El4",
+      "startOffsetMs": 0,
+      "aliases": []
+    },
+    {
+      "id": "song-ammaye-sannaga",
+      "title": "Ammaye Sannaga",
+      "movie": "Kushi",
+      "year": 2001,
+      "difficulty": "hard",
+      "videoId": "GXECGi0sIKw",
+      "startOffsetMs": 0,
+      "aliases": [
+        "Ammaye"
+      ]
+    },
+    {
+      "id": "song-oh-my-friend",
+      "title": "Oh My Friend",
+      "movie": "Happy Days",
+      "year": 2007,
+      "difficulty": "medium",
+      "videoId": "dHb3941DPV4",
+      "startOffsetMs": 0,
+      "aliases": [
+        "O My Friend"
+      ]
+    },
+    {
+      "id": "song-cheppave-chirugali",
+      "title": "Cheppave Chirugali",
+      "movie": "Okkadu",
+      "year": 2003,
+      "difficulty": "hard",
+      "videoId": "DX9u4QEPy0g",
+      "startOffsetMs": 0,
+      "aliases": []
+    },
+    {
+      "id": "song-unnamata-cheppaneevu",
+      "title": "Unnamata Cheppaneevu",
+      "movie": "Nuvvu Naaku Nachav",
+      "year": 2001,
+      "difficulty": "hard",
+      "videoId": "_eKpCXQKcSI",
+      "startOffsetMs": 0,
+      "aliases": [
+        "Unnamata Cheppanivu"
+      ]
+    },
+    {
+      "id": "song-kani-penchina-ma-ammake",
+      "title": "Kani Penchina Ma Ammake",
+      "movie": "Manam",
+      "year": 2014,
+      "difficulty": "medium",
+      "videoId": "nnNRTrBvoIM",
+      "startOffsetMs": 0,
+      "aliases": []
+    },
+    {
+      "id": "song-charuseela",
+      "title": "Charuseela",
+      "movie": "Srimanthudu",
+      "year": 2015,
+      "difficulty": "medium",
+      "videoId": "Oz-SMh8OxLo",
+      "startOffsetMs": 0,
+      "aliases": []
+    },
+    {
+      "id": "song-pakka-local",
+      "title": "Pakka Local",
+      "movie": "Janatha Garage",
+      "year": 2016,
+      "difficulty": "medium",
+      "videoId": "bpMzMi-vSmk",
+      "startOffsetMs": 0,
+      "aliases": []
+    },
+    {
+      "id": "song-ammadu-lets-do-kummudu",
+      "title": "Ammadu Lets Do Kummudu",
+      "movie": "Khaidi No 150",
+      "year": 2017,
+      "difficulty": "medium",
+      "videoId": "7jHMP7J6tRs",
+      "startOffsetMs": 0,
+      "aliases": [
+        "Ammadu Kummudu"
+      ]
+    },
+    {
+      "id": "song-adigaa-adigaa",
+      "title": "Adigaa Adigaa",
+      "movie": "Ninnu Kori",
+      "year": 2017,
+      "difficulty": "medium",
+      "videoId": "X-ItjQ3gIBI",
+      "startOffsetMs": 0,
+      "aliases": [
+        "Adiga Adiga"
+      ]
+    },
+    {
+      "id": "song-evare",
+      "title": "Evare",
+      "movie": "Premam",
+      "year": 2016,
+      "difficulty": "medium",
+      "videoId": "KG5UfTiBrAo",
+      "startOffsetMs": 0,
+      "aliases": []
+    },
+    {
+      "id": "song-kundanapu-bomma",
+      "title": "Kundanapu Bomma",
+      "movie": "Ye Maaya Chesave",
+      "year": 2010,
+      "difficulty": "medium",
+      "videoId": "sgSDt4YX9P8",
+      "startOffsetMs": 0,
+      "aliases": []
+    },
+    {
+      "id": "song-inka-edho",
+      "title": "Inka Edho",
+      "movie": "Darling",
+      "year": 2010,
+      "difficulty": "hard",
+      "videoId": "rC0YWZ0lly8",
+      "startOffsetMs": 0,
+      "aliases": []
+    },
+    {
+      "id": "song-pandagala-digivacchavu",
+      "title": "Pandagala Digivacchavu",
+      "movie": "Mirchi",
+      "year": 2013,
+      "difficulty": "medium",
+      "videoId": "Zd4FYU-KpVQ",
+      "startOffsetMs": 0,
+      "aliases": [
+        "Pandagala Digivachavu"
+      ]
+    },
+    {
+      "id": "song-nuvvostanante-nenoddantana",
+      "title": "Nuvvostanante Nenoddantana",
+      "movie": "Varsham",
+      "year": 2004,
+      "difficulty": "hard",
+      "videoId": "xct7JqcV6VM",
+      "startOffsetMs": 0,
+      "aliases": [
+        "Nuvvostanante"
+      ]
+    },
+    {
+      "id": "song-my-heart-is-beating",
+      "title": "My Heart Is Beating",
+      "movie": "Jalsa",
+      "year": 2008,
+      "difficulty": "medium",
+      "videoId": "yHlBhSiiaaA",
+      "startOffsetMs": 0,
+      "aliases": [
+        "My Heart"
+      ]
+    },
+    {
+      "id": "song-rooba-rooba",
+      "title": "Rooba Rooba",
+      "movie": "Orange",
+      "year": 2010,
+      "difficulty": "medium",
+      "videoId": "4zn9c_DAOvI",
+      "startOffsetMs": 0,
+      "aliases": []
+    },
+    {
+      "id": "song-cheliya-cheliya",
+      "title": "Cheliya Cheliya",
+      "movie": "Gharshana",
+      "year": 2004,
+      "difficulty": "hard",
+      "videoId": "A7ipnxIyyno",
+      "startOffsetMs": 0,
+      "aliases": []
+    },
+    {
+      "id": "song-o-priya-priya",
+      "title": "O Priya Priya",
+      "movie": "Geethanjali",
+      "year": 1989,
+      "difficulty": "hard",
+      "videoId": "5EyQzK811AM",
+      "startOffsetMs": 0,
+      "aliases": []
+    },
+    {
+      "id": "song-botany-paatamundi",
+      "title": "Botany Paatamundi",
+      "movie": "Shiva",
+      "year": 1989,
+      "difficulty": "hard",
+      "videoId": "4xdS0OK3zMk",
+      "startOffsetMs": 0,
+      "aliases": [
+        "Botany Patamundi"
+      ]
+    },
+    {
+      "id": "song-bhairava-anthem",
+      "title": "Bhairava Anthem",
+      "movie": "Kalki 2898 AD",
+      "year": 2024,
+      "difficulty": "medium",
+      "videoId": "7WYcMZXic_w",
+      "startOffsetMs": 0,
+      "aliases": []
+    },
+    {
+      "id": "song-sooreede",
+      "title": "Sooreede",
+      "movie": "Salaar",
+      "year": 2023,
+      "difficulty": "medium",
+      "videoId": "2n7lsBRfmA0",
+      "startOffsetMs": 0,
+      "aliases": []
+    },
+    {
+      "id": "song-peelings",
+      "title": "Peelings",
+      "movie": "Pushpa 2",
+      "year": 2024,
+      "difficulty": "easy",
+      "videoId": "8RAd-_Qj_ac",
+      "startOffsetMs": 0,
+      "aliases": []
+    },
+    {
+      "id": "song-sooseki",
+      "title": "Sooseki",
+      "movie": "Pushpa 2",
+      "year": 2024,
+      "difficulty": "easy",
+      "videoId": "qxbHtcfHq2s",
+      "startOffsetMs": 0,
+      "aliases": []
+    },
+    {
+      "id": "song-dabidi-dibidi",
+      "title": "Dabidi Dibidi",
+      "movie": "Daaku Maharaaj",
+      "year": 2025,
+      "difficulty": "medium",
+      "videoId": "ARGbxFY9McA",
+      "startOffsetMs": 0,
+      "aliases": []
+    },
+    {
+      "id": "song-godari-gattu",
+      "title": "Godari Gattu",
+      "movie": "Sankranthiki Vasthunam",
+      "year": 2025,
+      "difficulty": "easy",
+      "videoId": "L8s6qxQJKgk",
+      "startOffsetMs": 0,
+      "aliases": []
+    },
+    {
+      "id": "song-ticket-eh-konakunda",
+      "title": "Ticket Eh Konakunda",
+      "movie": "Tillu Square",
+      "year": 2024,
+      "difficulty": "medium",
+      "videoId": "UfrT9zkwqDU",
+      "startOffsetMs": 0,
+      "aliases": []
+    },
+    {
+      "id": "song-chamkeela-angeelesi",
+      "title": "Chamkeela Angeelesi",
+      "movie": "Dasara",
+      "year": 2023,
+      "difficulty": "medium",
+      "videoId": "XeGdY8RoxQY",
+      "startOffsetMs": 0,
+      "aliases": []
+    },
+    {
+      "id": "song-maguva-maguva",
+      "title": "Maguva Maguva",
+      "movie": "Vakeel Saab",
+      "year": 2021,
+      "difficulty": "medium",
+      "videoId": "-MAu6uPJ89o",
+      "startOffsetMs": 0,
+      "aliases": []
+    },
+    {
+      "id": "song-chitti",
+      "title": "Chitti",
+      "movie": "Jathi Ratnalu",
+      "year": 2021,
+      "difficulty": "easy",
+      "videoId": "ruWIZcL5T6I",
+      "startOffsetMs": 0,
+      "aliases": []
+    },
+    {
+      "id": "song-pranavalaya",
+      "title": "Pranavalaya",
+      "movie": "Shyam Singha Roy",
+      "year": 2021,
+      "difficulty": "hard",
+      "videoId": "NxgyR-kkqe0",
+      "startOffsetMs": 0,
+      "aliases": []
+    },
+    {
+      "id": "song-blockbuster",
+      "title": "Blockbuster",
+      "movie": "Sarrainodu",
+      "year": 2016,
+      "difficulty": "medium",
+      "videoId": "XI0Os8S-6MM",
+      "startOffsetMs": 0,
+      "aliases": []
+    },
+    {
+      "id": "song-seeti-maar",
+      "title": "Seeti Maar",
+      "movie": "DJ Duvvada Jagannadham",
+      "year": 2017,
+      "difficulty": "medium",
+      "videoId": "WLD0kUKybeE",
+      "startOffsetMs": 0,
+      "aliases": []
+    },
+    {
+      "id": "song-vachaadayyo-saami",
+      "title": "Vachaadayyo Saami",
+      "movie": "Bharat Ane Nenu",
+      "year": 2018,
+      "difficulty": "medium",
+      "videoId": "6YkK1fTSzss",
+      "startOffsetMs": 0,
+      "aliases": []
+    },
+    {
+      "id": "song-padara-padara",
+      "title": "Padara Padara",
+      "movie": "Maharshi",
+      "year": 2019,
+      "difficulty": "medium",
+      "videoId": "di7xdyhcboc",
+      "startOffsetMs": 0,
+      "aliases": []
+    },
+    {
+      "id": "song-ninnila",
+      "title": "Ninnila",
+      "movie": "Tholi Prema",
+      "year": 2018,
+      "difficulty": "medium",
+      "videoId": "IMAUNvSYs_Q",
+      "startOffsetMs": 0,
+      "aliases": []
+    }
+  ]
+}

@@ -118,7 +118,24 @@ export interface MafiaSubject extends BaseItem {
   language: MovieLanguage
 }
 
-export type ContentItem = ImageQuestion | EmojiQuestion | IdentityCard | MeldPrompt | MafiaSubject
+/**
+ * Paata Pattu: one song, played from YouTube.
+ *
+ * `startOffsetMs` is where the song proper begins in that upload, so a label's
+ * sting or a spoken intro does not eat the two-second clue.
+ */
+export interface SongQuestion extends BaseItem {
+  kind: 'song'
+  title: string
+  /** Other spellings the guess box should find it by. */
+  aliases: string[]
+  movie: string
+  year: number | null
+  videoId: string
+  startOffsetMs: number
+}
+
+export type ContentItem = ImageQuestion | EmojiQuestion | IdentityCard | MeldPrompt | MafiaSubject | SongQuestion
 export type ContentKind = ContentItem['kind']
 
 export interface ContentRequest {

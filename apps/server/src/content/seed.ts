@@ -73,6 +73,7 @@ export async function seedContent(pool: Pool, options: SeedOptions): Promise<See
   results.push(await seedIdentities(pool, options))
   results.push(await seedPrompts(pool, options))
   results.push(await seedMafia(pool, options))
+  results.push(await seedSongs(pool, options))
   return results
 }
 
@@ -205,6 +206,30 @@ async function seedMafia(pool: Pool, options: SeedOptions): Promise<SeedResult> 
   })
 }
 
+async function seedSongs(pool: Pool, options: SeedOptions): Promise<SeedResult> {
+  const raw = await readJson<{ language: string; items: RawSong[] }>(options, 'songs.json')
+  const items: ContentItem[] = raw.items.map((item) => ({
+    kind: 'song',
+    id: item.id,
+    title: item.title,
+    aliases: item.aliases,
+    movie: item.movie,
+    year: item.year,
+    videoId: item.videoId,
+    startOffsetMs: item.startOffsetMs,
+    category: raw.language,
+    difficulty: item.difficulty,
+  }))
+  return upsert(pool, options, {
+    datasetId: 'songs',
+    kind: 'song',
+    version: '1',
+    source: 'authored',
+    license: 'Song and film titles are facts; audio streams from the label\'s own YouTube upload',
+    items,
+  })
+}
+
 // ---------------------------------------------------------------------------
 
 async function upsert(
@@ -292,6 +317,7 @@ function answerFor(item: ContentItem): string {
     case 'image':
     case 'emoji':
     case 'mafia':
+    case 'song':
       return item.title
     case 'identity':
       return item.name
@@ -307,4 +333,5 @@ async function readJson<T>(options: SeedOptions, name: string): Promise<T> {
 interface RawEmoji { id: string; title: string; emojis: string; year: number; difficulty: 'easy' | 'medium' | 'hard'; aliases: string[] }
 interface RawIdentity { id: string; name: string; category: string; difficulty: 'easy' | 'medium' | 'hard'; aliases: string[]; hints: string[] }
 interface RawPrompt { id: string; prompt: string; category: string; difficulty: 'easy' | 'medium' | 'hard' }
+interface RawSong { id: string; title: string; movie: string; year: number; difficulty: 'easy' | 'medium' | 'hard'; videoId: string; startOffsetMs: number; aliases: string[] }
 interface RawMafia { id: string; title: string; difficulty: 'easy' | 'medium' | 'hard'; fanClue: string; imposterClue: string; language: MovieLanguage }

@@ -86,7 +86,7 @@ export function settle<S>(
 
 // --- content packs for the other games --------------------------------------
 
-import type { ContentItem, EmojiQuestion, IdentityCard, MafiaSubject, MeldPrompt, MovieLanguage } from '../../content.ts'
+import type { ContentItem, EmojiQuestion, IdentityCard, MafiaSubject, MeldPrompt, MovieLanguage, SongQuestion } from '../../content.ts'
 
 const EMOJI_TITLES = [
   ['Jurassic Park', '🦕 🏝️ 🚙'],
@@ -169,6 +169,22 @@ export function mafiaSubject(n: number, over: Partial<MafiaSubject> = {}): Mafia
   }
 }
 
+export function songQuestion(n: number, over: Partial<SongQuestion> = {}): SongQuestion {
+  return {
+    kind: 'song',
+    id: `song-${n}`,
+    title: `${fixtureTitle(n)} Song`,
+    aliases: [],
+    movie: `Film ${n}`,
+    year: 2000 + n,
+    videoId: `vid${String(n).padStart(8, '0')}`,
+    startOffsetMs: 0,
+    category: 'telugu',
+    difficulty: (['easy', 'medium', 'hard'] as const)[n % 3]!,
+    ...over,
+  }
+}
+
 export function packOf(kind: ContentItem['kind'], count: number) {
   const build = {
     image: imageQuestion,
@@ -176,6 +192,7 @@ export function packOf(kind: ContentItem['kind'], count: number) {
     identity: identityCard,
     prompt: meldPrompt,
     mafia: mafiaSubject,
+    song: songQuestion,
   }[kind]
   return { kind, items: Array.from({ length: count }, (_, i) => build(i + 1)) as ContentItem[] }
 }

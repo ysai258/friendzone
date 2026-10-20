@@ -9,10 +9,10 @@ without branching on which game is running.
 That is checkable rather than aspirational:
 
 ```bash
-grep -rn "blur-battle\|who-am-i\|emoji-movie\|mind-meld\|movie-mafia" apps/server/src
+grep -rn "blur-battle\|who-am-i\|emoji-movie\|mind-meld\|movie-mafia\|paata-pattu" apps/server/src
 ```
 
-returns nothing outside the registry wiring. Adding a sixth game touches one
+returns nothing outside the registry wiring. Adding a seventh game touches one
 array in `packages/game-engine/src/index.ts` and adds one component to the web
 app's screen map.
 
@@ -88,7 +88,7 @@ restart cannot accidentally draw different questions.
 
 A game returns `scoreDeltas` and the room applies them. The room owns
 cumulative scores, which is why the leaderboard, the final results screen and
-Play Again work identically for all five games without any of them implementing
+Play Again work identically for all six games without any of them implementing
 a scoreboard.
 
 ## Choosing content
@@ -206,7 +206,7 @@ may end — so a second tap on "Next question" is an `INVALID_ACTION`, not a
 skipped question. The room view publishes `deadlineAt: null` for such a phase,
 so no screen shows a countdown parked at zero.
 
-## The five games
+## The six games
 
 | Game | Phases | What it exercises |
 | --- | --- | --- |
@@ -215,6 +215,7 @@ so no screen shows a countdown parked at zero.
 | Mind Meld | COUNTDOWN → PROMPT → REVEAL → … | Simultaneous submission, answer clustering, host-ended phases |
 | Who Am I? | ASSIGN → ASK → VOTE → RESULT → … | Turn order, per-player secrets, voting, a public log beside private hints |
 | Movie Mafia | ROLES → DISCUSSION → VOTE → RESULT → … | Asymmetric secrets, elimination, team scoring |
+| Paata Pattu | COUNTDOWN → QUESTION → REVEAL → … | Per-player clue ladders, picking from a catalog instead of typing, scoring by clue rather than clock |
 
 They are deliberately different shapes. Blur Battle and Emoji Movie look
 similar but differ where it matters: Blur Battle gives one guess, because the

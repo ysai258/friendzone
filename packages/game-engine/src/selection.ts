@@ -91,4 +91,5 @@ export const RECENT_LIMITS: Record<ContentItem['kind'], number> = {
   prompt: 80,
   identity: 40,
   image: 60,
+  song: 40,
 }

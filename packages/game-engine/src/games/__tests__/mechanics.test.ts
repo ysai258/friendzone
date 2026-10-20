@@ -5,7 +5,7 @@ import { packOf, players, settle, T0, turnCtx, viewCtx } from './helpers.ts'
 
 function boot(def: ErasedGameDefinition, count: number, settings: Record<string, unknown> = {}) {
   const roster = players(count)
-  const kind = { 'blur-battle': 'image', 'emoji-movie': 'emoji', 'who-am-i': 'identity', 'mind-meld': 'prompt', 'movie-mafia': 'mafia' }[def.id] as Parameters<typeof packOf>[0]
+  const kind = { 'blur-battle': 'image', 'emoji-movie': 'emoji', 'who-am-i': 'identity', 'mind-meld': 'prompt', 'movie-mafia': 'mafia', 'paata-pattu': 'song' }[def.id] as Parameters<typeof packOf>[0]
   const state = def.createGame({
     now: T0,
     seed: `seed-${def.id}`,
