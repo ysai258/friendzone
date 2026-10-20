@@ -16,7 +16,6 @@ import type { EngineEvent, ErasedGameDefinition, GameRegistry, TurnContext } fro
 import type { Config } from '../config.ts'
 import type { Logger } from '../logger.ts'
 import type { ContentProvider } from '../content/provider.ts'
-import type { RoomArchive } from '../db/archive.ts'
 import { computeDeadline } from './deadline.ts'
 import { type RoomStore } from './store.ts'
 import {
@@ -80,7 +79,6 @@ export interface RoomServiceDeps {
   store: RoomStore
   registry: GameRegistry
   content: ContentProvider
-  archive: RoomArchive
   config: Config
   logger: Logger
   now?: () => number
@@ -90,7 +88,6 @@ export class RoomService {
   private readonly store: RoomStore
   private readonly registry: GameRegistry
   private readonly content: ContentProvider
-  private readonly archive: RoomArchive
   private readonly config: Config
   private readonly logger: Logger
   private readonly now: () => number
@@ -100,7 +97,6 @@ export class RoomService {
     this.store = deps.store
     this.registry = deps.registry
     this.content = deps.content
-    this.archive = deps.archive
     this.config = deps.config
     this.logger = deps.logger
     this.now = deps.now ?? (() => Date.now())
@@ -145,9 +141,6 @@ export class RoomService {
       })
       try {
         await this.store.create(room, computeDeadline(room, definition))
-        void this.archive.recordRoomCreated(room).catch((err: unknown) => {
-          this.logger.error({ err, roomCode: room.code }, 'failed to archive room creation')
-        })
         this.logger.info({ roomCode: room.code, gameId }, 'room created')
         return room
       } catch (error) {
@@ -480,13 +473,8 @@ export class RoomService {
       return {
         room: started,
         events: [{ type: 'GAME_STARTED' as const, data: { gameId: definition.id, sessionId } }],
-        value: { sessionId, settings },
+        value: undefined,
       }
-    }).then((result) => {
-      if (result === null) return
-      void this.archive
-        .recordGameStarted(result.room, sessionId, settings)
-        .catch((err: unknown) => this.logger.error({ err, roomCode: args.code }, 'failed to archive game start'))
     })
   }
 
@@ -538,8 +526,6 @@ export class RoomService {
     reduce: (room: RoomRecord) => Reduction<T> | null,
     prefetched?: { room: RoomRecord; version: number },
   ): Promise<{ room: RoomRecord; version: number; value: T | undefined } | null> {
-    const finished: { room: RoomRecord; sessionId: string }[] = []
-
     const result = await this.store.update<Carried<T>>(
       code,
       (current) => {
@@ -562,10 +548,6 @@ export class RoomService {
         room = host.room
         if (host.changed) events = [...events, { type: 'HOST_CHANGED', data: { hostId: room.hostId } }]
 
-        if (room.status === 'GAME_OVER' && current.status !== 'GAME_OVER' && room.session !== null) {
-          finished.push({ room, sessionId: room.session.sessionId })
-        }
-
         const built = nextEvents(room, events, now)
         return { room: built.room, value: { value: reduced?.value, events: built.events } }
       },
@@ -576,12 +558,6 @@ export class RoomService {
     if (result === null) return null
 
     this.publish({ room: result.room, version: result.version, events: result.value.events })
-
-    for (const entry of finished) {
-      void this.archive
-        .recordGameFinished(entry.room, entry.sessionId)
-        .catch((err: unknown) => this.logger.error({ err, roomCode: code }, 'failed to archive game result'))
-    }
 
     return { room: result.room, version: result.version, value: result.value.value }
   }

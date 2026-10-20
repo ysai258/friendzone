@@ -12,9 +12,8 @@ import type { Config } from '../config.ts'
  *
  * What is here is work that is genuinely not part of a request:
  *
- *   housekeeping   Closing out rooms in Postgres long after everyone left,
- *                  and sweeping index entries whose rooms have expired. Runs
- *                  on a schedule, takes seconds, and nobody is waiting.
+ *   housekeeping   Sweeping index entries whose rooms have expired. Runs on
+ *                  a schedule, takes seconds, and nobody is waiting.
  *
  *   content        Deriving the reveal ladder for a new image. Each one is
  *                  several seconds of sharp resizing — enough to stall an
@@ -32,8 +31,6 @@ export const QUEUE_NAMES = {
 
 export interface HousekeepingJob {
   kind: 'reap-rooms'
-  /** Rooms untouched for longer than this are closed out. */
-  idleMinutes: number
 }
 
 export interface ContentJob {
@@ -85,6 +82,6 @@ export async function scheduleHousekeeping(queue: Queue<HousekeepingJob>): Promi
   await queue.upsertJobScheduler(
     'reap-rooms',
     { pattern: '*/5 * * * *' },
-    { name: 'reap-rooms', data: { kind: 'reap-rooms', idleMinutes: 60 } },
+    { name: 'reap-rooms', data: { kind: 'reap-rooms' } },
   )
 }

@@ -217,19 +217,6 @@ describe('blur battle, five players', () => {
     }
   })
 
-  it('wrote the finished game to Postgres', async () => {
-    // The archive is written off the realtime path, so give it a moment.
-    await new Promise((resolve) => setTimeout(resolve, 1_500))
-    const { rows } = await server.services.pool.query<{ count: string }>(
-      `SELECT count(*)::text AS count
-         FROM game_results r
-         JOIN game_sessions s ON s.id = r.session_id
-        WHERE s.room_code = $1`,
-      [host.roomCode],
-    )
-    expect(Number(rows[0]!.count)).toBe(5)
-  })
-
   it('plays again with the same people, the same room, and a clean scoreboard', async () => {
     host.send(ROOM_ACTIONS.PLAY_AGAIN)
     for (const client of everyone()) {

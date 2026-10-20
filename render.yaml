@@ -2,18 +2,15 @@
 #
 #   render.com -> New -> Blueprint -> connect ysai258/friendzone
 #
-# Creates everything: the app, a Postgres, and a Key Value (Redis) instance,
-# all on free plans. The app serves the web client, the API and the WebSocket
-# on one origin, so there is no proxy to configure and no CORS.
+# Creates the app and a Key Value (Redis) instance, both on free plans. The app
+# serves the web client, the API and the WebSocket on one origin, so there is
+# no proxy to configure and no CORS.
+#
+# Postgres is not created here: Render's free Postgres is deleted after 30
+# days. Point DATABASE_URL at a free Supabase project instead — the blueprint
+# asks for it on first sync.
 #
 # Read docs/deployment.md for what the free tier costs you in behaviour.
-
-databases:
-  - name: friendzone-db
-    plan: free
-    databaseName: friendzone
-    user: friendzone
-    region: singapore
 
 services:
   # Live room state, the deadline index that drives every round, pub/sub, and
@@ -46,10 +43,20 @@ services:
       - key: LOG_LEVEL
         value: info
       # Render injects PORT; the server reads it.
+      # Supabase's Session pooler URI (Connect -> Session pooler), as copied,
+      # with no sslmode added. Not the direct connection: that host is
+      # IPv6-only and Render cannot reach it. Not the transaction pooler
+      # either: migrations hold an advisory lock across statements.
       - key: DATABASE_URL
-        fromDatabase:
-          name: friendzone-db
-          property: connectionString
+        sync: false
+      # Supabase's root certificate (Settings -> Database -> SSL), pasted as
+      # PEM. The connection is then encrypted and the server verified.
+      - key: PG_CA_CERT
+        sync: false
+      # The database only serves question loads at game start, and the free
+      # pooler caps clients per project.
+      - key: PG_POOL_MAX
+        value: "3"
       - key: REDIS_URL
         fromService:
           type: keyvalue

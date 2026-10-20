@@ -7,7 +7,6 @@ import type { RedisClients } from './redis/client.ts'
 import type { RedisKeys } from './redis/keys.ts'
 import type { RateLimiter } from './redis/ratelimit.ts'
 import type { ContentProvider } from './content/provider.ts'
-import type { RoomArchive } from './db/archive.ts'
 import type { RoomService } from './rooms/service.ts'
 import type { RoomStore } from './rooms/store.ts'
 import type { SessionSigner } from './rooms/session.ts'
@@ -31,7 +30,6 @@ export interface AppServices {
 
   registry: GameRegistry
   content: ContentProvider
-  archive: RoomArchive
   store: RoomStore
   signer: SessionSigner
   limiter: RateLimiter

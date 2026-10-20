@@ -3,10 +3,9 @@ import type { Config } from '../config.ts'
 import type { Logger } from '../logger.ts'
 
 /**
- * Postgres is a dependency of durability, not of gameplay. Nothing on the
- * realtime path awaits a query: writes are recorded at lifecycle boundaries
- * (room created, game started, results final) and a failure there degrades the
- * record, never the round in progress. See docs/reliability.md.
+ * Postgres holds the content library and nothing else. It is read when a game
+ * starts and cached in process, so nothing on the realtime path awaits a
+ * query. See docs/reliability.md.
  */
 export function createPool(config: Config, logger: Logger): pg.Pool {
   const pool = new pg.Pool({
@@ -18,6 +17,7 @@ export function createPool(config: Config, logger: Logger): pg.Pool {
     // A realtime handler must never be the thing that waits on a slow query.
     statement_timeout: 10_000,
     application_name: 'friendzone',
+    ssl: config.PG_CA_CERT === '' ? undefined : { ca: config.PG_CA_CERT },
   })
 
   pool.on('error', (error) => {

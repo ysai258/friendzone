@@ -12,7 +12,6 @@ import { createLogger, type Logger } from './logger.ts'
 import { createMetrics } from './metrics.ts'
 import { createPool, type Pool } from './db/pool.ts'
 import { runMigrations } from './db/migrate.ts'
-import { RoomArchive } from './db/archive.ts'
 import { createRedis } from './redis/client.ts'
 import { RedisKeys } from './redis/keys.ts'
 import { defineScripts } from './redis/scripts.ts'
@@ -65,7 +64,6 @@ export async function buildApp(options: BuildOptions = {}): Promise<BuiltApp> {
   const scripts = defineScripts(redis.command)
   const keys = new RedisKeys(config.REDIS_PREFIX)
 
-  const archive = new RoomArchive(pool, logger)
   const content = new ContentProvider(pool, logger)
   const limiter = new RateLimiter(scripts, keys, metrics)
   const store = new RoomStore(
@@ -81,7 +79,7 @@ export async function buildApp(options: BuildOptions = {}): Promise<BuiltApp> {
   )
   const signer = new SessionSigner(config.SESSION_SECRET, config.SESSION_TTL_SECONDS)
 
-  const service = new RoomService({ store, registry: gameRegistry, content, archive, config, logger })
+  const service = new RoomService({ store, registry: gameRegistry, content, config, logger })
   const scheduler = new Scheduler(service, store, logger, metrics, config.SCHEDULER_TICK_MS)
 
   let gateway: Gateway | null = null
@@ -96,7 +94,6 @@ export async function buildApp(options: BuildOptions = {}): Promise<BuiltApp> {
     keys,
     registry: gameRegistry,
     content,
-    archive,
     store,
     signer,
     limiter,

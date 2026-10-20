@@ -43,14 +43,24 @@ No Kubernetes, no service mesh, no message broker.
 
 ## Render, on the free plan
 
-A `render.yaml` blueprint creates the app, a Postgres and a Key Value
-instance in one go:
+A `render.yaml` blueprint creates the app and a Key Value instance in one go:
 
   render.com -> New -> Blueprint -> connect this repo
 
-Nothing else to configure. Render generates `SESSION_SECRET`, wires
-`DATABASE_URL` and `REDIS_URL`, and the app migrates and seeds itself on
-first boot.
+Render generates `SESSION_SECRET` and wires `REDIS_URL`. Postgres comes from a
+free Supabase project, because Render's free Postgres is deleted after 30 days:
+
+1. Create a Supabase project, in Singapore to sit beside the app.
+2. Copy the **Session pooler** URI from Connect, as is, into `DATABASE_URL`.
+   The direct connection is IPv6-only, which Render cannot reach. The
+   transaction pooler breaks the advisory locks that migration and seeding
+   hold.
+3. Download the root certificate from Settings → Database → SSL and paste its
+   contents into `PG_CA_CERT`. The connection is then encrypted and the server
+   verified against Supabase's own CA, which public trust stores do not carry.
+   Do not add `sslmode` to the URI: it would replace this setting.
+
+The app migrates and seeds itself on first boot.
 
 What the free plan costs you, stated plainly because all three affect a party
 game:
@@ -59,14 +69,14 @@ game:
 | --- | --- |
 | **Cold starts** | The service suspends after 15 minutes idle and takes about a minute to wake. The first person to open your link waits that out. Open it yourself before you share it. |
 | **Key Value is in-memory and may restart at any time** | Live room state lives there. A restart ends games in progress — players are told the room is gone rather than seeing anything corrupt, but the game is over. |
-| **Postgres expires 30 days after creation** | Only history lives there, so losing it costs finished-game records, not gameplay. Recreate it or move to a paid plan. |
+| **Supabase pauses a free project after a week without activity** | A paused project refuses connections, so games cannot load their questions. Restore it from the Supabase dashboard; nothing is lost, and the content is reloaded from `data/seed/` on every boot anyway. |
 
 None of these corrupt anything: every state change is one atomic
 compare-and-set, so the failure mode is a room that vanishes, not a room that
 lies. But a long session on a free instance will be interrupted eventually.
 
-Paid plans remove all three. The same blueprint works — change the `plan`
-values.
+Paid plans remove all three: change the `plan` values in the blueprint, and
+Supabase's Pro plan does not pause.
 
 ## One box, one command
 
@@ -218,9 +228,9 @@ instances overlap during a rollout.
 - **Alert on** `friendzone_scheduler_errors_total` above zero (rounds are not
   advancing — the worst failure here), WebSocket connection failure rate,
   `friendzone_cas_retries_total` rising in steady state, and Redis reachability.
-- **Redis is the hard dependency.** Postgres being down costs history, not
-  gameplay. Redis being down stops play, safely — see
+- **Redis is the hard dependency.** Postgres being down stops new games
+  loading questions the cache does not already hold, never a game in progress. Redis being down stops play, safely — see
   [redis.md](redis.md).
-- **Back up Postgres.** Redis holds nothing worth backing up: everything in it
-  is either transient or reconstructible.
+- **Nothing needs backing up.** Postgres holds only the content library, which
+  is rebuilt from `data/seed/` on boot, and everything in Redis is transient.
 - **Run one worker.** Its jobs are idempotent, but a second adds nothing.

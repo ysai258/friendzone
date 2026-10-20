@@ -47,13 +47,6 @@ describe('racing the same room', () => {
     const stored = await a!.services.store.read(host.roomCode)
     expect(stored!.room.sessionCount).toBe(1)
     expect(host.errors.filter((e) => e.code === 'GAME_ALREADY_STARTED')).toHaveLength(1)
-
-    // And exactly one session was recorded.
-    const { rows } = await a!.services.pool.query<{ count: string }>(
-      'SELECT count(*)::text AS count FROM game_sessions WHERE room_code = $1',
-      [host.roomCode],
-    )
-    expect(Number(rows[0]!.count)).toBe(1)
   }, 40_000)
 
   it('starts the game exactly once when two instances are asked at the same moment', async () => {

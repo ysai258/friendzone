@@ -46,6 +46,12 @@ const schema = z.object({
 
   DATABASE_URL: z.string().min(1),
   PG_POOL_MAX: z.coerce.number().int().min(1).max(100).default(10),
+  /**
+   * PEM root certificate for a database whose server certificate is signed by
+   * a private CA, such as Supabase's. When set, the connection uses TLS and
+   * verifies the server against it. Leave unset for a local database.
+   */
+  PG_CA_CERT: z.string().default(''),
 
   REDIS_URL: z.string().min(1),
   REDIS_PREFIX: z.string().min(1).max(64).regex(/^[A-Za-z0-9:_-]+$/).default('fz'),

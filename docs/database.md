@@ -2,56 +2,35 @@
 
 ## What belongs here
 
-The rule: Postgres holds what is worth keeping after the room is gone.
+The rule: Postgres holds the question library, and nothing else.
 
 | | Where | Why |
 | --- | --- | --- |
-| **Durable** — rooms, players, sessions, results, lifecycle events, question content | Postgres | Outlives the party. Someone may ask what happened. |
+| **Content** — datasets and questions | Postgres | Loaded from `data/seed/` on boot, read when a game starts |
 | **Ephemeral** — live room state, presence, current round, answers in flight | Redis | Changes many times a second. Meaningless an hour later. |
-| **Cached** — question pools | Redis TTL + in-process | Static between deploys, read on every game start |
+| **Cached** — question pools | In-process | Static between deploys, read on every game start |
 | **Derived** — scoreboard, ranks, public views | Computed per request | Storing it would mean keeping two things in step |
+
+Finished games are not recorded. Earlier versions wrote rooms, players,
+sessions, results and lifecycle events here, but nothing a player could reach
+read them back, so `002_drop_history.sql` removed those tables.
 
 ## Schema
 
 ```mermaid
 erDiagram
-  rooms ||--o{ room_players : "has"
-  rooms ||--o{ game_sessions : "hosted"
-  game_sessions ||--o{ game_results : "produced"
-  room_players ||--o{ game_results : "scored"
   datasets ||--o{ questions : "contains"
 
-  rooms {
-    text code PK
-    text seed
-    text game_id
-    uuid host_player_id
-    text status
-    timestamptz last_activity_at
-  }
-  room_players {
-    uuid id PK
-    text room_code FK
-    text name
-    int join_seq
-    int final_score
-  }
-  game_sessions {
-    uuid id PK
-    text room_code FK
-    text game_id
-    jsonb settings
-    timestamptz ended_at
-    text end_reason
-  }
-  game_results {
-    uuid session_id FK
-    uuid player_id FK
-    int score
-    smallint rank
+  datasets {
+    text id PK
+    text kind
+    text version
+    text source
+    int item_count
   }
   questions {
     text id PK
+    text dataset_id FK
     text kind
     text category
     text difficulty
@@ -61,14 +40,6 @@ erDiagram
 ```
 
 Notes on choices that were not obvious:
-
-**`rooms.seed` is stored.** It is the input to every draw a game makes, so
-keeping it means a finished session's question order can be reproduced exactly
-— which is the difference between investigating a scoring complaint and
-guessing.
-
-**`room_players(room_code, join_seq)` is unique.** Host succession is defined
-in terms of join order, so it has to be unique and stable per room.
 
 **`questions.payload` is the engine's own `ContentItem`, stored whole.** Only
 the columns used for selection are lifted out. The database does not
@@ -98,7 +69,7 @@ page group by it.
 
 **There is no `answers` table.** Persisting every submission would turn a party
 game into a write-heavy pipeline for data nobody reads. Answers live in the
-session state and are summarised into `game_results` when the game ends.
+session state in Redis and go when the room does.
 
 ## The content library
 
@@ -142,20 +113,11 @@ would not, and the games forgive typos, so two titles one edit apart mean one
 is silently accepted for the other. `Gamyam` and `Gaayam` are both real Telugu
 films and one edit apart, which is how this check came to exist.
 
-## Writes are off the hot path
+## Nothing in a round touches Postgres
 
-Nothing in a round awaits Postgres. The archive is called without `await` at
-lifecycle boundaries only — room created, game started, game finished — and a
-failure is logged rather than propagated:
-
-```ts
-void this.archive.recordGameFinished(room, sessionId)
-  .catch((err) => this.logger.error({ err, roomCode }, 'failed to archive game result'))
-```
-
-If Postgres is down, players keep playing and history is lost for the duration.
-That is the right trade for this product: the game is not recoverable, the
-history is.
+The server writes here only when seeding at boot, and reads only when a game
+starts and its kind is not already cached. If Postgres is down, games in
+progress carry on; see [reliability.md](reliability.md#postgres-goes-down).
 
 ## Pool settings, and why
 
@@ -164,6 +126,7 @@ connectionTimeoutMillis: 5_000   // fail fast instead of queueing behind a sick 
 idleTimeoutMillis: 30_000
 statement_timeout: 10_000        // no query may ever be the thing a realtime handler waits on
 max: PG_POOL_MAX                 // default 10 per instance
+ssl: { ca: PG_CA_CERT }          // only when set: verify a hosted database's private CA
 ```
 
 The pool's `error` handler logs and continues. An idle client dropping must not

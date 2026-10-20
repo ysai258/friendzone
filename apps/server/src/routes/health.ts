@@ -28,7 +28,7 @@ export function registerHealthRoutes(app: FastifyInstance, services: AppServices
       await services.redis.command.ping()
     })
     checks['postgres'] = await timed(async () => {
-      await services.archive.ping()
+      await services.pool.query('SELECT 1')
     })
 
     // Content is a soft dependency: an instance with an empty question table

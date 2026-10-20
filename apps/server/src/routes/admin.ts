@@ -48,8 +48,6 @@ export function registerAdminRoutes(app: FastifyInstance, services: AppServices)
         }
       })
 
-      scope.get('/admin/sessions', async () => ({ sessions: await services.archive.recentSessions(25) }))
-
       /** Inspect one room. Returns structure and counts, never game secrets. */
       scope.get('/admin/rooms/:code', async (request) => {
         const code = String((request.params as { code: string }).code).toUpperCase()

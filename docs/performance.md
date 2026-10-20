@@ -115,7 +115,7 @@ number precisely.
 
 | Path | Design |
 | --- | --- |
-| Join a room | HTTP, rate limited, one Redis CAS, one fire-and-forget Postgres write |
+| Join a room | HTTP, rate limited, one Redis CAS |
 | Send an action | Two Redis round trips. Nothing else awaits. |
 | Broadcast state | Built synchronously per viewer; the cross-instance publish is fire-and-forget |
 | Advance a round | One sorted-set range plus one CAS per due room, up to 200 rooms per tick |

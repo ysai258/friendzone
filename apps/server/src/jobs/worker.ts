@@ -1,7 +1,6 @@
 import { Worker } from 'bullmq'
 import { loadConfig } from '../config.ts'
 import { createLogger } from '../logger.ts'
-import { createPool } from '../db/pool.ts'
 import { createRedis } from '../redis/client.ts'
 import { RedisKeys } from '../redis/keys.ts'
 import { defineScripts } from '../redis/scripts.ts'
@@ -14,12 +13,11 @@ import { connectionFor, createQueues, scheduleHousekeeping, QUEUE_NAMES, type Co
  * Runs separately from the game servers on purpose: image derivation is
  * CPU-bound and would otherwise block an event loop that is also holding
  * thousands of WebSockets. Scale it independently, or do not run it at all —
- * the game works without it, it just accumulates stale rows.
+ * the game works without it, it just accumulates stale index entries.
  */
 async function main(): Promise<void> {
   const config = loadConfig()
   const logger = createLogger(config).child({ process: 'worker' })
-  const pool = createPool(config, logger)
   const redis = await createRedis(config, logger)
   const keys = new RedisKeys(config.REDIS_PREFIX)
   const store = new RoomStore(redis.command, defineScripts(redis.command), keys, {
@@ -36,39 +34,16 @@ async function main(): Promise<void> {
 
   const housekeeping = new Worker<HousekeepingJob>(
     QUEUE_NAMES.housekeeping,
-    async (job) => {
+    async () => {
       const startedAt = Date.now()
 
-      // 1. Rooms whose Redis state has expired but whose codes still sit in
-      //    the index. Left alone these accumulate for as long as the process
-      //    runs, and the scheduler re-claims them on every tick.
+      // Rooms whose Redis state has expired but whose codes still sit in the
+      // index. Left alone these accumulate for as long as the process runs, and
+      // the scheduler re-claims them on every tick.
       const pruned = await store.pruneActiveSet(1_000)
 
-      // 2. Postgres rows for rooms nobody has touched in an hour. The live
-      //    state is long gone; this is only closing the books.
-      const { rowCount } = await pool.query(
-        `UPDATE rooms
-            SET closed_at = now(), status = 'CLOSED'
-          WHERE closed_at IS NULL
-            AND last_activity_at < now() - make_interval(mins => $1::int)`,
-        [job.data.idleMinutes],
-      )
-
-      // 3. Sessions that were never finished, so a crashed game does not look
-      //    like one still in progress forever.
-      const { rowCount: abandoned } = await pool.query(
-        `UPDATE game_sessions
-            SET ended_at = now(), end_reason = 'ABANDONED'
-          WHERE ended_at IS NULL
-            AND started_at < now() - make_interval(mins => $1::int)`,
-        [job.data.idleMinutes],
-      )
-
-      logger.info(
-        { pruned, roomsClosed: rowCount, sessionsAbandoned: abandoned, ms: Date.now() - startedAt },
-        'housekeeping complete',
-      )
-      return { pruned, roomsClosed: rowCount, sessionsAbandoned: abandoned }
+      logger.info({ pruned, ms: Date.now() - startedAt }, 'housekeeping complete')
+      return { pruned }
     },
     { connection, prefix, concurrency: 1 },
   )
@@ -105,7 +80,6 @@ async function main(): Promise<void> {
     await Promise.allSettled([housekeeping.close(), content.close()])
     await queues.close()
     await redis.close()
-    await pool.end()
     process.exit(0)
   }
 

@@ -95,10 +95,12 @@ action cannot claim to have been earlier than it was.
 
 ## Postgres goes down
 
-Games keep running. Every archive write is fire-and-forget with its own catch,
-so the effect is lost history, not lost gameplay. New rooms are still created —
-the Redis write is what makes a room exist, and the Postgres row is a record of
-it. `/ready` fails, so the instance leaves rotation.
+Games in progress keep running: Postgres holds only the question library, and
+nothing on the realtime path queries it. New rooms are still created — the
+Redis write is what makes a room exist. Starting a game needs its questions,
+which the content cache usually already holds (see below); a kind that was
+never loaded cannot start until Postgres returns. `/ready` fails, so the
+instance leaves rotation.
 
 ## Redis goes down
 
@@ -116,5 +118,4 @@ not stop the next game starting.
 
 Redis TTLs, refreshed on every write: 30 minutes for a lobby, 15 for a finished
 game. A room nobody touches stops existing. The worker sweeps index entries
-left behind by expired rooms and closes the Postgres rows, on a five-minute
-schedule. Nothing grows without bound.
+left behind by expired rooms on a five-minute schedule. Nothing grows without bound.

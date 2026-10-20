@@ -3,7 +3,7 @@
 ## The shape of it
 
 A modular monolith: one server process that speaks HTTP and WebSocket, backed
-by Redis for live state and Postgres for durable records, with a separate
+by Redis for live state and Postgres for the question library, with a separate
 worker for background jobs. Several copies of that process run behind a load
 balancer and coordinate through Redis.
 
@@ -23,7 +23,7 @@ graph TB
   end
 
   R[("Redis<br/>live room state<br/>deadline index<br/>pub/sub<br/>rate limits")]
-  P[("PostgreSQL<br/>rooms, players<br/>sessions, results<br/>question content")]
+  P[("PostgreSQL<br/>question content")]
   W[Worker<br/>cleanup · image derivation]
 
   B1 -- WebSocket --> LB
@@ -97,7 +97,7 @@ sequenceDiagram
 ```
 
 Two Redis round trips, both required. Nothing else on this path awaits
-anything: the archive write and the cross-instance publish are fire-and-forget,
+anything: the cross-instance publish is fire-and-forget,
 and the per-viewer payloads are built synchronously.
 
 ## Who owns what
@@ -108,7 +108,6 @@ and the per-viewer payloads are built synchronously.
 | Round deadlines | Redis sorted set | Any instance can notice any room is due; survives a restart |
 | Cross-instance updates | Redis pub/sub, per room | Only instances holding a socket for that room pay for its traffic |
 | Rate limits | Redis token buckets | Per-process limits multiply by the instance count |
-| Rooms, players, results | Postgres | Worth keeping after the room is gone |
 | Question content | Postgres, cached in process | Static between deploys; never read during a round |
 | Game rules | `packages/game-engine` | Pure functions, no I/O, testable without a server |
 | Screens | `apps/web` | One component per game, chosen by id, no other branching |
@@ -122,8 +121,8 @@ graph LR
   GR --> GD[Game definition]
   RS --> ST[Room store]
   ST --> R[(Redis)]
-  RS --> AR[Archive]
-  AR --> P[(Postgres)]
+  RS --> CP[Content provider]
+  CP --> P[(Postgres)]
 ```
 
 The gateway knows about sockets and nothing about games. The room service knows
