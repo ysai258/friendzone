@@ -17,7 +17,7 @@ data/seed/
   prompts.json           1261   Mind Meld, 17 themes
   identities.json         177   Who Am I?, 7 categories
   image-subjects.json      79   Blur Battle subjects; the pipeline does the rest
-  songs.json             1013   Paata Pattu — Telugu songs and their YouTube clips
+  songs.json              930   Paata Pattu — Telugu songs and their YouTube clips
 ```
 
 Each file is `{ "$comment": …, "items": [ … ] }`, and the movie files also
@@ -251,7 +251,10 @@ A song stays only if it clears one of three bars:
 Each song was resolved to its Topic audio track, and the film and year come
 from that track's album. Remixes, lo-fi edits, instrumentals, devotional
 albums, composer compilations, non-film singles, and Tamil or Hindi originals
-under their own film names were dropped. Every track was checked through
+under their own film names were dropped. A dub of another language's film
+stays only if Telugu listeners actually play it, in at least 5 of the Spotify
+playlists. Every entry was then reviewed by hand, which caught songs that had
+borrowed a famous namesake's numbers (two films, one title). Every track was checked through
 oEmbed. Difficulty follows the same numbers: `easy` is at least 50M views, at
 least 15 playlists, or at least 5 lists; `hard` is pre-1990 or a lower reach.
 To add a song by hand, give it the same test.

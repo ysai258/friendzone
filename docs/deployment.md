@@ -159,7 +159,7 @@ npm run seed
 
 `/ready` reports per-kind content counts, which is the quickest way to see
 whether a deployment has content at all. A healthy deployment built from
-this repo reports `emoji 351, identity 177, image 79, mafia 90, prompt 1261, song 1013`.
+this repo reports `emoji 351, identity 177, image 79, mafia 90, prompt 1261, song 930`.
 
 ### Updating content on a live deployment
 
