@@ -1,37 +1,39 @@
 @import 'tailwindcss';
 
 /*
- * FriendZone's design tokens, shared with Chaos Club: neo-brutalist sticker
- * style. Thick ink outlines, hard offset shadows, loud saturated colours on
- * cream paper. Built for a phone held in a noisy room, so contrast stays high
- * and touch targets stay big.
+ * FriendZone's design tokens. The sticker style it shares with Chaos Club
+ * (thick outlines, hard offset shadows, loud fills) in FriendZone's own
+ * colours: deep navy ink on cool periwinkle paper, with coral, teal, mint,
+ * electric violet, saffron and magenta. Same family, different house.
  *
- * Use as Tailwind classes: bg-tomato, bg-sky-soft, text-ink, border-ink,
+ * The colour names are the slots the components use: `tomato` is the warm
+ * alarm colour, `sky` the cool one, `lime` means right, `sun` means you or
+ * now. Use as Tailwind classes: bg-tomato, bg-sky-soft, text-ink, border-ink,
  * shadow-hard, font-display, font-chunky, animate-wiggle ...
  */
 @theme {
-  --color-tomato: #ff5a36;
-  --color-sky: #38b6ff;
-  --color-lime: #9be15d;
-  --color-grape: #a77bff;
-  --color-sun: #ffd23f;
-  --color-bubblegum: #ff7ac6;
-  --color-ink: #16130f;
-  --color-paper: #fff4e0;
+  --color-tomato: #ff6f61;
+  --color-sky: #2ec4b6;
+  --color-lime: #5be0a5;
+  --color-grape: #7b61ff;
+  --color-sun: #ffb627;
+  --color-bubblegum: #f15bb5;
+  --color-ink: #1d1b4b;
+  --color-paper: #eef1ff;
 
-  --color-tomato-soft: #ffd5ca;
-  --color-sky-soft: #cdeeff;
-  --color-lime-soft: #e2f7cc;
-  --color-grape-soft: #e8dcff;
-  --color-sun-soft: #fff0b3;
-  --color-bubblegum-soft: #ffd9ee;
-  --color-paper-deep: #f6e6c8;
-  --color-ink-soft: #5c544a;
+  --color-tomato-soft: #ffd9d4;
+  --color-sky-soft: #ccf3ee;
+  --color-lime-soft: #d3f7e6;
+  --color-grape-soft: #e2dcff;
+  --color-sun-soft: #ffebc2;
+  --color-bubblegum-soft: #fdd6ee;
+  --color-paper-deep: #dfe4ff;
+  --color-ink-soft: #545286;
 
   /* The old dark theme's names, pointed at their light equivalents so nothing
      renders invisible on paper. New code uses the names above. */
-  --color-chalk: #16130f;
-  --color-muted: #5c544a;
+  --color-chalk: #1d1b4b;
+  --color-muted: #545286;
 
   --font-sans: 'DM Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-display: 'Bricolage Grotesque', ui-rounded, system-ui, sans-serif;
