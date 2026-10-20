@@ -24,7 +24,7 @@ No signup. No downloads. Just friends.
 | 🧠 **Mind Meld** | One prompt, everyone answers at once, points for agreeing. Being clever is a trap. | 2–16 |
 | 🕵️ **Who Am I?** | A secret identity on your forehead that everyone but you can see. One category per game: Telugu actors, cricketers, singers… | 3–10 |
 | 🎭 **Movie Mafia** | Everyone gets a clue about the same film. One clue is wrong, and its holder does not know. Same language picker as Emoji Movie. | 4–12 |
-| 📼 **Paata Pattu** | Name the Telugu song from its opening seconds. Two seconds, then four, seven, ten, fifteen — each wrong guess or skip buys a longer listen, and the table watches everyone's ladder fill up. | 1–12 |
+| 📼 **Paata Pattu** | Name That Tune for Telugu songs. The whole room hears the same intro — two seconds, then four, seven, ten, fifteen — with one guess per clue. First on the shortest clue wins; the right movie with the wrong song still earns a little. Music on every phone, or on the host's speaker. | 1–12 |
 
 ## Running it
 

@@ -7,8 +7,7 @@ import { Scoreboard } from '../components/Scoreboard.tsx'
 import { useYouTubeClip, type ClipStatus } from '../lib/youtubeClip.ts'
 import { Banner, Countdown, GameHeader, PlayerName, readView } from './shared.tsx'
 
-type Mark = 'correct' | 'wrong' | 'skipped'
-type Status = 'playing' | 'won' | 'lost'
+type GuessKind = 'correct' | 'movie' | 'wrong'
 
 interface CatalogEntry {
   id: string
@@ -18,43 +17,63 @@ interface CatalogEntry {
   aliases: string[]
 }
 
+interface Pick {
+  title: string | null
+  kind: GuessKind
+  stage: number
+}
+
 interface PaataView {
   clipSeconds: number[]
-  maxAttempts: number
-  ladders: Record<string, { marks: Mark[]; status: Status }>
+  stage: number
+  unlockedSeconds: number
+  audio: 'everyone' | 'host'
+  board: Record<string, { solvedStage: number | null; place: number | null; misses: number; usedStage: boolean }>
   activeCount: number
   clip?: { videoId: string; startOffsetMs: number }
   catalog?: CatalogEntry[]
-  you?: { status: Status; points: number; attempts: { kind: Mark; title: string | null }[]; unlockedSeconds: number }
+  you?: { solvedStage: number | null; place: number | null; points: number; canGuess: boolean; guesses: Pick[] }
   answer?: { title: string; movie: string; year: number | null; youtubeUrl: string }
-  results?: { playerId: string; marks: Mark[]; status: Status; points: number; place: number | null; picks: string[] }[]
+  results?: { playerId: string; solvedStage: number | null; place: number | null; points: number; picks: Pick[] }[]
 }
+
+const ORDINAL = ['1st', '2nd', '3rd']
+const ordinal = (place: number) => ORDINAL[place - 1] ?? `${place}th`
 
 export function PaataPattu({ connection, room }: GameProps) {
   const view = readView<PaataView>(room)
   const phase = room.game?.phase
 
-  if (phase === 'COUNTDOWN') {
-    return (
-      <Countdown
-        connection={connection}
-        room={room}
-        title={`Song ${room.game?.roundNumber} of ${room.game?.totalRounds}`}
-        subtitle="Two seconds of intro. Name it, or skip for a longer listen."
-      />
-    )
-  }
+  const counting = phase === 'COUNTDOWN'
+  const hostName = room.players.find((p) => p.id === room.hostId)?.name ?? 'the host'
+  const playsHere = view.audio === 'everyone' || room.viewerId === room.hostId
+  // Every new clue, and the reveal, plays from the top for the whole room.
+  const autoplayKey = phase === 'QUESTION' || phase === 'REVEAL' ? `${room.game?.roundNumber}:${phase}:${view.stage}` : null
 
-  const unlocked = view.you?.unlockedSeconds ?? view.clipSeconds[0] ?? 2
+  // The deck stays mounted across the countdown, hidden, so the song is loaded
+  // and buffered by the time the first clue opens.
   return (
     <div className="flex flex-col gap-4">
-      <GameHeader connection={connection} room={room} label="📼 Paata Pattu" accent="bg-amber-400" />
-      <Deck view={view} />
-      {phase === 'QUESTION' ? (
+      {counting ? (
+        <Countdown
+          connection={connection}
+          room={room}
+          title={`Song ${room.game?.roundNumber} of ${room.game?.totalRounds}`}
+          subtitle="Everyone hears the same intro. One guess per clue — get it before your friends do."
+        />
+      ) : (
+        <GameHeader connection={connection} room={room} label="📼 Paata Pattu" accent="bg-amber-400" />
+      )}
+      {playsHere ? (
+        <Deck view={view} autoplayKey={autoplayKey} hidden={counting} />
+      ) : (
+        !counting && <SpeakerNote hostName={hostName} seconds={view.unlockedSeconds} />
+      )}
+      {counting ? null : phase === 'QUESTION' ? (
         <>
-          <Ladder view={view} unlocked={unlocked} />
+          <ClueRail view={view} />
           <GuessPanel connection={connection} view={view} />
-          <TableLadders room={room} view={view} />
+          <RaceBoard room={room} view={view} />
         </>
       ) : (
         <RevealPanel view={view} room={room} />
@@ -68,12 +87,38 @@ export function PaataPattu({ connection, room }: GameProps) {
 const STATUS_COPY: Record<ClipStatus, (seconds: number) => [string, string]> = {
   loading: () => ['Preparing audio', 'Loading the tape…'],
   ready: (s) => [`Play ${s} seconds`, 'Ready to play'],
-  starting: () => ['Pause clue', 'Checking playback…'],
-  playing: () => ['Pause clue', 'Playing the unlocked clue'],
-  paused: () => ['Continue clue', 'Paused'],
-  done: (s) => ['Replay from start', `${s}-second clue complete`],
-  unavailable: () => ['Audio unavailable', 'This song will not play here. Skip it.'],
+  blocked: (s) => [`Tap to play ${s} seconds`, 'Your browser wants a tap before it plays audio'],
+  starting: () => ['Pause', 'Starting the tape…'],
+  playing: () => ['Pause', 'Playing the clue'],
+  paused: () => ['Continue', 'Paused'],
+  done: (s) => ['Replay', `${s}-second clue played`],
+  unavailable: () => ['Audio unavailable', 'This song will not play here'],
   error: () => ['Retry audio', 'Audio could not start'],
+}
+
+function Cassette({ seconds, spinning }: { seconds: number; spinning: boolean }) {
+  return (
+    <div
+      aria-hidden
+      className="relative mx-auto aspect-[320/205] w-full max-w-sm rounded-[13px] border-[3px] border-[#171513] bg-[#533287] shadow-[5px_5px_0_#171513]"
+    >
+      <span className="absolute left-2 top-2 size-2 rounded-full bg-[#f5e7cb]" />
+      <span className="absolute right-2 top-2 size-2 rounded-full bg-[#f5e7cb]" />
+      <span className="absolute left-1/4 top-3 h-1 w-1/2 bg-[#e9a72b]" />
+      <div className="absolute inset-x-[9%] top-[17%] -rotate-[0.8deg] bg-[#fff8e9] px-2 py-1 text-right font-mono text-[10px] font-semibold tracking-wider text-[#b52f21]">
+        SIDE A · PAATA PATTU
+      </div>
+      <div className="absolute inset-x-[15%] top-[38%] flex h-[34%] items-center justify-between rounded-[44px] border-2 border-[#171513] bg-[#f5e7cb] px-[6%]">
+        <Reel spinning={spinning} />
+        <span className="mx-1 h-1.5 flex-1 bg-[#b52f21]" />
+        <Reel spinning={spinning} />
+      </div>
+      <div className="absolute inset-x-[22%] bottom-0 h-[16%] bg-[#146b68] [clip-path:polygon(8%_0,92%_0,100%_100%,0_100%)]" />
+      <span className="absolute bottom-2 right-2 border-2 border-[#171513] bg-[#171513] px-1.5 font-mono text-sm font-semibold text-[#e9a72b]">
+        00:{String(seconds).padStart(2, '0')}
+      </span>
+    </div>
+  )
 }
 
 /**
@@ -81,76 +126,78 @@ const STATUS_COPY: Record<ClipStatus, (seconds: number) => [string, string]> = {
  * decoration. The video never renders on screen, so its title and thumbnail
  * cannot give the song away.
  */
-function Deck({ view }: { view: PaataView }) {
-  const seconds = view.you?.unlockedSeconds ?? view.clipSeconds[0] ?? 2
-  const clip = useYouTubeClip(view.clip?.videoId ?? null, view.clip?.startOffsetMs ?? 0, seconds)
+function Deck({ view, autoplayKey, hidden }: { view: PaataView; autoplayKey: string | null; hidden: boolean }) {
+  const seconds = view.unlockedSeconds
+  const clip = useYouTubeClip(view.clip?.videoId ?? null, view.clip?.startOffsetMs ?? 0, seconds, autoplayKey)
   const [label, sub] = STATUS_COPY[clip.status](seconds)
-  const spinning = clip.status === 'playing'
   const busy = clip.status === 'playing' || clip.status === 'starting'
   const progress = clip.limitMs > 0 ? clip.positionMs / clip.limitMs : 0
 
+  // Off-screen rather than display:none: YouTube will not play a hidden iframe.
+  const playerHost = (
+    <div
+      ref={clip.hostRef}
+      aria-hidden
+      className="pointer-events-none fixed left-[-10000px] top-0 h-[270px] w-[480px] opacity-0"
+    />
+  )
+  // The player's element sits outside the card, always in the same place, so
+  // showing the card after the countdown does not remount the primed player.
   return (
-    <Card className="flex flex-col gap-4 border-[#e9a72b]/30 bg-[#f5e7cb]/[0.04]">
-      <div
-        aria-hidden
-        className="relative mx-auto aspect-[320/205] w-full max-w-sm rounded-[13px] border-[3px] border-[#171513] bg-[#533287] shadow-[5px_5px_0_#171513]"
-      >
-        <span className="absolute left-2 top-2 size-2 rounded-full bg-[#f5e7cb]" />
-        <span className="absolute right-2 top-2 size-2 rounded-full bg-[#f5e7cb]" />
-        <span className="absolute left-1/4 top-3 h-1 w-1/2 bg-[#e9a72b]" />
-        <div className="absolute inset-x-[9%] top-[17%] -rotate-[0.8deg] bg-[#fff8e9] px-2 py-1 text-right font-mono text-[10px] font-semibold tracking-wider text-[#b52f21]">
-          SIDE A · PAATA PATTU
-        </div>
-        <div className="absolute inset-x-[15%] top-[38%] flex h-[34%] items-center justify-between rounded-[44px] border-2 border-[#171513] bg-[#f5e7cb] px-[6%]">
-          <Reel spinning={spinning} />
-          <span className="mx-1 h-1.5 flex-1 bg-[#b52f21]" />
-          <Reel spinning={spinning} />
-        </div>
-        <div className="absolute inset-x-[22%] bottom-0 h-[16%] bg-[#146b68] [clip-path:polygon(8%_0,92%_0,100%_100%,0_100%)]" />
-        <span className="absolute bottom-2 right-2 border-2 border-[#171513] bg-[#171513] px-1.5 font-mono text-sm font-semibold text-[#e9a72b]">
-          00:{String(seconds).padStart(2, '0')}
-        </span>
-      </div>
+    <>
+      {!hidden && (
+        <Card className="flex flex-col gap-4 border-[#e9a72b]/30 bg-[#f5e7cb]/[0.04]">
+          <Cassette seconds={seconds} spinning={clip.status === 'playing'} />
 
-      <div className="flex items-center gap-4">
-        <button
-          type="button"
-          onClick={() => clip.toggle()}
-          disabled={clip.status === 'loading' || clip.status === 'unavailable'}
-          aria-label={label}
-          className="flex size-16 shrink-0 items-center justify-center rounded-full border-[3px] border-[#171513] bg-[#e9a72b] text-2xl text-[#171513] shadow-[3px_3px_0_#171513] transition active:translate-x-0.5 active:translate-y-0.5 active:shadow-[1px_1px_0_#171513] disabled:opacity-55"
-        >
-          {clip.status === 'loading' ? '…' : busy ? 'Ⅱ' : '▶'}
-        </button>
-        <div className="min-w-0">
-          <p className="font-bold">{label}</p>
-          <p className="text-sm text-muted" aria-live="polite">{sub}</p>
-        </div>
-      </div>
+          <div className="flex items-center gap-4">
+            <button
+              type="button"
+              onClick={() => clip.toggle()}
+              disabled={clip.status === 'loading' || clip.status === 'unavailable'}
+              aria-label={label}
+              className={clsx(
+                'flex size-16 shrink-0 items-center justify-center rounded-full border-[3px] border-[#171513] bg-[#e9a72b] text-2xl text-[#171513] shadow-[3px_3px_0_#171513] transition active:translate-x-0.5 active:translate-y-0.5 active:shadow-[1px_1px_0_#171513] disabled:opacity-55',
+                clip.status === 'blocked' && 'animate-soft-pulse',
+              )}
+            >
+              {clip.status === 'loading' ? '…' : busy ? 'Ⅱ' : '▶'}
+            </button>
+            <div className="min-w-0">
+              <p className="font-bold">{label}</p>
+              <p className="text-sm text-muted" aria-live="polite">{sub}</p>
+            </div>
+          </div>
 
-      <div className="flex flex-col gap-1">
-        <div className="h-2 w-full overflow-hidden rounded-full border border-white/15 bg-black/40">
-          <div className="h-full bg-[#146b68] transition-[width] duration-150" style={{ width: `${Math.round(progress * 100)}%` }} />
-        </div>
-        <div className="flex justify-between font-mono text-xs text-muted">
-          <span className="tabular">{(clip.positionMs / 1000).toFixed(1)}s</span>
-          <span>{seconds}s</span>
-        </div>
-      </div>
+          <div className="flex flex-col gap-1">
+            <div className="h-2 w-full overflow-hidden rounded-full border border-white/15 bg-black/40">
+              <div className="h-full bg-[#146b68] transition-[width] duration-150" style={{ width: `${Math.round(progress * 100)}%` }} />
+            </div>
+            <div className="flex justify-between font-mono text-xs text-muted">
+              <span className="tabular">{(clip.positionMs / 1000).toFixed(1)}s</span>
+              <span>{seconds}s</span>
+            </div>
+          </div>
 
-      <p className="text-center text-[11px] text-muted">
-        Audio via{' '}
-        <a className="underline hover:text-chalk" href="https://www.youtube.com/" target="_blank" rel="noreferrer noopener">
-          YouTube ↗
-        </a>
-      </p>
+          <p className="text-center text-[11px] text-muted">
+            Audio via{' '}
+            <a className="underline hover:text-chalk" href="https://music.youtube.com/" target="_blank" rel="noreferrer noopener">
+              YouTube Music ↗
+            </a>
+          </p>
+        </Card>
+      )}
+      {playerHost}
+    </>
+  )
+}
 
-      {/* Off-screen rather than display:none: YouTube will not play a hidden iframe. */}
-      <div
-        ref={clip.hostRef}
-        aria-hidden
-        className="pointer-events-none fixed left-[-10000px] top-0 h-[270px] w-[480px] opacity-0"
-      />
+/** For everyone but the host, when the music plays on one speaker for the room. */
+function SpeakerNote({ hostName, seconds }: { hostName: string; seconds: number }) {
+  return (
+    <Card className="flex flex-col gap-3 border-[#e9a72b]/30 bg-[#f5e7cb]/[0.04]">
+      <Cassette seconds={seconds} spinning={false} />
+      <p className="text-center font-semibold">🔊 Listen to {hostName}&rsquo;s speaker</p>
+      <p className="text-center text-xs text-muted">The music plays on the host&rsquo;s device so the whole room hears it together.</p>
     </Card>
   )
 }
@@ -168,38 +215,32 @@ function Reel({ spinning }: { spinning: boolean }) {
   )
 }
 
-// --- the ladder --------------------------------------------------------------
+// --- the clue rail -----------------------------------------------------------
 
-const MARK_STYLE: Record<Mark, string> = {
-  correct: 'border-emerald-300/60 bg-emerald-500/80 text-white',
-  wrong: 'border-rose-300/60 bg-rose-500/80 text-white',
-  skipped: 'border-violet-300/60 bg-violet-500/70 text-white',
-}
-const MARK_WORD: Record<Mark, string> = { correct: 'Correct', wrong: 'Wrong', skipped: 'Skipped' }
+const KIND_MARK: Record<GuessKind, string> = { correct: '✓', movie: '🎬', wrong: '✗' }
 
-/** Your five clues: what each attempt was, and which one you are on. */
-function Ladder({ view, unlocked }: { view: PaataView; unlocked: number }) {
-  const attempts = view.you?.attempts ?? []
-  const playing = view.you?.status === 'playing'
+/** The room's five clues, and what you did with each. */
+function ClueRail({ view }: { view: PaataView }) {
+  const mine = view.you?.guesses ?? []
   return (
-    <ol className="grid grid-cols-5 gap-1.5" aria-label="Your clues">
+    <ol className="grid grid-cols-5 gap-1.5" aria-label="Clues">
       {view.clipSeconds.map((seconds, index) => {
-        const attempt = attempts[index]
-        const current = playing && index === attempts.length
+        const current = index === view.stage
+        const past = index < view.stage
+        const pick = mine.find((g) => g.stage === index)
         return (
           <li
             key={seconds}
             className={clsx(
               'flex min-h-14 flex-col items-center justify-center rounded-xl border text-center',
-              attempt !== undefined && MARK_STYLE[attempt.kind],
               current && 'border-amber-300 bg-amber-400 text-ink-950 shadow-[2px_2px_0_#171513]',
-              attempt === undefined && !current && 'border-dashed border-white/20 text-muted opacity-60',
+              past && 'border-amber-300/30 bg-amber-400/15 text-amber-100',
+              !current && !past && 'border-dashed border-white/20 text-muted opacity-60',
             )}
           >
-            <span className="font-mono text-[10px] opacity-70">{index + 1}</span>
             <span className="font-mono text-sm font-semibold">{seconds}s</span>
-            <span className="text-[10px] font-bold">
-              {attempt !== undefined ? MARK_WORD[attempt.kind] : current ? 'Current' : seconds <= unlocked ? '' : 'Locked'}
+            <span className="text-[11px] font-bold">
+              {pick !== undefined ? KIND_MARK[pick.kind] : current ? 'Now' : past ? '' : 'Locked'}
             </span>
           </li>
         )
@@ -208,46 +249,36 @@ function Ladder({ view, unlocked }: { view: PaataView; unlocked: number }) {
   )
 }
 
-/** Everyone's ladder at a glance. Marks only: nobody's pick is sent until the reveal. */
-function TableLadders({ room, view }: { room: PublicRoomView; view: PaataView }) {
+/** The race as the table sees it: who has it, on which clue, and how many misses. */
+function RaceBoard({ room, view }: { room: PublicRoomView; view: PaataView }) {
   const seated = room.players.filter((p) => p.presence !== 'INACTIVE')
   return (
     <Card className="flex flex-col gap-2">
-      <p className="text-xs font-bold uppercase tracking-wider text-muted">The table</p>
+      <p className="text-xs font-bold uppercase tracking-wider text-muted">The race</p>
       {seated.map((player) => {
-        const ladder = view.ladders[player.id]
+        const entry = view.board[player.id]
+        const solved = entry?.solvedStage ?? null
         return (
           <div key={player.id} className="flex items-center gap-2 text-sm">
             <span className="min-w-0 flex-1 truncate">
               <PlayerName room={room} playerId={player.id} />
             </span>
-            <MiniLadder marks={ladder?.marks ?? []} total={view.maxAttempts} />
-            <span className="w-5 text-center" aria-label={ladder?.status ?? 'playing'}>
-              {ladder?.status === 'won' ? '✓' : ladder?.status === 'lost' ? '✗' : ''}
-            </span>
+            {Array.from({ length: entry?.misses ?? 0 }, (_, i) => (
+              <span key={i} className="text-rose-300" aria-hidden>✗</span>
+            ))}
+            {solved !== null ? (
+              <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-xs font-bold text-emerald-200">
+                ✓ {view.clipSeconds[solved]}s{entry?.place != null && <> · {ordinal(entry.place)}</>}
+              </span>
+            ) : entry?.usedStage === true ? (
+              <span className="text-xs text-muted">waiting for next clue</span>
+            ) : (
+              <span className="text-xs text-muted animate-soft-pulse">listening…</span>
+            )}
           </div>
         )
       })}
     </Card>
-  )
-}
-
-function MiniLadder({ marks, total }: { marks: Mark[]; total: number }) {
-  return (
-    <span className="flex gap-1" aria-label={marks.length === 0 ? 'No attempts yet' : marks.map((m) => MARK_WORD[m]).join(', ')}>
-      {Array.from({ length: total }, (_, i) => {
-        const mark = marks[i]
-        return (
-          <span
-            key={i}
-            className={clsx(
-              'size-3.5 rounded-[3px] border',
-              mark === undefined ? 'border-dashed border-white/25' : MARK_STYLE[mark],
-            )}
-          />
-        )
-      })}
-    </span>
   )
 }
 
@@ -273,15 +304,13 @@ function GuessPanel({ connection, view }: { connection: GameProps['connection'];
   const inputRef = useRef<HTMLInputElement>(null)
 
   const you = view.you
-  const attemptsUsed = you?.attempts.length ?? 0
-  const lastAttempt = attemptsUsed >= view.maxAttempts - 1
 
   // Search once per catalog, not per keystroke.
   const index = useMemo(
     () => (view.catalog ?? []).map((entry) => ({ entry, haystack: normalize([entry.title, entry.movie, ...entry.aliases].join(' ')) })),
     [view.catalog],
   )
-  const tried = useMemo(() => new Set((you?.attempts ?? []).map((a) => a.title)), [you?.attempts])
+  const tried = useMemo(() => new Set((you?.guesses ?? []).map((g) => g.title)), [you?.guesses])
 
   const results = useMemo(() => {
     const terms = normalize(query).split(' ').filter((t) => t.length > 0)
@@ -294,15 +323,22 @@ function GuessPanel({ connection, view }: { connection: GameProps['connection'];
 
   if (you === undefined) return null
 
-  if (you.status !== 'playing') {
-    const landed = you.attempts.length
+  if (you.solvedStage !== null) {
     return (
-      <Banner tone={you.status === 'won' ? 'good' : 'bad'}>
-        {you.status === 'won' ? (
-          <>Got it on the {view.clipSeconds[landed - 1]}-second clue — +{you.points.toLocaleString()}.</>
-        ) : (
-          <>Out of clues. The reveal is coming.</>
-        )}
+      <Banner tone="good">
+        Got it on the {view.clipSeconds[you.solvedStage]}-second clue
+        {you.place !== null && <> — {ordinal(you.place)}!</>} +{you.points.toLocaleString()}
+      </Banner>
+    )
+  }
+
+  if (!you.canGuess) {
+    const last = you.guesses.at(-1)
+    const next = view.clipSeconds[view.stage + 1]
+    return (
+      <Banner tone={last?.kind === 'movie' ? 'neutral' : 'bad'}>
+        {last?.kind === 'movie' ? <>🎬 Right movie, wrong song! +100. </> : <>“{last?.title}” isn&rsquo;t it. </>}
+        {next !== undefined ? <>Your next guess opens with the {next}-second clue.</> : <>That was your last clue.</>}
       </Banner>
     )
   }
@@ -313,29 +349,19 @@ function GuessPanel({ connection, view }: { connection: GameProps['connection'];
     setOpen(false)
   }
 
-  const reset = () => {
-    setSelected(null)
-    setQuery('')
-    setHighlight(0)
-  }
-
   const submit = () => {
     if (selected === null) return
     connection.send('song/guess', { trackId: selected.id })
-    reset()
-    inputRef.current?.focus()
-  }
-
-  const skip = () => {
-    connection.send('song/skip', {})
-    reset()
+    setSelected(null)
+    setQuery('')
+    setHighlight(0)
   }
 
   return (
     <div className="flex flex-col gap-3">
       <div className="relative">
         <label htmlFor="paata-guess" className="mb-1.5 block text-sm font-semibold">
-          Your guess
+          Your guess <span className="font-normal text-muted">— one per clue</span>
         </label>
         <input
           ref={inputRef}
@@ -415,16 +441,11 @@ function GuessPanel({ connection, view }: { connection: GameProps['connection'];
         )}
       </div>
 
-      <div className="grid grid-cols-2 gap-2">
-        <Button onClick={submit} disabled={selected === null}>
-          Guess song
-        </Button>
-        <Button variant="ghost" onClick={skip}>
-          {lastAttempt ? 'Give up :(' : 'Unlock next clue'}
-        </Button>
-      </div>
+      <Button onClick={submit} disabled={selected === null}>
+        Lock it in
+      </Button>
       <p className="text-center text-xs text-muted">
-        A wrong guess or a skip unlocks a longer clip. The fewer clues you need, the more it pays.
+        Wrong, and you sit out until the next clue. Right movie, wrong song still earns 100.
       </p>
     </div>
   )
@@ -455,20 +476,26 @@ function RevealPanel({ view, room }: { view: PaataView; room: PublicRoomView }) 
       )}
 
       {(view.results ?? []).length > 0 && (
-        <Card className="flex flex-col gap-2">
+        <Card className="flex flex-col gap-2.5">
           {(view.results ?? []).map((result) => (
             <div key={result.playerId} className="flex flex-col gap-0.5 text-sm">
               <div className="flex items-center gap-2">
                 <span className="min-w-0 flex-1 truncate">
                   <PlayerName room={room} playerId={result.playerId} />
                 </span>
-                <MiniLadder marks={result.marks} total={view.maxAttempts} />
+                {result.solvedStage !== null && (
+                  <span className="text-xs font-bold text-emerald-200">
+                    {view.clipSeconds[result.solvedStage]}s{result.place !== null && <> · {ordinal(result.place)}</>}
+                  </span>
+                )}
                 <span className={clsx('tabular w-14 text-right font-bold', result.points > 0 ? 'text-emerald-300' : 'text-muted')}>
                   {result.points > 0 ? `+${result.points}` : '—'}
                 </span>
               </div>
               {result.picks.length > 0 && (
-                <p className="truncate pl-1 text-xs text-muted">{result.picks.map((p) => `“${p}”`).join(' → ')}</p>
+                <p className="truncate pl-1 text-xs text-muted">
+                  {result.picks.map((p) => `${KIND_MARK[p.kind]} ${p.title ?? '?'} (${view.clipSeconds[p.stage]}s)`).join('  ·  ')}
+                </p>
               )}
             </div>
           ))}

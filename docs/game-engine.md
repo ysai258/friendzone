@@ -215,7 +215,7 @@ so no screen shows a countdown parked at zero.
 | Mind Meld | COUNTDOWN → PROMPT → REVEAL → … | Simultaneous submission, answer clustering, host-ended phases |
 | Who Am I? | ASSIGN → ASK → VOTE → RESULT → … | Turn order, per-player secrets, voting, a public log beside private hints |
 | Movie Mafia | ROLES → DISCUSSION → VOTE → RESULT → … | Asymmetric secrets, elimination, team scoring |
-| Paata Pattu | COUNTDOWN → QUESTION → REVEAL → … | Per-player clue ladders, picking from a catalog instead of typing, scoring by clue rather than clock |
+| Paata Pattu | COUNTDOWN → QUESTION (five clue stages) → REVEAL → … | A shared clock that also closes early when everyone has acted, one guess per stage, partial credit, picking from a catalog instead of typing |
 
 They are deliberately different shapes. Blur Battle and Emoji Movie look
 similar but differ where it matters: Blur Battle gives one guess, because the

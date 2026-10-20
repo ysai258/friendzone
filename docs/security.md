@@ -77,8 +77,9 @@ Concretely protected:
   only the imposter's payload says they are the imposter.
 - **Mind Meld** — while the prompt is live, no payload contains another
   player's answer, or even a length hint. Only who has locked in.
-- **Paata Pattu** — every player sees everyone's ladder of right, wrong and
-  skipped, but nobody's picks until the reveal. One honest exception: the clip
+- **Paata Pattu** — every player sees who has the song, on which clue, and
+  how many misses everyone has, but nobody's picks until the reveal. Only the
+  player who picked the right film hears "right movie". One honest exception: the clip
   plays from YouTube, so the payload has to carry the video id, and the video's
   title is one lookup away. The clip length is enforced by the player in the
   browser, not the server. This is a party game among friends, and the daily
