@@ -84,12 +84,12 @@ data/seed/
   movies/tamil.json        48
   movies/malayalam.json    36
   mafia.json               90   Movie Mafia subjects, with fan and imposter clues
-  prompts.json            221   Mind Meld, across 17 themes
+  prompts.json           1261   Mind Meld, across 17 themes
   identities.json         177   Who Am I?, across 7 categories
   image-subjects.json      79   Blur Battle; the pipeline derives the blur ladder
 ```
 
-918 items across the files. Blur Battle is the one kind seeded from the
+1,958 items across the files. Blur Battle is the one kind seeded from the
 pipeline's output rather than from its subject list, so how many of its 79
 subjects arrive depends on the pipeline: the placeholder build keeps all of
 them, while the Wikimedia fetch in this repo's development database rejected
