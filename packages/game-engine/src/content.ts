@@ -121,8 +121,8 @@ export interface MafiaSubject extends BaseItem {
 /**
  * Paata Pattu: one song, played from YouTube.
  *
- * `startOffsetMs` is where the song proper begins in that upload, so a label's
- * sting or a spoken intro does not eat the two-second clue.
+ * `videoId` is the song's YouTube Music track, which starts on the first note.
+ * `startOffsetMs` skips a recording that itself opens on silence or dialogue.
  */
 export interface SongQuestion extends BaseItem {
   kind: 'song'

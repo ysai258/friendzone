@@ -17,7 +17,7 @@ data/seed/
   prompts.json            221   Mind Meld, 17 themes
   identities.json         177   Who Am I?, 7 categories
   image-subjects.json      79   Blur Battle subjects; the pipeline does the rest
-  songs.json               76   Paata Pattu — Telugu songs and their YouTube clips
+  songs.json               87   Paata Pattu — Telugu songs and their YouTube clips
 ```
 
 Each file is `{ "$comment": …, "items": [ … ] }`, and the movie files also
@@ -205,16 +205,22 @@ player, hidden off-screen so the video's title and thumbnail stay out of sight.
   "aliases": [] }
 ```
 
-- **Use the label's own upload** (Aditya Music, Lahari, T-Series Telugu, Sony
-  Music South, Saregama…). Fan re-uploads vanish and often disable embedding.
-  Prefer a lyrical or audio video: it starts on the music, not on a scene.
+- **Use the song's YouTube Music track**, the auto-generated upload on an
+  "Artist - Topic" channel ("Provided to YouTube by …"). It is the studio audio
+  and starts on the song's first note. A label's own lyrical or video upload
+  (Aditya Music, Lahari, T-Series…) opens with the label's sting, which uses up
+  the whole two-second clue, so those are not accepted. Find the track by
+  searching music.youtube.com for "title movie" and taking the Songs result;
+  watch for dubbed versions with the same title and check the singer is the
+  Telugu one. Its length should match the official track length (iTunes or
+  Spotify) to within a second. A film whose label does not publish Topic
+  tracks (much of Aditya Music's recent catalogue) cannot be added.
 - **Check it embeds.** A video that cannot be embedded fails silently in the
   game. `https://www.youtube.com/oembed?format=json&url=https://www.youtube.com/watch?v=<id>`
   returns 401 or 404 for those.
-- **`startOffsetMs`** is where the song itself begins in that upload. Leave it
-  at 0 unless the video opens with a label sting or a spoken intro, which
-  would otherwise eat the whole two-second clue. Most entries are 0 and have
-  not been checked by ear.
+- **`startOffsetMs`** is where to start playing. A Topic track needs 0. It
+  exists for the rare song whose recording itself opens with silence or
+  dialogue.
 - **`aliases`** are other spellings the guess box should find, such as
   "Yentha Sakkagunnave" for "Entha Sakkagunnave". Guesses are picked from the
   list, so aliases only help a player find the song; they are not typo rules.

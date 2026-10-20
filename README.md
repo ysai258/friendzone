@@ -177,8 +177,8 @@ Blur Battle images come from Wikimedia Commons under CC0, public domain, CC BY
 or CC BY-SA. NonCommercial and NoDerivatives files are filtered out at fetch
 time, because this project generates derivatives and cannot promise
 non-commercial use on a deployer's behalf. Every image carries its author,
-source and licence through to the reveal screen. Paata Pattu streams 76 Telugu
-songs from their labels' own YouTube uploads; the list of which songs is ours,
+source and licence through to the reveal screen. Paata Pattu streams 87 Telugu
+songs from their official YouTube Music tracks; the list of which songs is ours,
 the audio is not. The other four games' content is
 original to this project: 351 films across five languages, 90 Movie Mafia
 subjects, 221 Mind Meld prompts and 177 identities across seven categories, all
