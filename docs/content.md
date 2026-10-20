@@ -17,7 +17,7 @@ data/seed/
   prompts.json           1261   Mind Meld, 17 themes
   identities.json         177   Who Am I?, 7 categories
   image-subjects.json      79   Blur Battle subjects; the pipeline does the rest
-  songs.json              930   Paata Pattu — Telugu songs and their YouTube clips
+  songs.json             1249   Paata Pattu — Telugu songs and their YouTube clips
 ```
 
 Each file is `{ "$comment": …, "items": [ … ] }`, and the movie files also
@@ -238,13 +238,16 @@ Telugu crowd can name, not every track on an album. Candidates came from three
 places:
 - YouTube Music's own Telugu playlists ("'90s Tollywood", "Telugu Hits 2024",
   "Presenting M. M. Keeravani" and some sixty more)
-- 186 Telugu playlists on Spotify
+- 771 Telugu playlists on Spotify (editorial, decade, mood, and one per
+  big star, composer and singer)
 - published best-of lists (Filmfare and Nandi award pages, JioSaavn decade
   playlists, articles)
 
 A song stays only if it clears one of three bars:
 - its biggest YouTube upload has 10M views or more
-- it appears in at least 5 of those Spotify playlists
+- it appears in at least 5 of the first 186 Spotify playlists, or in at
+  least 10 of all 771 counted by title and lead singer together, so two
+  songs that share a title cannot pool their numbers
 - it appears on at least 2 of the published lists, which is what keeps the
   classics whose uploads predate YouTube
 
