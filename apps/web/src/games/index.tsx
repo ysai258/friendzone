@@ -39,7 +39,7 @@ export function GameScreen({ connection, room }: GameProps) {
 
   const Screen = SCREENS[gameId]
   if (Screen === undefined) {
-    return <Card><p className="text-sm text-muted">This version of the app does not know how to show {gameId}. Reload to update.</p></Card>
+    return <Card><p className="text-sm text-ink-soft">This version of the app does not know how to show {gameId}. Reload to update.</p></Card>
   }
   return <Screen connection={connection} room={room} />
 }

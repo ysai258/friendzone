@@ -11,7 +11,7 @@ import clsx from 'clsx'
 export function Timer({
   msLeft,
   totalMs,
-  accent = 'bg-violet-400',
+  accent = 'bg-lime',
 }: {
   msLeft: number
   totalMs: number
@@ -24,15 +24,18 @@ export function Timer({
   return (
     <div className="flex items-center gap-3">
       <div
-        className={clsx('tabular w-12 text-right text-3xl font-extrabold', urgent ? 'text-rose-300' : 'text-chalk')}
+        className={clsx(
+          'grid h-10 min-w-12 place-items-center rounded-full border-3 border-ink px-2 font-display text-xl font-extrabold tabular',
+          urgent ? 'animate-pulse-soft bg-tomato' : 'bg-white',
+        )}
         // Announced at a readable pace rather than on every 100ms tick.
         aria-live="off"
       >
         {seconds}
       </div>
-      <div className="h-2.5 flex-1 overflow-hidden rounded-full bg-white/10">
+      <div className={clsx('h-4 flex-1 overflow-hidden rounded-full border-3 border-ink bg-white', urgent && 'animate-shake')}>
         <div
-          className={clsx('h-full rounded-full transition-[width] duration-100 ease-linear', urgent ? 'bg-rose-400' : accent)}
+          className={clsx('h-full transition-[width] duration-100 ease-linear', urgent ? 'bg-tomato' : fraction > 0.5 ? accent : 'bg-sun')}
           style={{ width: `${fraction * 100}%` }}
         />
       </div>

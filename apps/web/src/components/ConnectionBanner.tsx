@@ -20,9 +20,9 @@ export function ConnectionBanner({
   if (farewell !== null && farewell.reason !== 'SERVER_SHUTDOWN') {
     const permanent = farewell.reason === 'KICKED' || farewell.reason === 'ROOM_CLOSED'
     return (
-      <div className="sticky top-0 z-30 -mx-4 mb-1 border-b border-white/10 bg-ink-850/95 px-4 py-3 backdrop-blur">
+      <div className="sticky top-0 z-30 -mx-4 mb-1 border-b-3 border-ink bg-tomato-soft px-4 py-3">
         <div className="mx-auto flex max-w-2xl items-center justify-between gap-3">
-          <p className="text-sm font-semibold">{farewell.message}</p>
+          <p className="font-display font-extrabold">{farewell.message}</p>
           {farewell.reason === 'PROTOCOL_MISMATCH' ? (
             <Button size="md" onClick={() => window.location.reload()}>Reload</Button>
           ) : permanent ? (
@@ -43,13 +43,13 @@ export function ConnectionBanner({
   return (
     <div
       role="status"
-      className="sticky top-0 z-30 -mx-4 mb-1 border-b border-amber-400/20 bg-amber-400/10 px-4 py-2 backdrop-blur"
+      className="sticky top-0 z-30 -mx-4 mb-1 border-b-3 border-ink bg-sun px-4 py-2"
     >
-      <div className="mx-auto flex max-w-2xl items-center gap-2 text-sm font-semibold text-amber-200">
-        <span className="size-2 animate-soft-pulse rounded-full bg-amber-300" aria-hidden />
+      <div className="mx-auto flex max-w-2xl items-center gap-2 font-display text-sm font-extrabold">
+        <span className="size-3 animate-soft-pulse rounded-full border-2 border-ink bg-tomato" aria-hidden />
         {message}
         {status === 'closed' && (
-          <Button variant="subtle" className="ml-auto text-amber-200" onClick={onReconnect}>
+          <Button size="sm" variant="secondary" className="ml-auto" onClick={onReconnect}>
             Try again
           </Button>
         )}

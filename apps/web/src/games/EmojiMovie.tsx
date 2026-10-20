@@ -38,10 +38,10 @@ export function EmojiMovie({ connection, room }: GameProps) {
 
   return (
     <div className="flex flex-col gap-4">
-      <GameHeader connection={connection} room={room} label="🎬 Emoji Movie" accent="bg-rose-400" />
+      <GameHeader connection={connection} room={room} label="🎬 Emoji Movie" accent="bg-bubblegum" />
 
-      <Card className="flex min-h-40 items-center justify-center py-8">
-        <p className="animate-pop text-center text-6xl leading-relaxed tracking-[0.15em] sm:text-7xl" aria-label={`Emoji clue: ${view.emojis}`}>
+      <Card color="bubblegum" soft tilt="right" shadow="lg" className="flex min-h-44 items-center justify-center px-4 py-8">
+        <p className="max-w-full animate-pop break-words text-center text-5xl leading-relaxed tracking-[0.12em] drop-shadow-[3px_3px_0_var(--color-ink)] min-[400px]:text-6xl sm:text-7xl" aria-label={`Emoji clue: ${view.emojis}`}>
           {view.emojis}
         </p>
       </Card>
@@ -85,7 +85,7 @@ function Race({ connection, view, room }: { connection: GameProps['connection'];
             />
             <Button onClick={submit} disabled={guess.trim().length === 0}>Go</Button>
           </div>
-          <p className="text-center text-xs text-muted">
+          <p className="self-center rounded-full border-2 border-ink bg-sun px-3 py-1 font-display text-xs font-extrabold shadow-hard-sm">
             {left} {left === 1 ? 'guess' : 'guesses'} left
           </p>
         </>
@@ -94,7 +94,7 @@ function Race({ connection, view, room }: { connection: GameProps['connection'];
       {attempts.length > 0 && (
         <div className="flex flex-wrap justify-center gap-1.5">
           {attempts.map((attempt, i) => (
-            <span key={`${attempt}-${i}`} className="rounded-full bg-white/5 px-2.5 py-1 text-xs text-muted line-through">
+            <span key={`${attempt}-${i}`} className="max-w-full truncate rounded-full border-2 border-ink bg-tomato-soft px-2.5 py-1 text-xs font-semibold text-ink line-through decoration-2">
               {attempt}
             </span>
           ))}
@@ -109,26 +109,29 @@ function Race({ connection, view, room }: { connection: GameProps['connection'];
 function Reveal({ view, room }: { view: EmojiView; room: PublicRoomView }) {
   return (
     <div className="flex flex-col gap-4">
-      <div className="animate-pop text-center">
-        <p className="text-sm font-semibold text-muted">It was</p>
-        <p className="text-3xl font-extrabold">{view.answer}</p>
-        <p className="text-sm text-muted">
+      <div className="flex animate-pop flex-col items-center gap-1 rotate-1 rounded-3xl border-3 border-ink bg-lime px-5 py-5 text-center shadow-hard-lg">
+        <p className="rounded-full border-2 border-ink bg-white px-3 py-0.5 font-display text-xs font-extrabold uppercase tracking-wider">It was</p>
+        <p className="max-w-full break-words font-display text-3xl font-extrabold leading-tight sm:text-4xl">{view.answer}</p>
+        <p className="text-sm font-semibold text-ink">
           {[view.year, view.languageLabel].filter((part) => part != null && part !== '').join(' · ')}
         </p>
       </div>
 
       {(view.results ?? []).length > 0 && (
-        <Card className="flex flex-col gap-2">
+        <Card padding="sm" className="flex flex-col gap-2 px-4">
           {(view.results ?? []).map((result) => (
-            <div key={result.playerId} className="flex items-center gap-2 text-sm">
-              <span className={result.solved ? 'text-emerald-300' : 'text-rose-300'} aria-hidden>
+            <div key={result.playerId} className="flex min-w-0 items-center gap-2 text-sm">
+              <span
+                className={`grid size-6 shrink-0 place-items-center rounded-full border-2 border-ink text-xs font-extrabold ${result.solved ? 'bg-lime' : 'bg-tomato'}`}
+                aria-hidden
+              >
                 {result.solved ? '✓' : '✗'}
               </span>
               <PlayerName room={room} playerId={result.playerId} />
-              <span className="min-w-0 flex-1 truncate text-muted">
+              <span className="min-w-0 flex-1 truncate text-ink-soft">
                 {result.solved ? `in ${result.attempts} ${result.attempts === 1 ? 'try' : 'tries'}` : `“${result.lastGuess ?? '—'}”`}
               </span>
-              {result.solved && <span className="tabular font-bold text-emerald-300">+{result.points}</span>}
+              {result.solved && <span className="tabular shrink-0 rounded-full border-2 border-ink bg-lime px-2 py-0.5 font-display text-xs font-extrabold">+{result.points}</span>}
             </div>
           ))}
         </Card>

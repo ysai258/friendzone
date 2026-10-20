@@ -55,10 +55,15 @@ export function GameHeader({
 export function Countdown({ connection, room, title, subtitle }: { connection: RoomConnection; room: PublicRoomView; title: string; subtitle?: string }) {
   const { seconds } = useCountdown(room.deadlineAt, connection.serverNow)
   return (
-    <div className="flex flex-col items-center gap-4 py-20 text-center">
-      <p className="text-lg font-semibold text-muted">{title}</p>
-      <p key={seconds} className="animate-pop text-8xl font-extrabold tabular">{Math.max(seconds, 0)}</p>
-      {subtitle !== undefined && <p className="max-w-xs text-sm text-muted">{subtitle}</p>}
+    <div className="flex flex-col items-center gap-5 py-16 text-center">
+      <p className="font-display text-xl font-extrabold">{title}</p>
+      <p
+        key={seconds}
+        className="animate-pop font-chunky text-[7rem] leading-none tabular text-sun text-outline-thick [text-shadow:5px_5px_0_var(--color-ink)]"
+      >
+        {Math.max(seconds, 0)}
+      </p>
+      {subtitle !== undefined && <p className="max-w-xs font-medium text-ink-soft">{subtitle}</p>}
     </div>
   )
 }
@@ -74,8 +79,8 @@ export function AnsweredRow({ players, answeredIds }: { players: PublicPlayer[];
           <li
             key={player.id}
             className={clsx(
-              'flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold transition',
-              done ? 'border-emerald-400/40 bg-emerald-500/15 text-emerald-200' : 'border-white/10 bg-white/5 text-muted',
+              'flex items-center gap-1.5 rounded-full border-2 border-ink px-2.5 py-1 text-xs font-bold transition',
+              done ? 'animate-pop bg-lime shadow-hard-sm' : 'bg-white text-ink-soft',
             )}
           >
             <span aria-hidden>{player.avatar}</span>
@@ -91,7 +96,7 @@ export function AnsweredRow({ players, answeredIds }: { players: PublicPlayer[];
 
 export function PlayerName({ room, playerId }: { room: PublicRoomView; playerId: string }) {
   const player = room.players.find((p) => p.id === playerId)
-  if (player === undefined) return <span className="text-muted">someone</span>
+  if (player === undefined) return <span className="text-ink-soft">someone</span>
   return (
     <span className="font-semibold">
       <span aria-hidden>{player.avatar}</span> {player.name}
@@ -103,13 +108,13 @@ export function Attribution({ value }: { value: unknown }) {
   if (typeof value !== 'object' || value === null) return null
   const a = value as { source: string; sourceUrl: string; license: string; licenseUrl: string; author: string | null }
   return (
-    <p className="text-[11px] leading-relaxed text-muted">
+    <p className="text-[11px] leading-relaxed text-ink-soft">
       {a.author !== null && <>{a.author} · </>}
-      <a className="underline hover:text-chalk" href={a.sourceUrl} target="_blank" rel="noreferrer noopener">
+      <a className="underline hover:text-ink" href={a.sourceUrl} target="_blank" rel="noreferrer noopener">
         {a.source}
       </a>
       {' · '}
-      <a className="underline hover:text-chalk" href={a.licenseUrl} target="_blank" rel="noreferrer noopener">
+      <a className="underline hover:text-ink" href={a.licenseUrl} target="_blank" rel="noreferrer noopener">
         {a.license}
       </a>
     </p>
@@ -119,11 +124,10 @@ export function Attribution({ value }: { value: unknown }) {
 export function Banner({ tone, children }: { tone: 'good' | 'bad' | 'neutral'; children: ReactNode }) {
   return (
     <Card
-      className={clsx(
-        'animate-pop text-center font-semibold',
-        tone === 'good' && 'border-emerald-400/40 bg-emerald-500/15 text-emerald-100',
-        tone === 'bad' && 'border-rose-400/40 bg-rose-500/15 text-rose-100',
-      )}
+      color={tone === 'good' ? 'lime' : tone === 'bad' ? 'tomato' : 'sun'}
+      soft
+      padding="sm"
+      className="animate-pop text-center font-display text-lg font-extrabold"
     >
       {children}
     </Card>

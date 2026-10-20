@@ -3,7 +3,8 @@ import type { GameCatalogEntry, PublicRoomView, SettingField } from '@friendzone
 import { ROOM_ACTIONS } from '@friendzone/shared'
 import { api } from '../lib/api.ts'
 import type { RoomConnection } from '../lib/useRoom.ts'
-import { accentOf, Button, Card, Logo, Pill, PresenceDot } from '../components/ui.tsx'
+import clsx from 'clsx'
+import { Avatar, Badge, Button, Card, COLOR, colorOf, Logo, PresenceDot } from '../components/ui.tsx'
 
 /**
  * The waiting room: the code to share, who has arrived, and — for the host —
@@ -53,48 +54,57 @@ export function Lobby({ connection, room }: { connection: RoomConnection; room: 
   }
 
   return (
-    <div className="flex flex-col gap-5">
-      <header className="flex flex-col items-center gap-2 pt-2 text-center">
+    <div className="flex flex-col gap-8">
+      <header className="flex items-center gap-3 pt-1">
+        <div className="flex min-w-0 flex-1 flex-col leading-none">
+          <span className="text-[0.7rem] font-bold uppercase tracking-[0.2em] text-ink-soft">Room code</span>
+          <h1 className="font-chunky text-[2rem] tracking-wider">{room.code}</h1>
+        </div>
+        {connection.latencyMs > 0 && <Badge>{connection.latencyMs} ms</Badge>}
         <Logo compact as="div" />
-        <h1 className="font-mono text-5xl font-extrabold tracking-[0.22em]">{room.code}</h1>
       </header>
 
-      <Card className="flex flex-col gap-3">
-        <p className="text-sm font-semibold text-muted">Share this link with your friends</p>
-        <p className="truncate rounded-xl bg-black/30 px-4 py-3 font-mono text-sm text-chalk">{shareUrl}</p>
-        <div className="flex gap-2">
-          <Button className="flex-1" onClick={() => void share()}>{copied ? 'Copied ✓' : 'Copy link'}</Button>
-        </div>
+      <Card color="sky" soft tilt="left" className="flex flex-col gap-3">
+        <p className="font-display text-lg font-extrabold">Share this link with your friends <span aria-hidden>🔗</span></p>
+        <p className="truncate rounded-xl border-2 border-ink bg-white px-4 py-3 text-sm font-semibold">{shareUrl}</p>
+        <Button color="sky" icon={copied ? '✅' : '📋'} onClick={() => void share()}>{copied ? 'Copied ✓' : 'Copy link'}</Button>
       </Card>
 
-      <section className="flex flex-col gap-2">
-        <div className="flex items-baseline justify-between">
-          <h2 className="text-sm font-bold uppercase tracking-wider text-muted">
-            Players <span className="text-chalk">{seated.length}</span>
-            {game !== null && <span className="text-muted">/{room.config.maxPlayers}</span>}
+      <section className="flex flex-col gap-3">
+        <div className="flex items-center justify-between gap-2">
+          <h2 className="text-3xl">
+            Players{' '}
+            <Badge size="md" className="ml-1 align-middle">
+              {seated.length}
+              {game !== null && <span className="text-ink-soft">/{room.config.maxPlayers}</span>}
+            </Badge>
           </h2>
-          {connection.latencyMs > 0 && <Pill>{connection.latencyMs} ms</Pill>}
         </div>
 
-        <ul aria-label="Players in this room" className="flex flex-col gap-1.5">
+        <ul aria-label="Players in this room" className="flex flex-col gap-2">
           {room.players.map((player) => (
             <li
               key={player.id}
-              className="animate-rise flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-3 py-2.5"
+              className={clsx(
+                'animate-pop flex items-center gap-3 rounded-2xl border-3 border-ink px-3 py-2 shadow-hard-sm',
+                player.id === room.viewerId ? 'bg-sun-soft' : 'bg-white',
+                player.presence === 'INACTIVE' && 'opacity-60',
+              )}
             >
-              <PresenceDot presence={player.presence} />
-              <span className="text-xl" aria-hidden>{player.avatar}</span>
+              <Avatar emoji={player.avatar} size="sm" host={player.isHost} dim={player.presence !== 'CONNECTED'} />
               {/* The name is its own element rather than a text node sharing a
                   span with the badge, so it can be read and matched on its own. */}
-              <span className="flex min-w-0 flex-1 items-baseline gap-1.5">
-                <span className="truncate font-semibold">{player.name}</span>
-                {player.id === room.viewerId && <span className="text-xs font-bold text-violet-300">you</span>}
+              <span className="flex min-w-0 flex-1 items-center gap-1.5">
+                <span className="truncate font-bold">{player.name}</span>
+                {player.id === room.viewerId && <Badge color="ink">you</Badge>}
               </span>
-              {player.isHost && <Pill className="text-amber-200">host</Pill>}
+              <PresenceDot presence={player.presence} />
+              {player.isHost && <Badge color="sun">host</Badge>}
               {isHost && player.id !== room.viewerId && (
                 <Button
                   variant="subtle"
-                  className="min-h-9 px-2 text-xs"
+                  size="sm"
+                  className="!min-h-9 px-2 text-xs"
                   onClick={() => connection.send(ROOM_ACTIONS.KICK_PLAYER, { playerId: player.id })}
                 >
                   remove
@@ -116,27 +126,30 @@ export function Lobby({ connection, room }: { connection: RoomConnection; room: 
       )}
 
       {isHost ? (
-        <div className="sticky bottom-4 flex flex-col gap-2">
+        <div className="sticky bottom-0 -mx-1 flex flex-col gap-2 bg-gradient-to-t from-paper via-paper/90 to-transparent px-1 pb-4 pt-6">
           <Button
-            size="lg"
+            size="xl"
+            block
+            icon="🚀"
             disabled={tooFew || tooMany}
             onClick={() => connection.send(ROOM_ACTIONS.START_GAME)}
           >
             Start game
           </Button>
           {game !== null && seated.length < game.minPlayers && (
-            <p className="text-center text-sm text-muted">
+            <p className="text-center text-sm font-semibold text-ink-soft">
               {game.name} needs at least {game.minPlayers} players — {game.minPlayers - seated.length} more to go.
             </p>
           )}
           {game !== null && seated.length > game.maxPlayers && (
-            <p className="text-center text-sm text-amber-200">{game.name} takes at most {game.maxPlayers} players.</p>
+            <p className="text-center text-sm font-bold text-tomato">{game.name} takes at most {game.maxPlayers} players.</p>
           )}
         </div>
       ) : (
-        <p className="py-2 text-center text-sm text-muted">
+        <Card color="sun" soft padding="sm" className="flex items-center justify-center gap-2 text-center font-display font-extrabold">
+          <span className="animate-wiggle-loop" aria-hidden>⏳</span>
           Waiting for {room.players.find((p) => p.isHost)?.name ?? 'the host'} to start…
-        </p>
+        </Card>
       )}
     </div>
   )
@@ -161,12 +174,11 @@ function GamePicker({
 
   return (
     <section className="flex flex-col gap-3">
-      <h2 className="text-sm font-bold uppercase tracking-wider text-muted">Game</h2>
+      <h2 className="text-3xl">{isHost ? 'Pick a game' : 'The game'}</h2>
 
       {isHost ? (
         <div className="grid grid-cols-2 gap-2">
           {catalog.map((game) => {
-            const accent = accentOf(game.accent)
             const selected = game.id === room.config.gameId
             return (
               <button
@@ -174,32 +186,39 @@ function GamePicker({
                 type="button"
                 aria-pressed={selected}
                 onClick={() => onPick(game.id)}
-                className={`card flex flex-col gap-1 p-3 text-left transition hover:bg-white/[0.06] ${
-                  selected ? `ring-2 ${accent.ring}` : ''
-                }`}
+                className={clsx(
+                  'flex items-center gap-2 rounded-2xl border-3 border-ink p-2.5 text-left transition-transform',
+                  'active:translate-x-1 active:translate-y-1 active:shadow-none',
+                  COLOR[colorOf(game.accent)].bg,
+                  selected ? 'shadow-hard-lg ring-3 ring-inset ring-ink' : 'shadow-hard-sm',
+                )}
               >
-                <span className="text-xl" aria-hidden>{game.emoji}</span>
-                <span className="text-sm font-bold leading-tight">{game.name}</span>
-                <span className="text-[11px] text-muted">{game.minPlayers}–{game.maxPlayers} players</span>
+                <span className="grid size-10 shrink-0 place-items-center rounded-xl border-2 border-ink bg-white text-xl" aria-hidden>
+                  {game.emoji}
+                </span>
+                <span className="flex min-w-0 flex-col">
+                  <span className="font-display text-sm font-extrabold leading-tight">{game.name}</span>
+                  <span className="text-[11px] font-semibold">{game.minPlayers}–{game.maxPlayers} players</span>
+                </span>
               </button>
             )
           })}
         </div>
       ) : (
         current !== undefined && (
-          <Card className="flex items-center gap-3">
-            <span className="text-2xl" aria-hidden>{current.emoji}</span>
+          <Card color={colorOf(current.accent)} tilt="right" className="flex items-center gap-3">
+            <span className="grid size-14 shrink-0 place-items-center rounded-2xl border-3 border-ink bg-white text-3xl" aria-hidden>{current.emoji}</span>
             <div>
-              <p className="font-bold">{current.name}</p>
-              <p className="text-sm text-muted">{current.tagline}</p>
+              <p className="font-display text-xl font-extrabold">{current.name}</p>
+              <p className="text-sm font-medium">{current.tagline}</p>
             </div>
           </Card>
         )
       )}
 
       {current !== undefined && (
-        <Card className="flex flex-col gap-4">
-          <p className="text-sm text-muted">{current.description}</p>
+        <Card className="flex flex-col gap-5">
+          <p className="text-ink-soft">{current.description}</p>
           {current.settings.map((field) => (
             <SettingControl
               key={field.key}
@@ -233,9 +252,9 @@ function SettingControl({
     const checked = typeof value === 'boolean' ? value : field.default
     return (
       <div className="flex items-center justify-between gap-4">
-        <label htmlFor={id} className="text-sm font-semibold">
+        <label htmlFor={id} className="font-display font-bold">
           {field.label}
-          {field.help !== undefined && <span className="block text-xs font-normal text-muted">{field.help}</span>}
+          {field.help !== undefined && <span className="block font-body text-xs font-normal text-ink-soft">{field.help}</span>}
         </label>
         <button
           id={id}
@@ -244,9 +263,9 @@ function SettingControl({
           aria-checked={checked}
           disabled={disabled}
           onClick={() => onChange(!checked)}
-          className={`h-7 w-12 shrink-0 rounded-full transition disabled:opacity-40 ${checked ? 'bg-violet-500' : 'bg-white/15'}`}
+          className={`h-8 w-14 shrink-0 rounded-full border-3 border-ink transition disabled:opacity-40 ${checked ? 'bg-lime' : 'bg-white'}`}
         >
-          <span className={`block size-5 rounded-full bg-white transition-transform ${checked ? 'translate-x-6' : 'translate-x-1'}`} />
+          <span className={`block size-5 rounded-full border-2 border-ink bg-white transition-transform ${checked ? 'translate-x-6' : 'translate-x-0.5'}`} />
         </button>
       </div>
     )
@@ -264,9 +283,9 @@ function SettingControl({
     }
     return (
       <fieldset className="flex flex-col gap-2" disabled={disabled}>
-        <legend className="text-sm font-semibold">
+        <legend className="font-display font-bold">
           {field.label}
-          {field.help !== undefined && <span className="block text-xs font-normal text-muted">{field.help}</span>}
+          {field.help !== undefined && <span className="block font-body text-xs font-normal text-ink-soft">{field.help}</span>}
         </legend>
         <div className="flex flex-wrap gap-1.5">
           {field.options.map((option) => {
@@ -279,10 +298,8 @@ function SettingControl({
                 aria-checked={on}
                 disabled={disabled}
                 onClick={() => toggle(option.value)}
-                className={`flex min-h-10 items-center gap-1.5 rounded-xl border px-3 text-sm font-semibold transition disabled:opacity-50 ${
-                  on
-                    ? 'border-violet-400/60 bg-violet-500/20 text-chalk'
-                    : 'border-white/12 bg-white/5 text-muted hover:text-chalk'
+                className={`flex min-h-11 items-center gap-1.5 rounded-xl border-2 border-ink px-3 text-sm font-bold transition disabled:opacity-50 ${
+                  on ? 'bg-sun shadow-hard-sm' : 'bg-white text-ink-soft hover:text-ink'
                 }`}
               >
                 <span aria-hidden className="text-xs">{on ? '☑' : '☐'}</span>
@@ -299,7 +316,7 @@ function SettingControl({
     const selected = typeof value === 'string' ? value : field.default
     return (
       <div className="flex flex-col gap-2">
-        <span className="text-sm font-semibold">{field.label}</span>
+        <span className="font-display font-bold">{field.label}</span>
         <div className="flex flex-wrap gap-1.5">
           {field.options.map((option) => (
             <button
@@ -308,10 +325,8 @@ function SettingControl({
               disabled={disabled}
               aria-pressed={option.value === selected}
               onClick={() => onChange(option.value)}
-              className={`min-h-10 rounded-xl border px-3 text-sm font-semibold transition disabled:opacity-50 ${
-                option.value === selected
-                  ? 'border-violet-400/60 bg-violet-500/20 text-chalk'
-                  : 'border-white/12 bg-white/5 text-muted hover:text-chalk'
+              className={`min-h-11 rounded-xl border-2 border-ink px-3 text-sm font-bold transition disabled:opacity-50 ${
+                option.value === selected ? 'bg-sun shadow-hard-sm' : 'bg-white text-ink-soft hover:text-ink'
               }`}
             >
               {option.label}
@@ -326,8 +341,8 @@ function SettingControl({
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-baseline justify-between">
-        <label htmlFor={id} className="text-sm font-semibold">{field.label}</label>
-        <span className="tabular text-lg font-bold">
+        <label htmlFor={id} className="font-display font-bold">{field.label}</label>
+        <span className="tabular rounded-full border-2 border-ink bg-sun px-2.5 py-0.5 font-display text-lg font-extrabold">
           {numeric}
           {field.unit ?? ''}
         </span>
@@ -341,7 +356,7 @@ function SettingControl({
         value={numeric}
         disabled={disabled}
         onChange={(e) => onChange(Number(e.target.value))}
-        className="h-2 w-full cursor-pointer appearance-none rounded-full bg-white/10 accent-violet-400 disabled:opacity-50"
+        className="h-3 w-full cursor-pointer appearance-none rounded-full border-2 border-ink bg-white accent-[var(--color-tomato)] disabled:opacity-50"
       />
     </div>
   )

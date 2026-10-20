@@ -2,7 +2,7 @@ import clsx from 'clsx'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { PublicRoomView } from '@friendzone/shared'
 import type { GameProps } from './index.tsx'
-import { Button, Card } from '../components/ui.tsx'
+import { BigText, Button, Card } from '../components/ui.tsx'
 import { Scoreboard } from '../components/Scoreboard.tsx'
 import { api, type SongCatalogEntry } from '../lib/api.ts'
 import { useYouTubeClip, type ClipStatus } from '../lib/youtubeClip.ts'
@@ -80,7 +80,7 @@ export function PaataPattu({ connection, room }: GameProps) {
           subtitle="Everyone hears the same intro. One guess per clue — get it before your friends do."
         />
       ) : (
-        <GameHeader connection={connection} room={room} label="📼 Paata Pattu" accent="bg-amber-400" />
+        <GameHeader connection={connection} room={room} label="📼 Paata Pattu" accent="bg-sun" />
       )}
       {playsHere ? (
         <Deck view={view} autoplayKey={autoplayKey} hidden={counting} />
@@ -118,21 +118,31 @@ function Cassette({ seconds, spinning }: { seconds: number; spinning: boolean })
   return (
     <div
       aria-hidden
-      className="relative mx-auto aspect-[320/205] w-full max-w-sm rounded-[13px] border-[3px] border-[#171513] bg-[#533287] shadow-[5px_5px_0_#171513]"
+      className="relative mx-auto aspect-[320/205] w-full max-w-sm -rotate-1 rounded-2xl border-3 border-ink bg-grape shadow-hard-lg"
     >
-      <span className="absolute left-2 top-2 size-2 rounded-full bg-[#f5e7cb]" />
-      <span className="absolute right-2 top-2 size-2 rounded-full bg-[#f5e7cb]" />
-      <span className="absolute left-1/4 top-3 h-1 w-1/2 bg-[#e9a72b]" />
-      <div className="absolute inset-x-[9%] top-[17%] -rotate-[0.8deg] bg-[#fff8e9] px-2 py-1 text-right font-mono text-[10px] font-semibold tracking-wider text-[#b52f21]">
-        SIDE A · PAATA PATTU
+      {/* screws */}
+      <span className="absolute left-2 top-2 size-2.5 rounded-full border-2 border-ink bg-white" />
+      <span className="absolute right-2 top-2 size-2.5 rounded-full border-2 border-ink bg-white" />
+      <span className="absolute bottom-2 left-2 size-2.5 rounded-full border-2 border-ink bg-white" />
+      {/* the label */}
+      <div className="absolute inset-x-[9%] top-[9%] flex h-[72%] flex-col rounded-xl border-3 border-ink bg-sun px-2 pt-1">
+        <div className="flex items-center justify-between gap-1 border-b-2 border-ink pb-0.5">
+          <span className="rounded-full border-2 border-ink bg-tomato px-1.5 font-display text-[9px] font-extrabold leading-tight text-ink">
+            A
+          </span>
+          <span className="truncate font-display text-[10px] font-extrabold tracking-wider text-ink">PAATA PATTU</span>
+        </div>
+        {/* reel window */}
+        <div className="mx-[4%] mt-auto mb-[7%] flex h-[58%] items-center justify-between rounded-full border-3 border-ink bg-sky-soft px-[5%]">
+          <Reel spinning={spinning} />
+          <span className="mx-1 h-2 flex-1 rounded-full border-2 border-ink bg-bubblegum" />
+          <Reel spinning={spinning} />
+        </div>
       </div>
-      <div className="absolute inset-x-[15%] top-[38%] flex h-[34%] items-center justify-between rounded-[44px] border-2 border-[#171513] bg-[#f5e7cb] px-[6%]">
-        <Reel spinning={spinning} />
-        <span className="mx-1 h-1.5 flex-1 bg-[#b52f21]" />
-        <Reel spinning={spinning} />
-      </div>
-      <div className="absolute inset-x-[22%] bottom-0 h-[16%] bg-[#146b68] [clip-path:polygon(8%_0,92%_0,100%_100%,0_100%)]" />
-      <span className="absolute bottom-2 right-2 border-2 border-[#171513] bg-[#171513] px-1.5 font-mono text-sm font-semibold text-[#e9a72b]">
+      {/* tape-head bridge */}
+      <div className="absolute inset-x-[24%] bottom-0 h-[13%] rounded-t-xl border-3 border-b-0 border-ink bg-grape-soft" />
+      {/* time counter */}
+      <span className="absolute bottom-1.5 right-2 rotate-2 rounded-lg border-2 border-ink bg-ink px-1.5 font-chunky text-xs leading-5 text-lime shadow-hard-sm">
         00:{String(seconds).padStart(2, '0')}
       </span>
     </div>
@@ -164,7 +174,7 @@ function Deck({ view, autoplayKey, hidden }: { view: PaataView; autoplayKey: str
   return (
     <>
       {!hidden && (
-        <Card className="flex flex-col gap-4 border-[#e9a72b]/30 bg-[#f5e7cb]/[0.04]">
+        <Card color="grape" soft className="flex flex-col gap-4">
           <Cassette seconds={seconds} spinning={clip.status === 'playing'} />
 
           <div className="flex items-center gap-4">
@@ -174,31 +184,31 @@ function Deck({ view, autoplayKey, hidden }: { view: PaataView; autoplayKey: str
               disabled={clip.status === 'loading' || clip.status === 'unavailable'}
               aria-label={label}
               className={clsx(
-                'flex size-16 shrink-0 items-center justify-center rounded-full border-[3px] border-[#171513] bg-[#e9a72b] text-2xl text-[#171513] shadow-[3px_3px_0_#171513] transition active:translate-x-0.5 active:translate-y-0.5 active:shadow-[1px_1px_0_#171513] disabled:opacity-55',
+                'flex size-16 shrink-0 items-center justify-center rounded-full border-3 border-ink bg-sun font-display text-2xl font-extrabold text-ink shadow-hard transition-[transform,box-shadow] duration-100 active:translate-x-[4px] active:translate-y-[4px] active:shadow-none disabled:translate-x-0 disabled:translate-y-0 disabled:opacity-55 disabled:shadow-hard-sm',
                 clip.status === 'blocked' && 'animate-soft-pulse',
               )}
             >
               {clip.status === 'loading' ? '…' : busy ? 'Ⅱ' : '▶'}
             </button>
             <div className="min-w-0">
-              <p className="font-bold">{label}</p>
-              <p className="text-sm text-muted" aria-live="polite">{sub}</p>
+              <p className="font-display text-lg font-extrabold leading-tight">{label}</p>
+              <p className="text-sm font-medium text-ink-soft" aria-live="polite">{sub}</p>
             </div>
           </div>
 
           <div className="flex flex-col gap-1">
-            <div className="h-2 w-full overflow-hidden rounded-full border border-white/15 bg-black/40">
-              <div className="h-full bg-[#146b68] transition-[width] duration-150" style={{ width: `${Math.round(progress * 100)}%` }} />
+            <div className="h-4 w-full overflow-hidden rounded-full border-2 border-ink bg-white">
+              <div className="h-full bg-lime transition-[width] duration-150" style={{ width: `${Math.round(progress * 100)}%` }} />
             </div>
-            <div className="flex justify-between font-mono text-xs text-muted">
+            <div className="flex justify-between font-display text-xs font-bold text-ink-soft">
               <span className="tabular">{(clip.positionMs / 1000).toFixed(1)}s</span>
-              <span>{seconds}s</span>
+              <span className="tabular">{seconds}s</span>
             </div>
           </div>
 
-          <p className="text-center text-[11px] text-muted">
+          <p className="text-center text-[11px] text-ink-soft">
             Audio via{' '}
-            <a className="underline hover:text-chalk" href="https://music.youtube.com/" target="_blank" rel="noreferrer noopener">
+            <a className="font-semibold underline decoration-2 underline-offset-2 hover:text-ink" href="https://music.youtube.com/" target="_blank" rel="noreferrer noopener">
               YouTube Music ↗
             </a>
           </p>
@@ -212,10 +222,10 @@ function Deck({ view, autoplayKey, hidden }: { view: PaataView; autoplayKey: str
 /** For everyone but the host, when the music plays on one speaker for the room. */
 function SpeakerNote({ hostName, seconds }: { hostName: string; seconds: number }) {
   return (
-    <Card className="flex flex-col gap-3 border-[#e9a72b]/30 bg-[#f5e7cb]/[0.04]">
+    <Card color="sky" soft className="flex flex-col gap-3">
       <Cassette seconds={seconds} spinning={false} />
-      <p className="text-center font-semibold">🔊 Listen to {hostName}&rsquo;s speaker</p>
-      <p className="text-center text-xs text-muted">The music plays on the host&rsquo;s device so the whole room hears it together.</p>
+      <p className="text-center font-display text-lg font-extrabold">🔊 Listen to {hostName}&rsquo;s speaker</p>
+      <p className="text-center text-xs text-ink-soft">The music plays on the host&rsquo;s device so the whole room hears it together.</p>
     </Card>
   )
 }
@@ -224,11 +234,15 @@ function Reel({ spinning }: { spinning: boolean }) {
   return (
     <span
       className={clsx(
-        'flex size-10 items-center justify-center rounded-full border-[6px] border-dotted border-[#171513] bg-[#e9a72b]',
+        'relative flex size-10 shrink-0 items-center justify-center rounded-full border-3 border-ink bg-white',
         spinning && 'animate-[spin_1.8s_linear_infinite]',
       )}
     >
-      <span className="size-3 rounded-full bg-[#fff8e9]" />
+      {/* spokes */}
+      <span className="absolute h-0.5 w-[78%] rounded-full bg-ink" />
+      <span className="absolute h-0.5 w-[78%] rotate-60 rounded-full bg-ink" />
+      <span className="absolute h-0.5 w-[78%] -rotate-60 rounded-full bg-ink" />
+      <span className="relative size-3 rounded-full border-2 border-ink bg-sun" />
     </span>
   )
 }
@@ -250,14 +264,16 @@ function ClueRail({ view }: { view: PaataView }) {
           <li
             key={seconds}
             className={clsx(
-              'flex min-h-14 flex-col items-center justify-center rounded-xl border text-center',
-              current && 'border-amber-300 bg-amber-400 text-ink-950 shadow-[2px_2px_0_#171513]',
-              past && 'border-amber-300/30 bg-amber-400/15 text-amber-100',
-              !current && !past && 'border-dashed border-white/20 text-muted opacity-60',
+              'flex min-h-14 min-w-0 flex-col items-center justify-center rounded-2xl border-2 border-ink text-center text-ink',
+              current && '-rotate-2 scale-105 border-3 bg-sun shadow-hard-sm',
+              past && 'bg-sun-soft',
+              !current && !past && 'border-dashed bg-white text-ink-soft',
+              pick?.kind === 'correct' && 'bg-lime',
+              pick?.kind === 'wrong' && 'bg-tomato-soft',
             )}
           >
-            <span className="font-mono text-sm font-semibold">{seconds}s</span>
-            <span className="text-[11px] font-bold">
+            <span className="font-chunky text-xs leading-tight">{seconds}s</span>
+            <span className="font-display text-[11px] font-extrabold">
               {pick !== undefined ? KIND_MARK[pick.kind] : current ? 'Now' : past ? '' : 'Locked'}
             </span>
           </li>
@@ -271,27 +287,33 @@ function ClueRail({ view }: { view: PaataView }) {
 function RaceBoard({ room, view }: { room: PublicRoomView; view: PaataView }) {
   const seated = room.players.filter((p) => p.presence !== 'INACTIVE')
   return (
-    <Card className="flex flex-col gap-2">
-      <p className="text-xs font-bold uppercase tracking-wider text-muted">The race</p>
+    <Card padding="sm" tilt="right" className="flex flex-col gap-2">
+      <p className="font-display text-xs font-extrabold uppercase tracking-wider text-ink-soft">The race</p>
       {seated.map((player) => {
         const entry = view.board[player.id]
         const solved = entry?.solvedStage ?? null
         return (
-          <div key={player.id} className="flex items-center gap-2 text-sm">
-            <span className="min-w-0 flex-1 truncate">
+          <div key={player.id} className="flex min-h-9 items-center gap-2 text-sm">
+            <span className="min-w-0 flex-1 truncate font-semibold">
               <PlayerName room={room} playerId={player.id} />
             </span>
             {Array.from({ length: entry?.misses ?? 0 }, (_, i) => (
-              <span key={i} className="text-rose-300" aria-hidden>✗</span>
+              <span
+                key={i}
+                className="grid size-5 shrink-0 place-items-center rounded-full border-2 border-ink bg-tomato text-[10px] font-extrabold leading-none text-ink"
+                aria-hidden
+              >
+                ✗
+              </span>
             ))}
             {solved !== null ? (
-              <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-xs font-bold text-emerald-200">
+              <span className="shrink-0 rounded-full border-2 border-ink bg-lime px-2 py-0.5 font-display text-xs font-extrabold text-ink">
                 ✓ {view.clipSeconds[solved]}s{entry?.place != null && <> · {ordinal(entry.place)}</>}
               </span>
             ) : entry?.usedStage === true ? (
-              <span className="text-xs text-muted">waiting for next clue</span>
+              <span className="shrink-0 text-xs font-medium text-ink-soft">waiting for next clue</span>
             ) : (
-              <span className="text-xs text-muted animate-soft-pulse">listening…</span>
+              <span className="shrink-0 text-xs font-medium text-ink-soft animate-soft-pulse">listening…</span>
             )}
           </div>
         )
@@ -379,8 +401,8 @@ function GuessPanel({ connection, view }: { connection: GameProps['connection'];
   return (
     <div className="flex flex-col gap-3">
       <div className="relative">
-        <label htmlFor="paata-guess" className="mb-1.5 block text-sm font-semibold">
-          Your guess <span className="font-normal text-muted">— one per clue</span>
+        <label htmlFor="paata-guess" className="mb-1.5 block font-display text-base font-extrabold">
+          Your guess <span className="font-sans text-sm font-normal text-ink-soft">— one per clue</span>
         </label>
         <input
           ref={inputRef}
@@ -396,7 +418,7 @@ function GuessPanel({ connection, view }: { connection: GameProps['connection'];
           value={query}
           maxLength={80}
           placeholder="Type a song or movie…"
-          className="min-h-14 w-full rounded-2xl border border-white/15 bg-black/30 px-5 text-lg text-chalk placeholder:text-muted/60 focus:border-amber-400/60 focus:outline-none"
+          className="min-h-14 w-full min-w-0 rounded-2xl border-3 border-ink bg-white px-4 text-lg font-semibold text-ink shadow-hard-sm placeholder:font-normal placeholder:text-ink/40 focus:bg-sun-soft focus:shadow-hard focus:outline-none"
           onChange={(e) => {
             setQuery(e.target.value)
             setSelected(null)
@@ -427,10 +449,10 @@ function GuessPanel({ connection, view }: { connection: GameProps['connection'];
           <ul
             id="paata-results"
             role="listbox"
-            className="absolute inset-x-0 top-full z-20 mt-1.5 max-h-72 overflow-y-auto rounded-2xl border border-white/15 bg-ink-850 shadow-xl"
+            className="absolute inset-x-0 top-full z-20 mt-2 max-h-72 overflow-y-auto rounded-2xl border-3 border-ink bg-white shadow-hard"
           >
             {results.length === 0 ? (
-              <li className="px-4 py-3 text-sm text-muted">No matching songs or movies</li>
+              <li className="px-4 py-3 text-sm text-ink-soft">No matching songs or movies</li>
             ) : (
               results.map((entry, i) => (
                 <li
@@ -444,12 +466,12 @@ function GuessPanel({ connection, view }: { connection: GameProps['connection'];
                   }}
                   onMouseEnter={() => setHighlight(i)}
                   className={clsx(
-                    'flex cursor-pointer flex-col border-b border-white/5 px-4 py-2.5 last:border-b-0',
-                    i === highlight && 'bg-amber-400/20',
+                    'flex min-h-12 cursor-pointer flex-col justify-center border-b-2 border-ink/15 px-4 py-2.5 last:border-b-0',
+                    i === highlight && 'bg-sun',
                   )}
                 >
-                  <span className="font-semibold">{entry.title}</span>
-                  <span className="text-xs text-muted">
+                  <span className="font-display font-extrabold">{entry.title}</span>
+                  <span className={clsx('text-xs', i === highlight ? 'text-ink' : 'text-ink-soft')}>
                     {entry.movie}
                     {entry.year !== null && <> · {entry.year}</>}
                   </span>
@@ -460,10 +482,10 @@ function GuessPanel({ connection, view }: { connection: GameProps['connection'];
         )}
       </div>
 
-      <Button onClick={submit} disabled={selected === null}>
+      <Button onClick={submit} disabled={selected === null} size="lg" block>
         Lock it in
       </Button>
-      <p className="text-center text-xs text-muted">
+      <p className="text-center text-xs text-ink-soft">
         Wrong, and you sit out until the next clue. Right movie, wrong song still earns 100.
       </p>
     </div>
@@ -476,43 +498,52 @@ function RevealPanel({ view, room }: { view: PaataView; room: PublicRoomView }) 
   return (
     <div className="flex flex-col gap-4">
       {view.answer !== undefined && (
-        <div className="animate-pop text-center">
-          <p className="text-sm font-semibold text-muted">It was</p>
-          <p className="text-3xl font-extrabold text-amber-200">{view.answer.title}</p>
-          <p className="text-sm text-muted">
-            {view.answer.movie}
-            {view.answer.year !== null && <> · {view.answer.year}</>}
+        <Card color="sun" soft tilt="left" shadow="lg" className="flex animate-pop flex-col items-center gap-1.5 text-center">
+          <p className="font-display text-sm font-extrabold uppercase tracking-wider text-ink-soft">It was</p>
+          <BigText as="p" size="md" color="sun" className="max-w-full">
+            {view.answer.title}
+          </BigText>
+          <p className="mt-1 inline-flex max-w-full items-center rounded-full border-2 border-ink bg-white px-3 py-1 font-display text-sm font-bold">
+            <span className="truncate">
+              {view.answer.movie}
+              {view.answer.year !== null && <> · {view.answer.year}</>}
+            </span>
           </p>
           <a
-            className="mt-1 inline-block text-sm text-violet-300 underline hover:text-chalk"
+            className="mt-1 inline-flex min-h-11 items-center text-sm font-bold text-ink underline decoration-grape decoration-2 underline-offset-4 hover:decoration-ink"
             href={view.answer.youtubeUrl}
             target="_blank"
             rel="noreferrer noopener"
           >
             Listen on YouTube ↗
           </a>
-        </div>
+        </Card>
       )}
 
       {(view.results ?? []).length > 0 && (
-        <Card className="flex flex-col gap-2.5">
+        <Card padding="sm" className="flex flex-col gap-1">
           {(view.results ?? []).map((result) => (
-            <div key={result.playerId} className="flex flex-col gap-0.5 text-sm">
+            <div key={result.playerId} className="flex flex-col gap-0.5 border-b-2 border-ink/10 py-1.5 text-sm last:border-b-0">
               <div className="flex items-center gap-2">
-                <span className="min-w-0 flex-1 truncate">
+                <span className="min-w-0 flex-1 truncate font-semibold">
                   <PlayerName room={room} playerId={result.playerId} />
                 </span>
                 {result.solvedStage !== null && (
-                  <span className="text-xs font-bold text-emerald-200">
+                  <span className="shrink-0 rounded-full border-2 border-ink bg-lime-soft px-2 py-0.5 font-display text-xs font-extrabold text-ink">
                     {view.clipSeconds[result.solvedStage]}s{result.place !== null && <> · {ordinal(result.place)}</>}
                   </span>
                 )}
-                <span className={clsx('tabular w-14 text-right font-bold', result.points > 0 ? 'text-emerald-300' : 'text-muted')}>
+                <span
+                  className={clsx(
+                    'tabular shrink-0 rounded-full border-2 border-ink px-2 py-0.5 text-center font-display text-xs font-extrabold',
+                    result.points > 0 ? 'bg-lime text-ink' : 'bg-white text-ink-soft',
+                  )}
+                >
                   {result.points > 0 ? `+${result.points}` : '—'}
                 </span>
               </div>
               {result.picks.length > 0 && (
-                <p className="truncate pl-1 text-xs text-muted">
+                <p className="truncate pl-1 text-xs text-ink-soft">
                   {result.picks.map((p) => `${KIND_MARK[p.kind]} ${p.title ?? '?'} (${view.clipSeconds[p.stage]}s)`).join('  ·  ')}
                 </p>
               )}
@@ -530,10 +561,10 @@ export function PaataPattuEpilogue({ room }: { room: PublicRoomView }) {
   const view = readView<PaataView>(room)
   if (view.answer === undefined) return null
   return (
-    <Card className="flex flex-col gap-1 text-center">
-      <p className="text-xs font-bold uppercase tracking-wider text-muted">Last song</p>
-      <p className="text-lg font-bold">{view.answer.title}</p>
-      <p className="text-sm text-muted">{view.answer.movie}</p>
+    <Card color="sun" soft tilt="right" className="flex flex-col gap-1 text-center">
+      <p className="font-display text-xs font-extrabold uppercase tracking-wider text-ink-soft">Last song</p>
+      <p className="font-display text-xl font-extrabold">{view.answer.title}</p>
+      <p className="text-sm text-ink-soft">{view.answer.movie}</p>
     </Card>
   )
 }

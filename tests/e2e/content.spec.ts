@@ -346,7 +346,7 @@ test.describe('Who Am I? is one category', () => {
     // own, and no two players are the same person.
     const seen = new Set<string>()
     for (const page of pages) {
-      const cards = await page.locator('.card p.truncate.text-sm.font-bold').allInnerTexts()
+      const cards = await page.getByTestId('identity-card').allInnerTexts()
       for (const card of cards) {
         const name = card.trim()
         if (name !== '· · · · ·' && name !== '—' && name !== '✓ solved') seen.add(name)

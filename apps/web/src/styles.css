@@ -1,47 +1,126 @@
 @import 'tailwindcss';
 
 /*
- * One dark theme, tuned for a phone held in a noisy room: high contrast, large
- * touch targets, and colour used to mean something rather than to decorate.
+ * FriendZone's design tokens, shared with Chaos Club: neo-brutalist sticker
+ * style. Thick ink outlines, hard offset shadows, loud saturated colours on
+ * cream paper. Built for a phone held in a noisy room, so contrast stays high
+ * and touch targets stay big.
+ *
+ * Use as Tailwind classes: bg-tomato, bg-sky-soft, text-ink, border-ink,
+ * shadow-hard, font-display, font-chunky, animate-wiggle ...
  */
 @theme {
-  --font-sans: 'Outfit', ui-sans-serif, system-ui, sans-serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --color-tomato: #ff5a36;
+  --color-sky: #38b6ff;
+  --color-lime: #9be15d;
+  --color-grape: #a77bff;
+  --color-sun: #ffd23f;
+  --color-bubblegum: #ff7ac6;
+  --color-ink: #16130f;
+  --color-paper: #fff4e0;
 
-  --color-ink-950: #08070d;
-  --color-ink-900: #0b0a12;
-  --color-ink-850: #12101c;
-  --color-ink-800: #191627;
-  --color-ink-700: #241f38;
-  --color-ink-600: #342c4f;
-  --color-ink-500: #4a4070;
+  --color-tomato-soft: #ffd5ca;
+  --color-sky-soft: #cdeeff;
+  --color-lime-soft: #e2f7cc;
+  --color-grape-soft: #e8dcff;
+  --color-sun-soft: #fff0b3;
+  --color-bubblegum-soft: #ffd9ee;
+  --color-paper-deep: #f6e6c8;
+  --color-ink-soft: #5c544a;
 
-  --color-chalk: #f4f2ff;
-  --color-muted: #a49dc4;
+  /* The old dark theme's names, pointed at their light equivalents so nothing
+     renders invisible on paper. New code uses the names above. */
+  --color-chalk: #16130f;
+  --color-muted: #5c544a;
 
-  --color-pop-violet: #8b5cf6;
-  --color-pop-rose: #fb7185;
-  --color-pop-emerald: #34d399;
-  --color-pop-amber: #fbbf24;
-  --color-pop-sky: #38bdf8;
+  --font-sans: 'DM Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Bricolage Grotesque', ui-rounded, system-ui, sans-serif;
+  --font-body: 'DM Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-chunky: 'Rubik Mono One', 'Bricolage Grotesque', system-ui, sans-serif;
+  --font-mono: 'Rubik Mono One', ui-monospace, monospace;
+
+  --shadow-hard-sm: 2px 2px 0 0 var(--color-ink);
+  --shadow-hard: 4px 4px 0 0 var(--color-ink);
+  --shadow-hard-lg: 6px 6px 0 0 var(--color-ink);
+  --shadow-hard-xl: 9px 9px 0 0 var(--color-ink);
+
+  --animate-wiggle: wiggle 0.5s ease-in-out;
+  --animate-wiggle-loop: wiggle 2.4s ease-in-out infinite;
+  --animate-pop: pop 0.38s ease-out both;
+  --animate-shake: shake 0.42s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+  --animate-float: float 3.2s ease-in-out infinite;
+  --animate-rise: rise 0.3s ease-out both;
+  --animate-fade-in: fade-in 0.2s ease-out both;
+  --animate-pulse-soft: pulse-soft 1.1s ease-in-out infinite;
+  --animate-soft-pulse: soft-pulse 1.6s ease-in-out infinite;
+  --animate-spin-slow: spin 6s linear infinite;
+  --animate-bounce-dot: bounce-dot 0.9s ease-in-out infinite;
+
+  @keyframes wiggle {
+    0%, 100% { transform: rotate(0deg); }
+    20% { transform: rotate(-6deg); }
+    40% { transform: rotate(5deg); }
+    60% { transform: rotate(-3deg); }
+    80% { transform: rotate(2deg); }
+  }
+  /* Overshoot stays small (4%): a full-width block scaled further pokes past
+     the screen edge for a frame, and mobile Chrome then widens the layout
+     viewport for good. */
+  @keyframes pop {
+    0% { transform: scale(0.6); opacity: 0; }
+    65% { transform: scale(1.04); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  @keyframes shake {
+    10%, 90% { transform: translateX(-2px); }
+    20%, 80% { transform: translateX(4px); }
+    30%, 50%, 70% { transform: translateX(-7px); }
+    40%, 60% { transform: translateX(7px); }
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+  @keyframes rise {
+    from { transform: translateY(10px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  @keyframes fade-in {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+  }
+  @keyframes pulse-soft {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.06); }
+  }
+  @keyframes soft-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.45; }
+  }
+  @keyframes bounce-dot {
+    0%, 80%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-8px); }
+  }
 }
 
 @layer base {
   html {
-    background: var(--color-ink-950);
-    color-scheme: dark;
+    -webkit-tap-highlight-color: transparent;
     -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    background: var(--color-paper);
+    color-scheme: light;
   }
 
   body {
     margin: 0;
     min-height: 100dvh;
-    background:
-      radial-gradient(1100px 700px at 12% -10%, color-mix(in oklab, var(--color-pop-violet) 22%, transparent), transparent 60%),
-      radial-gradient(900px 600px at 95% 0%, color-mix(in oklab, var(--color-pop-sky) 14%, transparent), transparent 55%),
-      var(--color-ink-950);
-    color: var(--color-chalk);
-    font-family: var(--font-sans);
+    background-color: var(--color-paper);
+    background-image: radial-gradient(color-mix(in srgb, var(--color-ink) 9%, transparent) 1.2px, transparent 1.3px);
+    background-size: 22px 22px;
+    color: var(--color-ink);
+    font-family: var(--font-body);
+    overscroll-behavior-y: none;
     /* Safe areas, because this is played on phones with notches. */
     padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
   }
@@ -55,27 +134,65 @@
     font: inherit;
   }
 
+  /* iOS zooms into inputs smaller than 16px. Never let that happen. */
+  input, select, textarea {
+    font-size: max(16px, 1em);
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+
+  button {
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+
+  button:disabled {
+    cursor: not-allowed;
+  }
+
   :focus-visible {
-    outline: 2px solid var(--color-pop-sky);
-    outline-offset: 2px;
-    border-radius: 0.5rem;
+    outline: 3px solid var(--color-sky);
+    outline-offset: 3px;
+  }
+
+  ::selection {
+    background: var(--color-sun);
   }
 }
 
 @layer utilities {
+  /* A sticker: thick outline, hard shadow. The Card component is the usual
+     way in; this is for the odd element that cannot be one. */
   .card {
-    background: color-mix(in oklab, var(--color-ink-850) 88%, transparent);
-    border: 1px solid color-mix(in oklab, var(--color-ink-600) 60%, transparent);
-    border-radius: 1.25rem;
-    backdrop-filter: blur(12px);
+    background: white;
+    border: 3px solid var(--color-ink);
+    border-radius: 1.5rem;
+    box-shadow: var(--shadow-hard);
   }
 
   .tabular {
     font-variant-numeric: tabular-nums;
   }
+
+  .text-outline {
+    -webkit-text-stroke: 2px var(--color-ink);
+    paint-order: stroke fill;
+  }
+
+  .text-outline-thick {
+    -webkit-text-stroke: 4px var(--color-ink);
+    paint-order: stroke fill;
+  }
+
+  .no-scrollbar { scrollbar-width: none; }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
 }
 
-/* Respect a person's stated preference. Everything below is decoration. */
+/* Respect a person's stated preference. Everything moving is decoration. */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
@@ -83,21 +200,3 @@
     transition-duration: 0.01ms !important;
   }
 }
-
-@keyframes fz-pop {
-  0% { transform: scale(0.85); opacity: 0; }
-  60% { transform: scale(1.04); }
-  100% { transform: scale(1); opacity: 1; }
-}
-@keyframes fz-rise {
-  from { transform: translateY(10px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
-@keyframes fz-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.45; }
-}
-
-.animate-pop { animation: fz-pop 260ms cubic-bezier(0.2, 0.9, 0.3, 1.2) both; }
-.animate-rise { animation: fz-rise 300ms ease-out both; }
-.animate-soft-pulse { animation: fz-pulse 1.6s ease-in-out infinite; }

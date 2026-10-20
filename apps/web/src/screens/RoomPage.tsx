@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { isValidRoomCode, normalizeRoomCode, type RoomPeekResponse } from '@friendzone/shared'
+import { isValidRoomCode, normalizeRoomCode, randomAvatar, type RoomPeekResponse } from '@friendzone/shared'
 import { api, ApiError } from '../lib/api.ts'
-import { loadSession, saveSession, type StoredSession } from '../lib/session.ts'
+import { loadSession, rememberAvatar, rememberedAvatar, saveSession, type StoredSession } from '../lib/session.ts'
 import { useRoom } from '../lib/useRoom.ts'
 import { ConnectionBanner } from '../components/ConnectionBanner.tsx'
-import { Button, Card, Logo, Screen, Spinner, TextInput } from '../components/ui.tsx'
+import { AvatarPicker, AvatarShuffle, Badge, Button, Card, Logo, Screen, Spinner, TextInput } from '../components/ui.tsx'
 import { rememberedName } from '../lib/session.ts'
 import { Lobby } from './Lobby.tsx'
 import { Results } from './Results.tsx'
@@ -39,6 +39,7 @@ function JoinGate({ code, onSeated }: { code: string; onSeated: (session: Stored
   const [peek, setPeek] = useState<RoomPeekResponse | null>(null)
   const [peekError, setPeekError] = useState<string | null>(null)
   const [name, setName] = useState(rememberedName())
+  const [avatar, setAvatar] = useState(rememberedAvatar)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -52,7 +53,8 @@ function JoinGate({ code, onSeated }: { code: string; onSeated: (session: Stored
     setBusy(true)
     setError(null)
     try {
-      const response = await api.joinRoom(code, name.trim())
+      const response = await api.joinRoom(code, name.trim(), avatar)
+      rememberAvatar(avatar)
       onSeated(saveSession(response, name.trim()))
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Could not join.')
@@ -64,10 +66,12 @@ function JoinGate({ code, onSeated }: { code: string; onSeated: (session: Stored
     return (
       <Screen className="items-center pt-16 text-center">
         <Logo compact as="div" />
-        <div className="text-5xl" aria-hidden>🤷</div>
-        <p className="text-lg font-semibold">{peekError}</p>
-        <p className="text-sm text-muted">Rooms close a while after everyone leaves.</p>
-        <Button size="lg" onClick={() => { window.location.href = '/' }}>Start a new one</Button>
+        <Card color="tomato" soft padding="lg" tilt="left" className="flex flex-col items-center gap-3">
+          <div className="animate-float text-6xl" aria-hidden>🕳️</div>
+          <p className="font-display text-2xl font-extrabold">{peekError}</p>
+          <p className="text-ink-soft">Rooms close a while after everyone leaves.</p>
+        </Card>
+        <Button size="lg" icon="🏠" onClick={() => { window.location.href = '/' }}>Start a new one</Button>
       </Screen>
     )
   }
@@ -75,39 +79,55 @@ function JoinGate({ code, onSeated }: { code: string; onSeated: (session: Stored
   if (peek === null) return <Screen><Spinner label="Finding the room…" /></Screen>
 
   return (
-    <Screen className="pt-12">
-      <header className="flex flex-col items-center gap-2 text-center">
+    <Screen className="max-w-md pt-6">
+      <header className="flex items-center justify-between">
+        <button
+          type="button"
+          onClick={() => { window.location.href = '/' }}
+          className="min-h-11 font-display font-extrabold underline decoration-3 underline-offset-4"
+        >
+          ← FriendZone
+        </button>
         <Logo compact as="div" />
-        <h1 className="font-mono text-4xl font-bold tracking-[0.25em]">{code}</h1>
-        <p className="text-sm text-muted">
-          {peek.playerCount} {peek.playerCount === 1 ? 'person is' : 'people are'} in here playing {peek.gameName}
-        </p>
       </header>
 
-      <Card className="animate-rise flex flex-col gap-4">
+      <div className="flex flex-col items-center gap-3 text-center">
+        <p className="font-display text-lg font-bold">You&rsquo;re joining room</p>
+        <h1 className="-rotate-2 rounded-2xl border-4 border-ink bg-sun px-5 py-2 font-chunky text-4xl tracking-widest shadow-hard-lg">{code}</h1>
+        <Badge size="md">
+          👥 {peek.playerCount} {peek.playerCount === 1 ? 'person is' : 'people are'} in here playing {peek.gameName}
+        </Badge>
+      </div>
+
+      <Card padding="lg" className="animate-rise flex flex-col gap-5">
         {peek.joinable ? (
           <>
-            <label className="flex flex-col gap-2">
-              <span className="text-sm font-semibold text-muted">What&rsquo;s your name?</span>
-              <TextInput
-                autoFocus
-                value={name}
-                maxLength={20}
-                placeholder="Your name"
-                onChange={(e) => setName(e.target.value)}
-                onKeyDown={(e) => { if (e.key === 'Enter' && name.trim().length > 0) void join() }}
-              />
-            </label>
-            {error !== null && <p className="text-sm font-semibold text-rose-300">{error}</p>}
-            <Button size="lg" loading={busy} disabled={name.trim().length === 0} onClick={() => void join()}>
+            <div className="flex items-end gap-3">
+              <AvatarShuffle value={avatar} onShuffle={() => setAvatar(randomAvatar())} />
+              <label className="flex min-w-0 flex-1 flex-col gap-1.5">
+                <span className="font-display text-sm font-bold uppercase tracking-wide">What&rsquo;s your name?</span>
+                <TextInput
+                  autoFocus
+                  value={name}
+                  maxLength={20}
+                  placeholder="Your name"
+                  onChange={(e) => setName(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter' && name.trim().length > 0) void join() }}
+                />
+              </label>
+            </div>
+            <AvatarPicker value={avatar} onChange={setAvatar} />
+            {error !== null && <p className="animate-shake font-bold text-tomato">{error}</p>}
+            <Button size="xl" block icon="🚪" loading={busy} disabled={name.trim().length === 0} onClick={() => void join()}>
               Join room
             </Button>
           </>
         ) : (
           <div className="flex flex-col gap-3 text-center">
-            <p className="font-semibold">This game is already under way.</p>
-            <p className="text-sm text-muted">You can join when this round finishes — keep this page open.</p>
-            <Button variant="ghost" onClick={() => window.location.reload()}>Check again</Button>
+            <div className="text-5xl" aria-hidden>🎮</div>
+            <p className="font-display text-xl font-extrabold">This game is already under way.</p>
+            <p className="text-ink-soft">You can join when this round finishes — keep this page open.</p>
+            <Button variant="secondary" onClick={() => window.location.reload()}>Check again</Button>
           </div>
         )}
       </Card>
@@ -133,7 +153,7 @@ function ConnectedRoom({ session }: { session: StoredSession }) {
       <ConnectionBanner status={status} farewell={farewell} onReconnect={reconnectNow} />
 
       {error !== null && (
-        <div role="alert" className="animate-pop rounded-2xl border border-rose-400/30 bg-rose-500/15 px-4 py-3 text-sm font-semibold text-rose-100">
+        <div role="alert" className="animate-shake rounded-2xl border-3 border-ink bg-tomato px-4 py-3 font-display font-extrabold shadow-hard-sm">
           {error.message}
         </div>
       )}

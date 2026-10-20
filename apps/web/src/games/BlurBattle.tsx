@@ -36,7 +36,7 @@ export function BlurBattle({ connection, room }: GameProps) {
 
   return (
     <div className="flex flex-col gap-4">
-      <GameHeader connection={connection} room={room} label="🌀 Blur Battle" accent="bg-violet-400" />
+      <GameHeader connection={connection} room={room} label="🌀 Blur Battle" accent="bg-grape" />
       <BlurImage view={view} phase={phase ?? ''} />
       {phase === 'QUESTION' ? (
         <GuessBox connection={connection} view={view} room={room} />
@@ -64,7 +64,7 @@ function BlurImage({ view, phase }: { view: BlurView; phase: string }) {
   }, [view.imageUrl, loaded])
 
   return (
-    <div className="relative aspect-square w-full overflow-hidden rounded-3xl border border-white/10 bg-black/40">
+    <div className="relative aspect-square w-full overflow-hidden rounded-3xl border-4 border-ink bg-paper-deep shadow-hard-lg">
       {previous.current !== null && (
         <img src={previous.current} alt="" aria-hidden className="absolute inset-0 size-full object-cover" />
       )}
@@ -79,13 +79,13 @@ function BlurImage({ view, phase }: { view: BlurView; phase: string }) {
       )}
 
       {phase === 'QUESTION' && (
-        <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-2 bg-gradient-to-t from-black/70 to-transparent p-3">
-          <span className="rounded-full bg-black/50 px-2.5 py-1 text-xs font-semibold capitalize text-chalk">
+        <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-2 p-3">
+          <span className="min-w-0 -rotate-2 truncate rounded-full border-2 border-ink bg-sun px-3 py-1 font-display text-xs font-extrabold capitalize text-ink shadow-hard-sm empty:invisible">
             {view.category ?? ''}
           </span>
-          <div className="flex gap-1" aria-label={`Clarity ${view.stageIndex + 1} of ${view.stageCount}`}>
+          <div className="flex shrink-0 gap-1 rounded-full border-2 border-ink bg-white px-2 py-1.5 shadow-hard-sm" aria-label={`Clarity ${view.stageIndex + 1} of ${view.stageCount}`}>
             {Array.from({ length: view.stageCount }, (_, i) => (
-              <span key={i} className={`h-1.5 w-5 rounded-full ${i <= view.stageIndex ? 'bg-violet-300' : 'bg-white/25'}`} />
+              <span key={i} className={`h-2.5 w-4 rounded-full border-2 border-ink ${i <= view.stageIndex ? 'bg-grape' : 'bg-white'}`} />
             ))}
           </div>
         </div>
@@ -130,7 +130,7 @@ function GuessBox({ connection, view, room }: { connection: GameProps['connectio
           <Button onClick={submit} disabled={guess.trim().length === 0}>Guess</Button>
         </div>
       )}
-      <p className="text-center text-xs text-muted">One guess each — the earlier it lands, the more it pays.</p>
+      <p className="text-center text-xs font-medium text-ink-soft">One guess each — the earlier it lands, the more it pays.</p>
       <AnsweredRow players={room.players} answeredIds={view.answeredPlayerIds} />
     </div>
   )
@@ -139,22 +139,25 @@ function GuessBox({ connection, view, room }: { connection: GameProps['connectio
 function RevealPanel({ view, room }: { view: BlurView; room: PublicRoomView }) {
   return (
     <div className="flex flex-col gap-4">
-      <div className="animate-pop text-center">
-        <p className="text-sm font-semibold text-muted">It was</p>
-        <p className="text-3xl font-extrabold">{view.answer}</p>
+      <div className="flex animate-pop flex-col items-center gap-1 rotate-1 rounded-3xl border-3 border-ink bg-lime px-5 py-5 text-center shadow-hard-lg">
+        <p className="rounded-full border-2 border-ink bg-white px-3 py-0.5 font-display text-xs font-extrabold uppercase tracking-wider">It was</p>
+        <p className="max-w-full break-words font-display text-3xl font-extrabold leading-tight sm:text-4xl">{view.answer}</p>
         <Attribution value={view.attribution} />
       </div>
 
       {(view.results ?? []).length > 0 && (
-        <Card className="flex flex-col gap-2">
+        <Card padding="sm" className="flex flex-col gap-2 px-4">
           {(view.results ?? []).map((result) => (
-            <div key={result.playerId} className="flex items-center gap-2 text-sm">
-              <span className={result.correct ? 'text-emerald-300' : 'text-rose-300'} aria-hidden>
+            <div key={result.playerId} className="flex min-w-0 items-center gap-2 text-sm">
+              <span
+                className={`grid size-6 shrink-0 place-items-center rounded-full border-2 border-ink text-xs font-extrabold ${result.correct ? 'bg-lime' : 'bg-tomato'}`}
+                aria-hidden
+              >
                 {result.correct ? '✓' : '✗'}
               </span>
               <PlayerName room={room} playerId={result.playerId} />
-              <span className="min-w-0 flex-1 truncate text-muted">“{result.guess}”</span>
-              {result.correct && <span className="tabular font-bold text-emerald-300">+{result.points}</span>}
+              <span className="min-w-0 flex-1 truncate text-ink-soft">“{result.guess}”</span>
+              {result.correct && <span className="tabular shrink-0 rounded-full border-2 border-ink bg-lime px-2 py-0.5 font-display text-xs font-extrabold">+{result.points}</span>}
             </div>
           ))}
         </Card>
@@ -169,9 +172,9 @@ export function BlurBattleEpilogue({ room }: { room: PublicRoomView }) {
   const view = readView<BlurView>(room)
   if (view.answer === undefined) return null
   return (
-    <Card className="flex flex-col gap-2 text-center">
-      <p className="text-xs font-bold uppercase tracking-wider text-muted">Last image</p>
-      <p className="text-lg font-bold">{view.answer}</p>
+    <Card color="grape" soft tilt="left" className="flex flex-col items-center gap-2 text-center">
+      <p className="rounded-full border-2 border-ink bg-white px-3 py-0.5 font-display text-xs font-extrabold uppercase tracking-wider">Last image</p>
+      <p className="max-w-full break-words font-display text-xl font-extrabold">{view.answer}</p>
       <Attribution value={view.attribution} />
     </Card>
   )

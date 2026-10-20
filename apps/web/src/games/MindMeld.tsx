@@ -44,12 +44,12 @@ export function MindMeld({ connection, room }: GameProps) {
 
   return (
     <div className="flex flex-col gap-4">
-      <GameHeader connection={connection} room={room} label="🧠 Mind Meld" accent="bg-emerald-400" />
+      <GameHeader connection={connection} room={room} label="🧠 Mind Meld" accent="bg-lime" />
 
-      <Card className="flex flex-col gap-2 py-7 text-center">
-        <p className="text-2xl font-bold leading-snug">{view.prompt}</p>
+      <Card color="sun" tilt="left" shadow="lg" className="animate-pop flex flex-col items-center gap-3 px-5 py-8 text-center">
+        <p className="max-w-full break-words font-display text-2xl font-extrabold leading-tight sm:text-3xl">{view.prompt}</p>
         {view.authorId !== undefined && (
-          <p className="text-xs text-muted">
+          <p className="max-w-full rounded-full border-2 border-ink bg-white px-3 py-1 text-xs font-semibold text-ink">
             ✍️ Asked by <PlayerName room={room} playerId={view.authorId} />
           </p>
         )}
@@ -88,11 +88,11 @@ function Collecting({ connection, view, room }: { connection: GameProps['connect
 
   return (
     <div className="flex flex-col gap-4">
-      <GameHeader connection={connection} room={room} label="🧠 Mind Meld" accent="bg-emerald-400" />
+      <GameHeader connection={connection} room={room} label="🧠 Mind Meld" accent="bg-lime" />
 
-      <Card className="flex flex-col gap-1 py-6 text-center">
-        <p className="text-xl font-bold">Write a question for the table</p>
-        <p className="text-sm text-muted">
+      <Card color="grape" soft tilt="right" shadow="lg" className="flex flex-col gap-2 py-6 text-center">
+        <p className="font-display text-xl font-extrabold leading-tight sm:text-2xl">Write a question for the table</p>
+        <p className="text-sm font-medium text-ink-soft">
           One with an obvious answer — &ldquo;Name a fruit that&rsquo;s yellow&rdquo;. It gets mixed in with the rest.
         </p>
       </Card>
@@ -113,11 +113,11 @@ function Collecting({ connection, view, room }: { connection: GameProps['connect
       </div>
 
       {sent !== undefined && (
-        <p className="animate-pop text-center text-sm">
-          You asked <span className="font-bold text-emerald-300">{sent}</span>
+        <p className="animate-pop break-words text-center text-sm font-medium">
+          You asked <span className="rounded-lg border-2 border-ink bg-lime px-1.5 font-display font-extrabold [box-decoration-break:clone]">{sent}</span>
         </p>
       )}
-      <p className="text-center text-xs text-muted">Nobody sees your question until it comes up.</p>
+      <p className="text-center text-xs font-medium text-ink-soft">Nobody sees your question until it comes up.</p>
       <AnsweredRow players={room.players} answeredIds={view.submittedPlayerIds ?? []} />
 
       {isHost && (
@@ -158,11 +158,11 @@ function Answering({ connection, view, room }: { connection: GameProps['connecti
       </div>
 
       {submitted !== undefined && (
-        <p className="animate-pop text-center text-sm">
-          You said <span className="font-bold text-emerald-300">{submitted}</span>
+        <p className="animate-pop break-words text-center text-sm font-medium">
+          You said <span className="rounded-lg border-2 border-ink bg-lime px-1.5 font-display font-extrabold [box-decoration-break:clone]">{submitted}</span>
         </p>
       )}
-      <p className="text-center text-xs text-muted">Nobody can see anybody&rsquo;s answer until the clock stops.</p>
+      <p className="text-center text-xs font-medium text-ink-soft">Nobody can see anybody&rsquo;s answer until the clock stops.</p>
       <AnsweredRow players={room.players} answeredIds={view.answeredPlayerIds} />
     </div>
   )
@@ -210,23 +210,23 @@ function Groups({
           const body = (
             <>
               <div className="flex items-baseline justify-between gap-3" style={{ animationDelay: `${index * 60}ms` }}>
-                <p className="flex min-w-0 items-baseline gap-2 text-lg font-bold">
+                <p className="flex min-w-0 items-center gap-2 font-display text-lg font-extrabold">
                   {selected && (
-                    <span className="shrink-0 rounded-full bg-violet-500 px-2 text-xs leading-5 text-white" aria-hidden>
+                    <span className="grid size-6 shrink-0 animate-pop place-items-center rounded-full border-2 border-ink bg-grape text-xs leading-none text-ink" aria-hidden>
                       {order + 1}
                     </span>
                   )}
                   <span className="truncate">{group.label}</span>
                 </p>
                 {group.points > 0 ? (
-                  <span className="tabular shrink-0 font-bold text-emerald-300">+{group.points}</span>
+                  <span className="tabular shrink-0 -rotate-3 rounded-full border-2 border-ink bg-sun px-2.5 py-0.5 font-chunky text-sm shadow-hard-sm">+{group.points}</span>
                 ) : (
-                  <span className="shrink-0 text-xs font-semibold text-muted">alone</span>
+                  <span className="shrink-0 rounded-full border-2 border-ink bg-paper-deep px-2 py-0.5 text-xs font-bold text-ink-soft">alone</span>
                 )}
               </div>
               <div className="flex flex-wrap gap-1.5">
                 {group.playerIds.map((id) => (
-                  <span key={id} className="rounded-full bg-white/8 px-2.5 py-1 text-xs">
+                  <span key={id} className="max-w-full truncate rounded-full border-2 border-ink bg-white px-2.5 py-1 text-xs">
                     <PlayerName room={room} playerId={id} />
                   </span>
                 ))}
@@ -234,11 +234,16 @@ function Groups({
             </>
           )
 
-          const tone = matched ? 'border-emerald-400/40 bg-emerald-500/10' : ''
           if (!canRegroup) {
             // Staggered so the big matches land first and it reads as a reveal.
             return (
-              <Card key={group.key} className={`animate-rise flex flex-col gap-2 ${tone}`}>
+              <Card
+                key={group.key}
+                color={matched ? 'lime' : 'white'}
+                padding="sm"
+                shadow={matched ? 'md' : 'sm'}
+                className="animate-rise flex flex-col gap-2 rounded-2xl px-4"
+              >
                 {body}
               </Card>
             )
@@ -250,22 +255,22 @@ function Groups({
               aria-pressed={selected}
               aria-label={`${group.label}, ${group.playerIds.length} ${group.playerIds.length === 1 ? 'player' : 'players'}`}
               onClick={() => toggle(group.key)}
-              className={`card animate-rise flex flex-col gap-2 p-4 text-left transition ${tone} ${
-                selected ? 'ring-2 ring-violet-400' : ''
-              }`}
+              className={`animate-rise flex min-h-11 flex-col gap-2 rounded-2xl border-3 border-ink px-4 py-3 text-left transition-[transform,box-shadow] duration-100 active:translate-x-[3px] active:translate-y-[3px] active:shadow-none ${
+                matched ? 'bg-lime' : 'bg-white'
+              } ${selected ? 'shadow-hard-lg ring-4 ring-grape ring-offset-2 ring-offset-paper' : 'shadow-hard'}`}
             >
               {body}
             </button>
           )
         })}
-        {groups.length === 0 && <p className="py-6 text-center text-sm text-muted">Nobody answered in time.</p>}
+        {groups.length === 0 && <p className="rounded-2xl border-3 border-dashed border-ink bg-white py-6 text-center font-display text-sm font-bold text-ink-soft">Nobody answered in time.</p>}
       </div>
 
       {/* The machine folds "phone" and "mobile" together on its own; this is
           for everything it cannot know — an inside joke, a word in another
           language, two spellings nobody has written down. */}
       {canRegroup && groups.length > 1 && (
-        <p className="text-center text-xs text-muted">
+        <p className="text-center text-xs font-semibold text-ink-soft">
           {picked.length === 0
             ? 'Tap two answers that meant the same thing to join them.'
             : picked.length === 1
@@ -275,7 +280,7 @@ function Groups({
       )}
 
       {view.merged === true && !canRegroup && (
-        <p className="text-center text-xs text-muted">{hostName} joined some of these answers.</p>
+        <p className="text-center text-xs font-semibold text-ink-soft">{hostName} joined some of these answers.</p>
       )}
 
       <Scoreboard entries={room.scoreboard} viewerId={room.viewerId} showDeltas compact />
@@ -305,7 +310,7 @@ function Groups({
               </Button>
             </>
           ) : (
-            <p className="py-2 text-center text-sm text-muted">
+            <p className="rounded-full border-2 border-ink bg-sun-soft px-4 py-2 text-center text-sm font-semibold shadow-hard-sm">
               Talk it over — {hostName} moves it on when you&rsquo;re done.
             </p>
           )}
