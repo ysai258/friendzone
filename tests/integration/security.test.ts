@@ -192,6 +192,38 @@ describe('input handling', () => {
   })
 })
 
+describe('avatars', () => {
+  async function post(url: string, body: unknown): Promise<Response> {
+    return fetch(url, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) })
+  }
+
+  it('seats a player with the face they picked, and lets a rejoin change it', async () => {
+    const s = await server()
+    const created = (await (await post(`${s.httpUrl}/api/rooms`, { name: 'Host', avatar: '🍕' })).json()) as { roomCode: string; token: string }
+    const joined = (await (await post(`${s.httpUrl}/api/rooms/${created.roomCode}/join`, { name: 'Guest', avatar: '🦖' })).json()) as { token: string }
+
+    const watcher = await TestClient.join(s.httpUrl, s.wsUrl, created.roomCode, 'Watcher')
+    await watcher.connect()
+    clients.push(watcher)
+    const faceOf = (name: string) => watcher.room!.players.find((p) => p.name === name)?.avatar
+    expect(faceOf('Host')).toBe('🍕')
+    expect(faceOf('Guest')).toBe('🦖')
+
+    const rejoin = await post(`${s.httpUrl}/api/rooms/${created.roomCode}/join`, { name: 'Guest', avatar: '🧋', token: joined.token })
+    expect(rejoin.status).toBe(200)
+    await watcher.waitForRoom((room) => room.players.find((p) => p.name === 'Guest')?.avatar === '🧋')
+  })
+
+  it('refuses a face that is not on the list', async () => {
+    const s = await server()
+    for (const avatar of ['hello', '🍕🍕🍕', '<script>']) {
+      const response = await post(`${s.httpUrl}/api/rooms`, { name: 'Host', avatar })
+      expect(response.status).toBe(400)
+      expect(((await response.json()) as { error: { code: string } }).error.code).toBe('VALIDATION_FAILED')
+    }
+  })
+})
+
 describe('rate limiting', () => {
   it('throttles room creation from one address', async () => {
     const s = await server({ env: { RL_ROOM_CREATE: '3:0' } })

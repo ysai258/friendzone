@@ -1,4 +1,4 @@
-import type { SessionResponse } from '@friendzone/shared'
+import { isAvatar, randomAvatar, type SessionResponse } from '@friendzone/shared'
 
 /**
  * Who this browser is, per room.
@@ -13,6 +13,7 @@ import type { SessionResponse } from '@friendzone/shared'
  */
 const PREFIX = 'friendzone:session:'
 const NAME_KEY = 'friendzone:name'
+const AVATAR_KEY = 'friendzone:avatar'
 
 export interface StoredSession {
   roomCode: string
@@ -71,5 +72,24 @@ export function rememberedName(): string {
     return localStorage.getItem(NAME_KEY) ?? ''
   } catch {
     return ''
+  }
+}
+
+/** The last face this person picked, or a random one the first time. */
+export function rememberedAvatar(): string {
+  try {
+    const saved = localStorage.getItem(AVATAR_KEY)
+    if (saved !== null && isAvatar(saved)) return saved
+  } catch {
+    // Fall through to a fresh pick.
+  }
+  return randomAvatar()
+}
+
+export function rememberAvatar(avatar: string): void {
+  try {
+    localStorage.setItem(AVATAR_KEY, avatar)
+  } catch {
+    // Only costs a re-pick next time.
   }
 }

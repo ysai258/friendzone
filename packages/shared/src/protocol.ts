@@ -2,6 +2,7 @@ import { z } from 'zod'
 import type { PlayerId, RoomCode } from './ids.ts'
 import type { PublicRoomView } from './room.ts'
 import type { WireError } from './errors.ts'
+import { isAvatar } from './avatars.ts'
 
 /** Bumped when a change to these shapes is not backward compatible. A client
  *  holding an older version is told to reload rather than fed a payload it
@@ -173,9 +174,13 @@ export type ByeReason = (typeof BYE_REASONS)[number]
 // HTTP
 // ---------------------------------------------------------------------------
 
+/** One of the offered faces. Anything else is refused rather than stored. */
+export const avatarSchema = z.string().refine(isAvatar, { message: 'unknown avatar' })
+
 export const createRoomRequestSchema = z.strictObject({
   name: displayNameSchema,
   gameId: z.string().min(1).max(40).optional(),
+  avatar: avatarSchema.optional(),
 })
 
 export const joinRoomRequestSchema = z.strictObject({
@@ -183,6 +188,7 @@ export const joinRoomRequestSchema = z.strictObject({
   /** Present when this browser already holds a session for the room, which turns
    *  the join into a rejoin instead of creating a second seat. */
   token: z.string().min(8).max(512).optional(),
+  avatar: avatarSchema.optional(),
 })
 
 export interface SessionResponse {

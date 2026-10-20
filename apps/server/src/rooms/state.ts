@@ -67,13 +67,13 @@ export const ACTION_MEMORY = 256
 // Players and presence
 // ---------------------------------------------------------------------------
 
-export function addPlayer(room: RoomRecord, playerId: PlayerId, name: string, now: number): RoomRecord {
+export function addPlayer(room: RoomRecord, playerId: PlayerId, name: string, now: number, avatar?: string): RoomRecord {
   const joinSeq = room.joinCounter + 1
   const player: Player = {
     id: playerId,
     name,
     joinSeq,
-    avatar: avatarFor(playerId),
+    avatar: avatar ?? avatarFor(playerId),
     presence: 'CONNECTED',
     joinedAt: now,
     lastSeenAt: now,
@@ -235,6 +235,7 @@ export function createRoom(args: {
   seed: string
   hostId: PlayerId
   hostName: string
+  hostAvatar?: string
   config: RoomConfig
   now: number
 }): RoomRecord {
@@ -257,7 +258,7 @@ export function createRoom(args: {
     sessionCount: 0,
     recentContent: {},
   }
-  return addPlayer(empty, args.hostId, args.hostName, args.now)
+  return addPlayer(empty, args.hostId, args.hostName, args.now, args.hostAvatar)
 }
 
 /** Back to the lobby with the same people and the same room code. */

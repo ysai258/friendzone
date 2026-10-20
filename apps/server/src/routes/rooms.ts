@@ -45,6 +45,7 @@ export function registerRoomRoutes(app: FastifyInstance, services: AppServices):
     const room = await service.createRoom({
       hostName: body.name,
       hostId: playerId,
+      ...(body.avatar === undefined ? {} : { hostAvatar: body.avatar }),
       ...(body.gameId === undefined ? {} : { gameId: body.gameId }),
     })
 
@@ -95,7 +96,13 @@ export function registerRoomRoutes(app: FastifyInstance, services: AppServices):
     }
 
     const newPlayerId = randomUUID()
-    const result = await service.join({ code, name: body.name, existingPlayerId, newPlayerId })
+    const result = await service.join({
+      code,
+      name: body.name,
+      ...(body.avatar === undefined ? {} : { avatar: body.avatar }),
+      existingPlayerId,
+      newPlayerId,
+    })
 
     const { token, session } = signer.issue(code, Date.now(), result.playerId)
     return reply.code(result.rejoined ? 200 : 201).send(

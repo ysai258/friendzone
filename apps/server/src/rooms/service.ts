@@ -116,7 +116,7 @@ export class RoomService {
   // Creation and joining
   // -------------------------------------------------------------------------
 
-  async createRoom(args: { hostName: string; gameId?: string; hostId: PlayerId }): Promise<RoomRecord> {
+  async createRoom(args: { hostName: string; hostAvatar?: string; gameId?: string; hostId: PlayerId }): Promise<RoomRecord> {
     const gameId = args.gameId ?? DEFAULT_GAME_ID
     if (!this.registry.has(gameId)) throw new AppError('UNKNOWN_GAME')
     const definition = this.registry.get(gameId)
@@ -136,6 +136,7 @@ export class RoomService {
         seed: randomSeed(),
         hostId: args.hostId,
         hostName: args.hostName,
+        ...(args.hostAvatar === undefined ? {} : { hostAvatar: args.hostAvatar }),
         config,
         now,
       })
@@ -163,7 +164,13 @@ export class RoomService {
    * seat instead of taking a second one. That is what makes a refresh mid-game
    * a non-event, and it is why the token is checked before the name.
    */
-  async join(args: { code: RoomCode; name: string; existingPlayerId: PlayerId | null; newPlayerId: PlayerId }): Promise<{
+  async join(args: {
+    code: RoomCode
+    name: string
+    avatar?: string
+    existingPlayerId: PlayerId | null
+    newPlayerId: PlayerId
+  }): Promise<{
     room: RoomRecord
     playerId: PlayerId
     rejoined: boolean
@@ -171,10 +178,11 @@ export class RoomService {
     const result = await this.transact(args.code, (room) => {
       const existing = args.existingPlayerId === null ? undefined : room.players[args.existingPlayerId]
       if (existing !== undefined) {
-        // Reclaiming a seat. Name changes are allowed; the score is not reset.
+        // Reclaiming a seat. Name and face changes are allowed; the score is not reset.
         const renamed = args.name === existing.name ? room : renamePlayer(room, existing.id, args.name)
+        const refaced = args.avatar === undefined ? renamed : changeAvatar(renamed, existing.id, args.avatar)
         return {
-          room: setPresence(renamed, existing.id, 'CONNECTED', this.now(), this.config.PLAYER_GRACE_SECONDS),
+          room: setPresence(refaced, existing.id, 'CONNECTED', this.now(), this.config.PLAYER_GRACE_SECONDS),
           events: [],
           value: { playerId: existing.id, rejoined: true },
         }
@@ -184,7 +192,7 @@ export class RoomService {
       if (seatCount(room) >= room.config.maxPlayers) throw new AppError('ROOM_FULL')
       if (nameTaken(room, args.name)) throw new AppError('NAME_TAKEN')
 
-      const joined = addPlayer(room, args.newPlayerId, args.name, this.now())
+      const joined = addPlayer(room, args.newPlayerId, args.name, this.now(), args.avatar)
       return {
         room: joined,
         events: [{ type: 'PLAYER_JOINED' as const, data: { playerId: args.newPlayerId, name: args.name } }],
@@ -701,6 +709,12 @@ function renamePlayer(room: RoomRecord, playerId: PlayerId, name: string): RoomR
   if (player === undefined) return room
   if (nameTaken(room, name) && player.name.toLocaleLowerCase() !== name.toLocaleLowerCase()) return room
   return { ...room, players: { ...room.players, [playerId]: { ...player, name } } }
+}
+
+function changeAvatar(room: RoomRecord, playerId: PlayerId, avatar: string): RoomRecord {
+  const player = room.players[playerId]
+  if (player === undefined || player.avatar === avatar) return room
+  return { ...room, players: { ...room.players, [playerId]: { ...player, avatar } } }
 }
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {

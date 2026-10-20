@@ -50,16 +50,16 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 export const api = {
-  createRoom: (name: string, gameId?: string) =>
+  createRoom: (name: string, avatar: string, gameId?: string) =>
     request<SessionResponse>('/api/rooms', {
       method: 'POST',
-      body: JSON.stringify(gameId === undefined ? { name } : { name, gameId }),
+      body: JSON.stringify(gameId === undefined ? { name, avatar } : { name, avatar, gameId }),
     }),
 
-  joinRoom: (code: string, name: string, token?: string) =>
+  joinRoom: (code: string, name: string, avatar: string, token?: string) =>
     request<SessionResponse>(`/api/rooms/${code}/join`, {
       method: 'POST',
-      body: JSON.stringify(token === undefined ? { name } : { name, token }),
+      body: JSON.stringify(token === undefined ? { name, avatar } : { name, avatar, token }),
     }),
 
   peekRoom: (code: string) => request<RoomPeekResponse>(`/api/rooms/${code}`),
