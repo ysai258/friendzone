@@ -134,8 +134,8 @@ recentContent: { emoji: ['te-baahubali', 'hi-3-idiots', …], identity: […] }
 `startGame` passes that list into `createGame`, and games draw with `pickFresh`,
 which prefers items the room has not seen and tops up stalest-first only when
 history has used up the pool. Afterwards the room records what the session
-actually dealt, via `usedContentIds`, capped per kind (60 films, 40 people, 80
-prompts, 30 mafia subjects).
+actually dealt, via `usedContentIds`, capped per kind (60 films, 40 people, 250
+prompts, 30 mafia subjects, 150 songs).
 
 Three properties fall out of putting the history on the room record rather than
 in a client, a session or a query:

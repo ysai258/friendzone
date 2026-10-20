@@ -66,6 +66,12 @@ export const THINK_MS = 6_000
 export const STAGE_POINTS = [1000, 800, 600, 400, 250] as const
 /** Right film, wrong song. Paid once a round. */
 export const MOVIE_POINTS = 100
+/**
+ * How a Mixed game is made up. The pool runs back to the 1950s, and a uniform
+ * draw would hand a room of twenty-somethings two songs older than their
+ * parents every game; mostly songs they know, with a classic or two, is the mix.
+ */
+export const MIXED_SHARE = { easy: 0.45, medium: 0.4, hard: 0.15 } as const
 
 type Phase = 'COUNTDOWN' | 'QUESTION' | 'REVEAL' | 'FINISHED'
 type GuessKind = 'correct' | 'movie' | 'wrong'
@@ -236,6 +242,38 @@ function toReveal(state: PaataState, at: number): Transition<PaataState> {
 
 // ---------------------------------------------------------------------------
 
+/**
+ * The guess box's list: every song in the pool, by title. The server also hands
+ * this out over HTTP (GET /api/songs), once per page, because at a thousand
+ * songs it is too big to ride along in every room update.
+ */
+export function songCatalog(pool: readonly SongQuestion[]): CatalogEntry[] {
+  return pool
+    .map((song) => ({ id: song.id, title: song.title, movie: song.movie, year: song.year, aliases: song.aliases }))
+    .sort((a, b) => a.title.localeCompare(b.title))
+}
+
+type DrawOptions = Parameters<typeof pickFresh>[1]
+
+/** One difficulty. A thin one widens to everything rather than play a short game. */
+function drawOne(pool: SongQuestion[], difficulty: SongQuestion['difficulty'], options: DrawOptions): SongQuestion[] {
+  const matching = pool.filter((song) => song.difficulty === difficulty)
+  return pickFresh(matching.length >= options.count ? matching : pool, options).items
+}
+
+/** Each difficulty's share of the game, then any shortfall from the rest of the pool. */
+function drawMixed(pool: SongQuestion[], options: DrawOptions): SongQuestion[] {
+  const drawn: SongQuestion[] = []
+  for (const [difficulty, share] of Object.entries(MIXED_SHARE)) {
+    const matching = pool.filter((song) => song.difficulty === difficulty)
+    drawn.push(...pickFresh(matching, { ...options, count: Math.round(options.count * share) }).items)
+  }
+  const taken = new Set(drawn.map((song) => song.id))
+  const rest = pool.filter((song) => !taken.has(song.id))
+  drawn.push(...pickFresh(rest, { ...options, count: Math.max(0, options.count - drawn.length) }).items)
+  return options.rng.shuffle(drawn.slice(0, options.count))
+}
+
 export const paataPattu: ErasedGameDefinition = defineGame<PaataState, PaataSettings>({
   id: 'paata-pattu',
   meta: {
@@ -265,21 +303,17 @@ export const paataPattu: ErasedGameDefinition = defineGame<PaataState, PaataSett
     const pool = expectItems(ctx.content, 'song')
     const rng = createRng(ctx.seed, 'paata-pattu', ctx.sessionId)
 
-    const byDifficulty =
-      ctx.settings.difficulty === 'mixed' ? pool : pool.filter((song) => song.difficulty === ctx.settings.difficulty)
-    // A thin difficulty widens to everything rather than playing a short game.
-    const eligible = byDifficulty.length >= ctx.settings.songs ? byDifficulty : pool
-    const drawn = pickFresh(eligible, { count: ctx.settings.songs, recentIds: ctx.recentContentIds, rng })
+    const options = { count: ctx.settings.songs, recentIds: ctx.recentContentIds, rng }
+    const drawn =
+      ctx.settings.difficulty === 'mixed' ? drawMixed(pool, options) : drawOne(pool, ctx.settings.difficulty, options)
 
-    const catalog: CatalogEntry[] = pool
-      .map((song) => ({ id: song.id, title: song.title, movie: song.movie, year: song.year, aliases: song.aliases }))
-      .sort((a, b) => a.title.localeCompare(b.title))
+    const catalog = songCatalog(pool)
 
     return {
       sessionId: ctx.sessionId,
       phase: 'COUNTDOWN',
       roundIndex: 0,
-      songs: drawn.items,
+      songs: drawn,
       catalog,
       phaseStartedAt: ctx.now,
       phaseEndsAt: ctx.now + COUNTDOWN_MS,
@@ -309,7 +343,10 @@ export const paataPattu: ErasedGameDefinition = defineGame<PaataState, PaataSett
     // it cannot spend this clue's guess.
     if (mine.guesses.some((g) => g.trackId === trackId)) return noChange(state)
 
-    const sameFilm = picked.movie === song.movie && picked.year === song.year
+    // The year tells apart two films of one name (Adavi Ramudu, 1977 and 2004);
+    // a song whose year is unknown is taken at its film's word.
+    const sameFilm =
+      picked.movie === song.movie && (picked.year === null || song.year === null || picked.year === song.year)
     const kind: GuessKind =
       trackId === song.id ? 'correct' : sameFilm && !mine.guesses.some((g) => g.kind === 'movie') ? 'movie' : 'wrong'
     const guesses = [...mine.guesses, { trackId, stage: state.stage, at: ctx.now, kind }]
@@ -408,7 +445,6 @@ export const paataPattu: ErasedGameDefinition = defineGame<PaataState, PaataSett
       view['clip'] = { videoId: song.videoId, startOffsetMs: song.startOffsetMs }
     }
 
-    if (state.phase === 'QUESTION') view['catalog'] = state.catalog
 
     if (viewerId !== null) {
       const mine = roundFor(state, viewerId)

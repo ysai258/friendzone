@@ -9,6 +9,7 @@ import {
   type RoomPeekResponse,
   type SessionResponse,
 } from '@friendzone/shared'
+import { songCatalog } from '@friendzone/game-engine'
 import type { AppServices } from '../services.ts'
 
 /**
@@ -18,7 +19,7 @@ import type { AppServices } from '../services.ts'
  * can be retried without a connection lifecycle in the way.
  */
 export function registerRoomRoutes(app: FastifyInstance, services: AppServices): void {
-  const { service, signer, limiter, config, registry } = services
+  const { service, signer, limiter, config, registry, content } = services
 
   const sessionResponse = (args: {
     code: string
@@ -109,6 +110,17 @@ export function registerRoomRoutes(app: FastifyInstance, services: AppServices):
   })
 
   app.get('/api/games', () => registry.catalog().filter((g) => g.playable))
+
+  /**
+   * Paata Pattu's guess list. Every title in the pool, which is no secret: the
+   * game draws from all of it. Served here, once per page, because at a
+   * thousand songs it is far too big to repeat in every room update.
+   */
+  app.get('/api/songs', async (_request, reply) => {
+    const pack = await content.load({ kind: 'song', count: 0, difficulty: 'mixed', category: null })
+    void reply.header('cache-control', 'public, max-age=300')
+    return songCatalog(pack.items.flatMap((item) => (item.kind === 'song' ? [item] : [])))
+  })
 
   /** Lets a client seed its clock offset before any socket exists. */
   app.get('/api/time', () => ({ serverTime: Date.now() }))

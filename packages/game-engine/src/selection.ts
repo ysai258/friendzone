@@ -88,8 +88,8 @@ export function rememberUsed(
 export const RECENT_LIMITS: Record<ContentItem['kind'], number> = {
   emoji: 60,
   mafia: 30,
-  prompt: 80,
+  prompt: 250,
   identity: 40,
   image: 60,
-  song: 40,
+  song: 150,
 }

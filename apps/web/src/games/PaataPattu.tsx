@@ -1,20 +1,37 @@
 import clsx from 'clsx'
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import type { PublicRoomView } from '@friendzone/shared'
 import type { GameProps } from './index.tsx'
 import { Button, Card } from '../components/ui.tsx'
 import { Scoreboard } from '../components/Scoreboard.tsx'
+import { api, type SongCatalogEntry } from '../lib/api.ts'
 import { useYouTubeClip, type ClipStatus } from '../lib/youtubeClip.ts'
 import { Banner, Countdown, GameHeader, PlayerName, readView } from './shared.tsx'
 
 type GuessKind = 'correct' | 'movie' | 'wrong'
 
-interface CatalogEntry {
-  id: string
-  title: string
-  movie: string
-  year: number | null
-  aliases: string[]
+type CatalogEntry = SongCatalogEntry
+
+/**
+ * The guess list, fetched once per page and shared by every round. It is the
+ * whole song pool, so it comes over HTTP rather than in each room update.
+ */
+let catalogRequest: Promise<CatalogEntry[]> | null = null
+
+function useSongCatalog(): CatalogEntry[] {
+  const [catalog, setCatalog] = useState<CatalogEntry[]>([])
+  useEffect(() => {
+    let live = true
+    catalogRequest ??= api.songs().catch((error: unknown) => {
+      catalogRequest = null // let the next mount try again
+      throw error
+    })
+    catalogRequest.then((entries) => live && setCatalog(entries)).catch(() => undefined)
+    return () => {
+      live = false
+    }
+  }, [])
+  return catalog
 }
 
 interface Pick {
@@ -31,7 +48,6 @@ interface PaataView {
   board: Record<string, { solvedStage: number | null; place: number | null; misses: number; usedStage: boolean }>
   activeCount: number
   clip?: { videoId: string; startOffsetMs: number }
-  catalog?: CatalogEntry[]
   you?: { solvedStage: number | null; place: number | null; points: number; canGuess: boolean; guesses: Pick[] }
   answer?: { title: string; movie: string; year: number | null; youtubeUrl: string }
   results?: { playerId: string; solvedStage: number | null; place: number | null; points: number; picks: Pick[] }[]
@@ -41,6 +57,8 @@ const ORDINAL = ['1st', '2nd', '3rd']
 const ordinal = (place: number) => ORDINAL[place - 1] ?? `${place}th`
 
 export function PaataPattu({ connection, room }: GameProps) {
+  // Start loading the guess list during the countdown, not at the first clue.
+  useSongCatalog()
   const view = readView<PaataView>(room)
   const phase = room.game?.phase
 
@@ -305,10 +323,11 @@ function GuessPanel({ connection, view }: { connection: GameProps['connection'];
 
   const you = view.you
 
+  const catalog = useSongCatalog()
   // Search once per catalog, not per keystroke.
   const index = useMemo(
-    () => (view.catalog ?? []).map((entry) => ({ entry, haystack: normalize([entry.title, entry.movie, ...entry.aliases].join(' ')) })),
-    [view.catalog],
+    () => catalog.map((entry) => ({ entry, haystack: normalize([entry.title, entry.movie, ...entry.aliases].join(' ')) })),
+    [catalog],
   )
   const tried = useMemo(() => new Set((you?.guesses ?? []).map((g) => g.title)), [you?.guesses])
 

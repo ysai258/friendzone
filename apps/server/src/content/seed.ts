@@ -317,8 +317,13 @@ function answerFor(item: ContentItem): string {
     case 'image':
     case 'emoji':
     case 'mafia':
-    case 'song':
       return item.title
+    // Picked from a list rather than typed, and the list shows the film: two
+    // films each with a song called "Priyathama" are two different answers.
+    // The same song listed twice under two spellings of its film is not, and
+    // this still catches it.
+    case 'song':
+      return `${item.title} ${item.movie}`
     case 'identity':
       return item.name
     case 'prompt':

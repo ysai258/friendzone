@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { CLIP_SECONDS, MOVIE_POINTS, STAGE_POINTS, paataPattu, stageWindowMs } from '../paata-pattu.ts'
+import { CLIP_SECONDS, MIXED_SHARE, MOVIE_POINTS, STAGE_POINTS, paataPattu, songCatalog, stageWindowMs } from '../paata-pattu.ts'
 import { placementBonus } from '../../scoring.ts'
 import { packOf, players, settle, songQuestion, T0, turnCtx, viewCtx } from './helpers.ts'
 
@@ -147,6 +147,15 @@ describe('paata pattu / scoring', () => {
     expect(twice.scoreDeltas).toBeUndefined()
   })
 
+  it('a song whose year is unknown still counts as the same film', () => {
+    const content = packOf('song', 12)
+    content.items = content.items.map((_, i) => songQuestion(i + 1, { movie: 'Same Film', year: i % 2 === 0 ? 2001 : null }))
+    const state = intoQuestion({}, content)
+    const s = state as { catalog: { id: string; year: number | null }[] }
+    const other = s.catalog.find((entry) => entry.id !== answer(state).id && entry.year !== answer(state).year)!
+    expect(guess(state, 'p1', other.id, START + 500).scoreDeltas).toEqual({ p1: MOVIE_POINTS })
+  })
+
   it('a wrong pick from another film scores nothing', () => {
     const state = intoQuestion()
     expect(guess(state, 'p1', wrongId(state), START + 500).scoreDeltas).toBeUndefined()
@@ -175,9 +184,15 @@ describe('paata pattu / what each player sees', () => {
     expect(revealed.results![0]!.picks).toHaveLength(2)
   })
 
-  it('carries the catalog only while guessing, and it is the whole pool', () => {
-    expect(view(intoQuestion(), 'p1', START).catalog).toHaveLength(12)
-    expect(view(newGame(), 'p1', T0 + 100).catalog).toBeUndefined()
+  it('keeps the catalog out of the view; the page fetches it once over HTTP', () => {
+    expect(view(intoQuestion(), 'p1', START).catalog).toBeUndefined()
+  })
+
+  it('the catalog is the whole pool, titles only', () => {
+    const pool = packOf('song', 12).items as Parameters<typeof songCatalog>[0]
+    const catalog = songCatalog(pool)
+    expect(catalog).toHaveLength(12)
+    expect(JSON.stringify(catalog)).not.toContain('videoId')
   })
 })
 
@@ -185,6 +200,27 @@ describe('paata pattu / content', () => {
   it('draws the chosen difficulty when there is enough of it', () => {
     const state = newGame({ difficulty: 'hard' }) as { songs: { difficulty: string }[] }
     expect(state.songs.every((song) => song.difficulty === 'hard')).toBe(true)
+  })
+
+  it('a mixed game is mostly songs people know, with a classic or two', () => {
+    const content = packOf('song', 30)
+    content.items = content.items.map((_, i) =>
+      songQuestion(i + 1, { difficulty: (['easy', 'medium', 'hard'] as const)[i % 3]! }),
+    )
+    const state = newGame({ songs: 8 }, [], content) as { songs: { id: string; difficulty: string }[] }
+    const count = (d: string) => state.songs.filter((song) => song.difficulty === d).length
+    expect(state.songs).toHaveLength(8)
+    expect(new Set(state.songs.map((song) => song.id)).size).toBe(8)
+    expect(count('easy')).toBe(Math.round(8 * MIXED_SHARE.easy))
+    expect(count('medium')).toBe(Math.round(8 * MIXED_SHARE.medium))
+    expect(count('hard')).toBe(Math.round(8 * MIXED_SHARE.hard))
+  })
+
+  it('a mixed game tops up from elsewhere when a difficulty runs short', () => {
+    const content = packOf('song', 10)
+    content.items = content.items.map((_, i) => songQuestion(i + 1, { difficulty: 'medium' }))
+    const state = newGame({ songs: 8 }, [], content) as { songs: unknown[] }
+    expect(state.songs).toHaveLength(8)
   })
 
   it('widens to the whole pool rather than play a short game', () => {

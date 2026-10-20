@@ -14,10 +14,10 @@ data/seed/
   movies/tamil.json        48
   movies/malayalam.json    36
   mafia.json               90   Movie Mafia subjects with two clues each
-  prompts.json            221   Mind Meld, 17 themes
+  prompts.json           1261   Mind Meld, 17 themes
   identities.json         177   Who Am I?, 7 categories
   image-subjects.json      79   Blur Battle subjects; the pipeline does the rest
-  songs.json               87   Paata Pattu — Telugu songs and their YouTube clips
+  songs.json             1013   Paata Pattu — Telugu songs and their YouTube clips
 ```
 
 Each file is `{ "$comment": …, "items": [ … ] }`, and the movie files also
@@ -225,7 +225,38 @@ player, hidden off-screen so the video's title and thumbnail stay out of sight.
   "Yentha Sakkagunnave" for "Entha Sakkagunnave". Guesses are picked from the
   list, so aliases only help a player find the song; they are not typo rules.
 - **Difficulty** is how widely known the song is: `easy` is a recent
-  chartbuster, `hard` is a classic or a deep cut.
+  chartbuster, `hard` is a classic or a deep cut. A Mixed game is weighted
+  rather than uniform (`MIXED_SHARE`: 45% easy, 40% medium, 15% hard), because
+  the list runs back to the 1950s.
+- **`year`** is the film's year, or `null` when it is not known for sure. A
+  label's digital re-release carries its upload year (lots of 2014s on 80s
+  films), and a wrong year is worse than none: the "right movie" bonus matches
+  the film by name and, when both songs have one, by year.
+
+**Only songs a room will actually know.** The list is meant to be songs a
+Telugu crowd can name, not every track on an album. Candidates came from three
+places:
+- YouTube Music's own Telugu playlists ("'90s Tollywood", "Telugu Hits 2024",
+  "Presenting M. M. Keeravani" and some sixty more)
+- 186 Telugu playlists on Spotify
+- published best-of lists (Filmfare and Nandi award pages, JioSaavn decade
+  playlists, articles)
+
+A song stays only if it clears one of three bars:
+- its biggest YouTube upload has 10M views or more
+- it appears in at least 5 of those Spotify playlists
+- it appears on at least 2 of the published lists, which is what keeps the
+  classics whose uploads predate YouTube
+
+Each song was resolved to its Topic audio track, and the film and year come
+from that track's album. Remixes, lo-fi edits, instrumentals, devotional
+albums, composer compilations, non-film singles, and Tamil or Hindi originals
+under their own film names were dropped. Every track was checked through
+oEmbed. Difficulty follows the same numbers: `easy` is at least 50M views, at
+least 15 playlists, or at least 5 lists; `hard` is pre-1990 or a lower reach.
+To add a song by hand, give it the same test.
 
 The whole file is the guess box's catalog in every game, whatever difficulty
-the host picks, so the list of choices never narrows the answer.
+the host picks, so the list of choices never narrows the answer. At a thousand
+songs it is too big to repeat in every room update, so the browser fetches it
+once from `GET /api/songs` instead.

@@ -11,6 +11,7 @@ import { emojiMovie } from './games/emoji-movie.ts'
 import { mindMeld } from './games/mind-meld.ts'
 import { movieMafia } from './games/movie-mafia.ts'
 import { paataPattu } from './games/paata-pattu.ts'
+export { songCatalog, type CatalogEntry } from './games/paata-pattu.ts'
 
 export { blurBattle, whoAmI, emojiMovie, mindMeld, movieMafia, paataPattu }
 

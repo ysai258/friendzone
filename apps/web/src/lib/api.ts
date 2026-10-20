@@ -16,6 +16,14 @@ export class ApiError extends Error {
   }
 }
 
+export interface SongCatalogEntry {
+  id: string
+  title: string
+  movie: string
+  year: number | null
+  aliases: string[]
+}
+
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   let response: Response
   try {
@@ -57,6 +65,8 @@ export const api = {
   peekRoom: (code: string) => request<RoomPeekResponse>(`/api/rooms/${code}`),
 
   games: () => request<GameCatalogEntry[]>('/api/games'),
+
+  songs: () => request<SongCatalogEntry[]>('/api/songs'),
 
   time: () => request<{ serverTime: number }>('/api/time'),
 }
