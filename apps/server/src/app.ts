@@ -26,6 +26,8 @@ import { registerErrorHandler } from './errors.ts'
 import { registerRoomRoutes } from './routes/rooms.ts'
 import { registerHealthRoutes } from './routes/health.ts'
 import { registerAdminRoutes } from './routes/admin.ts'
+import { registerStatsRoutes } from './routes/stats.ts'
+import { RedisStatsStore, Stats } from './stats.ts'
 import { contentCounts, seedContent } from './content/seed.ts'
 import { resolveDataDir } from './content/data-dir.ts'
 import type { AppServices } from './services.ts'
@@ -81,6 +83,8 @@ export async function buildApp(options: BuildOptions = {}): Promise<BuiltApp> {
 
   const service = new RoomService({ store, registry: gameRegistry, content, config, logger })
   const scheduler = new Scheduler(service, store, logger, metrics, config.SCHEDULER_TICK_MS)
+  const stats = new Stats(new RedisStatsStore(redis.command, keys), logger)
+  service.observe((change) => stats.observe(change))
 
   let gateway: Gateway | null = null
 
@@ -99,6 +103,7 @@ export async function buildApp(options: BuildOptions = {}): Promise<BuiltApp> {
     limiter,
     service,
     scheduler,
+    stats,
     gateway: () => {
       if (gateway === null) throw new Error('gateway not initialised')
       return gateway
@@ -222,6 +227,7 @@ export async function buildApp(options: BuildOptions = {}): Promise<BuiltApp> {
   registerRoomRoutes(app, services)
   registerHealthRoutes(app, services)
   registerAdminRoutes(app, services)
+  registerStatsRoutes(app, services)
 
   app.get('/metrics', async (_request, reply) => {
     // Keep the gauges honest at scrape time rather than on every mutation.
@@ -247,6 +253,8 @@ export async function buildApp(options: BuildOptions = {}): Promise<BuiltApp> {
   })
 
   scheduler.start()
+  // The day's busiest moment: sample who is connected every few seconds.
+  stats.start(() => services.gateway().connectionCount)
 
   const shutdown = async (): Promise<void> => {
     services.shuttingDown = true
@@ -345,6 +353,7 @@ async function gracefulShutdown(app: FastifyInstance, services: AppServices, log
     logger.warn({ err: error }, 'shutdown: http close failed')
   }
 
+  await services.stats.stop()
   await services.redis.close().catch(() => undefined)
   await services.pool.end().catch(() => undefined)
   logger.info('shutdown: complete')

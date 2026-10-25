@@ -50,6 +50,7 @@ export function registerRoomRoutes(app: FastifyInstance, services: AppServices):
     })
 
     services.metrics.roomsCreated.inc()
+    services.stats.roomCreated()
     const { token, session } = signer.issue(room.code, Date.now(), playerId)
     return reply
       .code(201)

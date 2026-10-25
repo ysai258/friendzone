@@ -92,6 +92,7 @@ export class RoomService {
   private readonly logger: Logger
   private readonly now: () => number
   private publish: RoomPublisher = () => undefined
+  private readonly observers: RoomPublisher[] = []
 
   constructor(deps: RoomServiceDeps) {
     this.store = deps.store
@@ -105,6 +106,15 @@ export class RoomService {
   /** The gateway installs itself here so state can be fanned out after a write. */
   onChange(publisher: RoomPublisher): void {
     this.publish = publisher
+  }
+
+  /**
+   * Watch committed changes without taking part in fan-out — play statistics
+   * listen here. Called once per successful write, after publishing; a
+   * listener that throws is logged and never fails the write.
+   */
+  observe(listener: RoomPublisher): void {
+    this.observers.push(listener)
   }
 
   definitionFor(room: RoomRecord): ErasedGameDefinition | null {
@@ -565,7 +575,15 @@ export class RoomService {
 
     if (result === null) return null
 
-    this.publish({ room: result.room, version: result.version, events: result.value.events })
+    const change = { room: result.room, version: result.version, events: result.value.events }
+    this.publish(change)
+    for (const observer of this.observers) {
+      try {
+        observer(change)
+      } catch (error) {
+        this.logger.warn({ err: error, roomCode: code }, 'room change observer failed')
+      }
+    }
 
     return { room: result.room, version: result.version, value: result.value.value }
   }

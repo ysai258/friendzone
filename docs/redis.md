@@ -10,10 +10,14 @@
 | `fz:chan:room:{CODE}` | pub/sub | state updates between instances | transient |
 | `fz:rl:{bucket}:{subject}` | hash | token bucket | TTL long enough to refill from empty |
 | `fz:bull:*` | BullMQ | background job queues | managed by BullMQ |
+| `fz:stats:day:{YYYY-MM-DD}` | hash | play counts for one India-time day (`/stats`) | 400 days |
+| `fz:stats:peak:{YYYY-MM-DD}` | zset | the day's most people online at once | 400 days |
+| `fz:stats:online` | hash | instance → connected sockets, for "online now" | entries older than 20 s dropped |
 
 Redis is the source of truth for anything happening *now*. It is not being used
 as a substitute for Postgres: nothing durable lives only here, and losing the
-whole keyspace costs the parties currently in progress and nothing else.
+whole keyspace costs the parties currently in progress and the `/stats`
+history, nothing else.
 
 ## Three Lua scripts
 

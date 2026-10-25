@@ -12,6 +12,7 @@ import type { RoomStore } from './rooms/store.ts'
 import type { SessionSigner } from './rooms/session.ts'
 import type { Scheduler } from './rooms/scheduler.ts'
 import type { Gateway } from './ws/gateway.ts'
+import type { Stats } from './stats.ts'
 
 /**
  * Everything wired together, passed explicitly rather than reached for through
@@ -35,6 +36,7 @@ export interface AppServices {
   limiter: RateLimiter
   service: RoomService
   scheduler: Scheduler
+  stats: Stats
 
   /** Lazily resolved: the gateway needs the service, which is built first. */
   gateway: () => Gateway

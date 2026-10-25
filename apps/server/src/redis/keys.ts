@@ -33,6 +33,21 @@ export class RedisKeys {
     return `${this.prefix}:rl:${bucket}:${subject}`
   }
 
+  /** HASH counter -> n: one India-time day of play statistics. Counts only. */
+  statsDay(date: string): string {
+    return `${this.prefix}:stats:day:${date}`
+  }
+
+  /** ZSET { online: peak }: the day's busiest moment. A ZSET for ZADD GT. */
+  statsPeak(date: string): string {
+    return `${this.prefix}:stats:peak:${date}`
+  }
+
+  /** HASH instanceId -> "count:reportedAt": who is connected right now, per instance. */
+  get statsOnline(): string {
+    return `${this.prefix}:stats:online`
+  }
+
   /** STRING counter, for "rooms created today"-style metrics. */
   counter(name: string): string {
     return `${this.prefix}:count:${name}`

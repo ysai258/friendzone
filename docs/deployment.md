@@ -199,6 +199,7 @@ must exceed the 15-second heartbeat — 60 seconds or more.
 | `/health` | **Liveness.** Touches nothing external. A liveness probe that checked the database would restart every healthy instance during a database blip. |
 | `/ready` | **Readiness.** Checks Redis and Postgres, reports content counts, and fails with `draining` during shutdown so the load balancer stops sending new players first. |
 | `/metrics` | Prometheus. Not authenticated; put it behind your network policy. |
+| `/stats?days=14` | **Play statistics**, public. Rooms created, players, games started and finished (and by game), and the peak online, per India-time day; plus people online and rooms live now. Counts only: no names, IPs, room codes or player ids. Kept in Redis, so on the free Key Value plan a restart of that instance resets the history. |
 
 ## Rolling deploys
 
